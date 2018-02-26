@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "D:/repo/pvz_build/debug/pvz.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "D:/repo/pvz_build/debug",
+            "environment": [],
+            "externalConsole": true,
+            "preLaunchTask": "Build"
+        }
+    ]
+}
