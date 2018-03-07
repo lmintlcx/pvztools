@@ -873,12 +873,12 @@ MainWindow::MainWindow()
     check_box_slots_imitater = new QCheckBox(page_slots);
     check_box_slots_imitater->setText(tr("Imitater"));
 
-    check_box_slots_belt_no_delay = new QCheckBox(page_slots);
-    check_box_slots_belt_no_delay->setText(tr("Belt No Delay"));
     check_box_slots_purple_seed_unlimited = new QCheckBox(page_slots);
     check_box_slots_purple_seed_unlimited->setText(tr("Purple Seed Unlimited"));
     check_box_planting_freely = new QCheckBox(page_slots);
     check_box_planting_freely->setText(tr("Planting Freely"));
+    check_box_slots_belt_no_delay = new QCheckBox(page_slots);
+    check_box_slots_belt_no_delay->setText(tr("Belt No Delay"));
     check_box_lock_shovel = new QCheckBox(page_slots);
     check_box_lock_shovel->setText(tr("Lock Shovel"));
 
@@ -928,9 +928,9 @@ MainWindow::MainWindow()
     layout_slots->addWidget(combo_box_slots_seed, 1, 1, 1, 1);
     layout_slots->addWidget(push_button_slots_set, 1, 2, 1, 1);
     layout_slots->addWidget(check_box_slots_imitater, 1, 3, 1, 1);
-    layout_slots->addWidget(check_box_slots_belt_no_delay, 2, 0, 1, 1);
-    layout_slots->addWidget(check_box_slots_purple_seed_unlimited, 2, 1, 1, 1);
-    layout_slots->addWidget(check_box_planting_freely, 2, 2, 1, 1);
+    layout_slots->addWidget(check_box_slots_purple_seed_unlimited, 2, 0, 1, 1);
+    layout_slots->addWidget(check_box_planting_freely, 2, 1, 1, 1);
+    layout_slots->addWidget(check_box_slots_belt_no_delay, 2, 2, 1, 1);
     layout_slots->addWidget(check_box_lock_shovel, 2, 3, 1, 1);
     layout_slots->addWidget(combo_box_seed, 3, 0, 1, 1);
     layout_slots->addWidget(check_box_ignore_sun, 4, 0, 1, 1);
@@ -1314,25 +1314,40 @@ MainWindow::MainWindow()
 
     label_name = new QLabel(page_about);
     label_name->setText(tr("PvZ Tools"));
-    label_name->setStyleSheet("QLabel { font-size: 27px; font-weight: bold; }");
     label_version = new QLabel(page_about);
-    label_version->setText(tr("Version 1.12.0.1277 (2018.02.26)"));
-    label_version->setStyleSheet("QLabel { font-size: 13px; }");
+    label_version->setText(tr("Version 1.12.1.1315 (2018.03.07)"));
     label_copy = new QLabel(page_about);
-    label_copy->setText(tr("Copyright (c) 2018 lmintlcx"));
-    label_copy->setStyleSheet("QLabel { font-size: 13px; }");
+    label_copy->setText(tr("Copyright (c) 2018 <a href='https://www.lmintlcx.com/'>lmintlcx</a>"));
 
     label_license = new QLabel(page_about);
     label_license->setText(tr("Based on PVZ Helper 1.8.7 / Build with Qt 5.6.3"));
     label_contact = new QLabel(page_about);
     label_contact->setText(tr("Contact: <a href='mailto:pvztools@lmintlcx.com'>pvztools@lmintlcx.com</a>"));
-    label_contact->setOpenExternalLinks(true);
     label_website = new QLabel(page_about);
     label_website->setText(tr("Website: <a href='https://github.com/lmintlcx/PvZTools'>https://github.com/lmintlcx/PvZTools</a>"));
-    label_website->setOpenExternalLinks(true);
 
+    push_button_font = new QPushButton(page_about);
+    push_button_font->setText(tr("Font"));
+    combo_box_font_size = new QComboBox(page_about);
+    combo_box_font_size->addItem(tr("Small"));
+    combo_box_font_size->addItem(tr("Medium"));
+    combo_box_font_size->addItem(tr("Large"));
+    combo_box_font_size->setCurrentIndex(0);
     push_button_find_game = new QPushButton(page_about);
     push_button_find_game->setText(tr("Find Game"));
+
+    // init font size and clickable
+    QFont font = QApplication::font();
+    font.setPointSize(21);
+    font.setBold(true);
+    label_name->setFont(font);
+    font.setPointSize(11);
+    font.setBold(false);
+    label_version->setFont(font);
+    label_copy->setFont(font);
+    label_copy->setOpenExternalLinks(true);
+    label_contact->setOpenExternalLinks(true);
+    label_website->setOpenExternalLinks(true);
 
     layout_about = new QGridLayout(page_about);
     layout_about->addWidget(label_logo, 0, 0, 3, 2);
@@ -1342,6 +1357,8 @@ MainWindow::MainWindow()
     layout_about->addWidget(label_license, 3, 0, 1, 6);
     layout_about->addWidget(label_contact, 4, 0, 1, 6);
     layout_about->addWidget(label_website, 5, 0, 1, 6);
+    layout_about->addWidget(push_button_font, 6, 0, 1, 1);
+    layout_about->addWidget(combo_box_font_size, 6, 1, 1, 1);
     layout_about->addWidget(push_button_find_game, 6, 4, 1, 2);
 
     for (int i = 0; i < layout_about->rowCount(); i++)
@@ -1950,16 +1967,16 @@ MainWindow::MainWindow()
         pvz->SetSlotsSeed(slot, type, imitater);
     });
 
-    connect(check_box_slots_belt_no_delay, &QCheckBox::stateChanged, pvz, [=](int state) {
-        pvz->BeltNoDelay((state == Qt::Checked) ? true : false);
-    });
-
     connect(check_box_slots_purple_seed_unlimited, &QCheckBox::stateChanged, pvz, [=](int state) {
         pvz->PurpleSeedUnlimited((state == Qt::Checked) ? true : false);
     });
 
     connect(check_box_planting_freely, &QCheckBox::stateChanged, pvz, [=](int state) {
         pvz->PlantingFreely((state == Qt::Checked) ? true : false);
+    });
+
+    connect(check_box_slots_belt_no_delay, &QCheckBox::stateChanged, pvz, [=](int state) {
+        pvz->BeltNoDelay((state == Qt::Checked) ? true : false);
     });
 
     connect(check_box_lock_shovel, &QCheckBox::stateChanged, pvz, [=](int state) {
@@ -2310,8 +2327,35 @@ MainWindow::MainWindow()
 
     // Page 10 : About
 
+    connect(push_button_font, &QPushButton::clicked, [=]() {
+        bool ok;
+        QFont font = QFontDialog::getFont(&ok, this);
+        if (ok)
+            QApplication::setFont(font);
+    });
+
+    connect(combo_box_font_size, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int index) {
+        int font_size;
+        switch (index)
+        {
+        case 0:
+            font_size = 9;
+            break;
+        case 1:
+            font_size = 10;
+            break;
+        case 2:
+            font_size = 11;
+            break;
+        }
+        QFont font = QApplication::font();
+        font.setPointSize(font_size);
+        QApplication::setFont(font);
+    });
+
     connect(push_button_find_game, &QPushButton::clicked, pvz, &PVZ::FindGame);
 
+    // ...
     thread->start();
 }
 

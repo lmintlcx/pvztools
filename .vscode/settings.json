@@ -69,7 +69,8 @@
         "xlocbuf": "cpp",
         "xlocmes": "cpp",
         "xlocmon": "cpp",
-        "xloctime": "cpp"
+        "xloctime": "cpp",
+        "qcoreapplication": "cpp"
     },
     "python.linting.enabled": false
 }

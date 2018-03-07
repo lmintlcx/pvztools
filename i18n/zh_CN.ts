@@ -5,7 +5,7 @@
     <name>MainWindow</name>
     <message>
         <location filename="../src/window.cpp" line="7"/>
-        <location filename="../src/window.cpp" line="2266"/>
+        <location filename="../src/window.cpp" line="2283"/>
         <source>Adventure</source>
         <translation>冒险模式</translation>
     </message>
@@ -1551,17 +1551,27 @@
         <translation>显示铲子</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="877"/>
+        <location filename="../src/window.cpp" line="881"/>
         <source>Belt No Delay</source>
         <translation>传送带无延迟</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="879"/>
+        <location filename="../src/window.cpp" line="1318"/>
+        <source>Version 1.12.1.1315 (2018.03.07)</source>
+        <translation>版本号 1.12.1.1315 (2018.03.07)</translation>
+    </message>
+    <message>
+        <location filename="../src/window.cpp" line="1320"/>
+        <source>Copyright (c) 2018 &lt;a href=&apos;https://www.lmintlcx.com/&apos;&gt;lmintlcx&lt;/a&gt;</source>
+        <translation>版权所有 (c) 2018 &lt;a href=&apos;https://www.lmintlcx.com/&apos;&gt;lmintlcx&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/window.cpp" line="877"/>
         <source>Purple Seed Unlimited</source>
         <translation>紫卡无限制</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="881"/>
+        <location filename="../src/window.cpp" line="879"/>
         <source>Planting Freely</source>
         <translation>自由种植</translation>
     </message>
@@ -1832,7 +1842,7 @@
     </message>
     <message>
         <location filename="../src/window.cpp" line="1171"/>
-        <location filename="../src/window.cpp" line="2192"/>
+        <location filename="../src/window.cpp" line="2209"/>
         <source>Open File</source>
         <translation>打开文件</translation>
     </message>
@@ -1843,7 +1853,7 @@
     </message>
     <message>
         <location filename="../src/window.cpp" line="1178"/>
-        <location filename="../src/window.cpp" line="2205"/>
+        <location filename="../src/window.cpp" line="2222"/>
         <source>Open Folder</source>
         <translation>打开目录</translation>
     </message>
@@ -1923,53 +1933,71 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1319"/>
         <source>Version 1.12.0.1275 (2018.02.25)</source>
-        <translation>版本号 1.12.0.1275 (2018.02.25)</translation>
+        <translation type="vanished">版本号 1.12.0.1275 (2018.02.25)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1322"/>
         <source>Copyright (c) 2018 lmintlcx</source>
-        <translation>版权所有 (c) 2018 lmintlcx</translation>
+        <translation type="vanished">版权所有 (c) 2018 lmintlcx</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1326"/>
+        <location filename="../src/window.cpp" line="1323"/>
         <source>Based on PVZ Helper 1.8.7 / Build with Qt 5.6.3</source>
         <translation>基于 PVZ Helper 和 Qt 开发</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1328"/>
+        <location filename="../src/window.cpp" line="1325"/>
         <source>Contact: &lt;a href=&apos;mailto:pvztools@lmintlcx.com&apos;&gt;pvztools@lmintlcx.com&lt;/a&gt;</source>
         <translation>联系: &lt;a href=&apos;mailto:pvztools@lmintlcx.com&apos;&gt;pvztools@lmintlcx.com&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1331"/>
+        <location filename="../src/window.cpp" line="1327"/>
         <source>Website: &lt;a href=&apos;https://github.com/lmintlcx/PvZTools&apos;&gt;https://github.com/lmintlcx/PvZTools&lt;/a&gt;</source>
         <translation>网站: &lt;a href=&apos;https://github.com/lmintlcx/PvZTools&apos;&gt;https://github.com/lmintlcx/PvZTools&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1335"/>
+        <location filename="../src/window.cpp" line="1330"/>
+        <source>Font</source>
+        <translation>字体</translation>
+    </message>
+    <message>
+        <location filename="../src/window.cpp" line="1332"/>
+        <source>Small</source>
+        <translation>较小</translation>
+    </message>
+    <message>
+        <location filename="../src/window.cpp" line="1333"/>
+        <source>Medium</source>
+        <translation>中等</translation>
+    </message>
+    <message>
+        <location filename="../src/window.cpp" line="1334"/>
+        <source>Large</source>
+        <translation>较大</translation>
+    </message>
+    <message>
+        <location filename="../src/window.cpp" line="1337"/>
         <source>Find Game</source>
         <translation>查找游戏</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="2194"/>
+        <location filename="../src/window.cpp" line="2211"/>
         <source>PAK files (*.pak) ;; All files (*.*)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="2333"/>
-        <location filename="../src/window.cpp" line="2341"/>
+        <location filename="../src/window.cpp" line="2377"/>
+        <location filename="../src/window.cpp" line="2385"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="2335"/>
+        <location filename="../src/window.cpp" line="2379"/>
         <source>Game Not Found!</source>
         <translation>没找到游戏!</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="2343"/>
+        <location filename="../src/window.cpp" line="2387"/>
         <source>Unsupported Game Version!</source>
         <translation>不支持的游戏版本!</translation>
     </message>
@@ -1978,21 +2006,21 @@
     <name>QObject</name>
     <message>
         <location filename="../src/main.cpp" line="26"/>
-        <source>PvZ Tools 1.12.0</source>
+        <source>PvZ Tools 1.12.1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="63"/>
+        <location filename="../src/main.cpp" line="62"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="65"/>
+        <location filename="../src/main.cpp" line="64"/>
         <source>This is a very old beta version.</source>
         <translation>这是一份非常旧的测试版本.</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="66"/>
+        <location filename="../src/main.cpp" line="65"/>
         <source>Check for updates &lt;a href=&apos;https://github.com/lmintlcx/PvZTools&apos;&gt;here&lt;/a&gt;.</source>
         <translation>请前往&lt;a href=&apos;https://github.com/lmintlcx/PvZTools&apos;&gt;这里&lt;/a&gt;下载新版本.</translation>
     </message>

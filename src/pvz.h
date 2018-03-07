@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <initializer_list>
 
 #include <windows.h>
 #include <shlwapi.h>
@@ -44,8 +45,8 @@ class PVZ : public QObject
     // Process
     void FindGame();
     bool GameOn();
-    // Read/Write Memory
-    // T = byte/short/int/float/double
+    // Read/Write Memory (considered abandoned)
+    // T = byte/bool/short/int/float/double
     template <typename T>
     T ReadMemory(ptr);
     template <typename T>
@@ -68,6 +69,11 @@ class PVZ : public QObject
     void WriteMemory(T, ptr, ptr, ptr, ptr, ptr);
     template <typename T>
     void WriteArrayMemory(T *, int, ptr);
+    // A New Way
+    template <typename T>
+    T ReadMemory(std::initializer_list<ptr>);
+    template <typename T>
+    void WriteMemory(T, std::initializer_list<ptr>);
     // Asm Inject Code
     void asm_init();
     void asm_add_byte(unsigned char);
@@ -149,9 +155,9 @@ class PVZ : public QObject
     void SetSlotsCount(int);
     void ShowShovel();
     void SetSlotsSeed(int, int, bool);
-    void BeltNoDelay(bool);
     void PurpleSeedUnlimited(bool);
     void PlantingFreely(bool);
+    void BeltNoDelay(bool);
     void LockShovel(bool);
     void IgnoreSun(bool);
     void SlotsNoCoolDown(bool);
@@ -341,4 +347,28 @@ inline void PVZ::WriteArrayMemory(T *data, int length, ptr addr)
 {
     for (int i = 0; i < length; i++)
         WriteMemory(data[i], addr + sizeof(T) * i);
+}
+
+template <typename T>
+inline T PVZ::ReadMemory(std::initializer_list<ptr> addr)
+{
+    T result = 0;
+    ptr buff = 0;
+    for (auto it = addr.begin(); it != addr.end(); it++)
+        if (it != addr.end() - 1)
+            ReadProcessMemory(handle, LPCVOID(buff + *it), &buff, sizeof(buff), nullptr);
+        else
+            ReadProcessMemory(handle, LPCVOID(buff + *it), &result, sizeof(result), nullptr);
+    return result;
+}
+
+template <typename T>
+inline void PVZ::WriteMemory(T value, std::initializer_list<ptr> addr)
+{
+    ptr buff = 0;
+    for (auto it = addr.begin(); it != addr.end(); it++)
+        if (it != addr.end() - 1)
+            ReadProcessMemory(handle, LPCVOID(buff + *it), &buff, sizeof(buff), nullptr);
+        else
+            WriteProcessMemory(handle, LPVOID(buff + *it), &value, sizeof(value), nullptr);
 }

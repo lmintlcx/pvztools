@@ -23,9 +23,8 @@
 
 int main(int argc, char *argv[])
 {
-    QString title = QObject::tr("PvZ Tools 1.12.0");
+    QString title = QObject::tr("PvZ Tools 1.12.1");
 
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication app(argc, argv);
 
     // font
@@ -54,7 +53,7 @@ int main(int argc, char *argv[])
         shared_memory.create(1);
 
     // date limit for test version
-    QDate date_build(2018, 2, 25);
+    QDate date_build(2018, 3, 7);
     QDate date_limit = date_build.addDays(90);
     QDate date_now = QDate::currentDate();
     if (false) // (date_limit < date_now)
@@ -75,10 +74,22 @@ int main(int argc, char *argv[])
     if (true) // (locale == "zh_CN")
         app.installTranslator(&tr_zh_CN);
 
+    // dpi scale
+    HDC screen = GetDC(nullptr);
+    int dpi_x = GetDeviceCaps(screen, LOGPIXELSX);
+    int dpi_y = GetDeviceCaps(screen, LOGPIXELSY);
+    ReleaseDC(nullptr, screen);
+    const float default_dpi = 96.0f;
+    float scale_x = dpi_x / default_dpi;
+    float scale_y = dpi_y / default_dpi;
+    int width = 580 * scale_x;
+    int height = 280 * scale_y;
+
+    // main window
     MainWindow *window = new MainWindow;
     window->setAttribute(Qt::WA_DeleteOnClose);
     window->setWindowTitle(title);
-    window->setFixedSize(560, 270);
+    window->setFixedSize(width, height);
     window->show();
 
     return app.exec();

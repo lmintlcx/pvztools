@@ -17,7 +17,9 @@
 #include <QSlider>
 #include <QTimer>
 #include <QFileDialog>
+#include <QFontDialog>
 #include <QCoreApplication>
+#include <QApplication>
 
 #include "src/pvz.h"
 
@@ -193,9 +195,9 @@ private:
   QComboBox *combo_box_slots_seed;
   QPushButton *push_button_slots_set;
   QCheckBox *check_box_slots_imitater;
-  QCheckBox *check_box_slots_belt_no_delay;
   QCheckBox *check_box_slots_purple_seed_unlimited;
   QCheckBox *check_box_planting_freely;
+  QCheckBox *check_box_slots_belt_no_delay;
   QCheckBox *check_box_lock_shovel;
   QComboBox *combo_box_seed;
   QCheckBox *check_box_ignore_sun;
@@ -318,5 +320,7 @@ private:
   QLabel *label_license;
   QLabel *label_contact;
   QLabel *label_website;
+  QPushButton *push_button_font;
+  QComboBox *combo_box_font_size;
   QPushButton *push_button_find_game;
 };

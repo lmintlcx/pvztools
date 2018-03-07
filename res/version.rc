@@ -11,8 +11,8 @@
 
 #define VERSION_MAJOR         1
 #define VERSION_MINOR         12
-#define VERSION_MAINTENANCE   0
-#define VERSION_BUILD         1278
+#define VERSION_MAINTENANCE   1
+#define VERSION_BUILD         1316
 
 #define TOSTRING_(arg) #arg
 #define TOSTRING(arg) TOSTRING_(arg)

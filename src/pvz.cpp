@@ -1388,23 +1388,6 @@ void PVZ::SetSlotsSeed(int index, int type, bool imitater)
     }
 }
 
-void PVZ::BeltNoDelay(bool on)
-{
-    if (GameOn())
-    {
-        if (on)
-        {
-            WriteMemory<byte>(0x80, 0x00422d20);
-            WriteMemory<byte>(0x33, 0x00489ca1);
-        }
-        else
-        {
-            WriteMemory<byte>(0x8f, 0x00422d20);
-            WriteMemory<byte>(0x85, 0x00489ca1);
-        }
-    }
-}
-
 void PVZ::PurpleSeedUnlimited(bool on)
 {
     if (GameOn())
@@ -1439,6 +1422,23 @@ void PVZ::PlantingFreely(bool on)
             WriteMemory<byte>(0x84, 0x0040fe30);
             WriteMemory<byte>(0x74, 0x00438e40);
             WriteMemory<byte>(0x84, 0x0042a2d9);
+        }
+    }
+}
+
+void PVZ::BeltNoDelay(bool on)
+{
+    if (GameOn())
+    {
+        if (on)
+        {
+            WriteMemory<byte>(0x80, 0x00422d20);
+            WriteMemory<byte>(0x33, 0x00489ca1);
+        }
+        else
+        {
+            WriteMemory<byte>(0x8f, 0x00422d20);
+            WriteMemory<byte>(0x85, 0x00489ca1);
         }
     }
 }
