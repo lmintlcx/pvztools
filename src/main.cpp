@@ -1,106 +1,33 @@
 
-#include <QApplication>
-#include <QTranslator>
-#include <QString>
-#include <QLocale>
-#include <QThread>
-#include <QDateTime>
-#include <QSharedMemory>
-#include <QMessageBox>
-#include <QDebug>
-#include <QFont>
-#include <QFontDatabase>
+#define EVERYTHING 42
 
-#include <iostream>
-#include <windows.h>
+#include <ctime>
+#include <random>
 
-#include "src/pvz.h"
+#include "src/application.h"
 #include "src/window.h"
 
-// #include <QtPlugin>
-// Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
-// Q_IMPORT_PLUGIN(QICOPlugin)
+// static_assert(sizeof(void *) == 4);
+
+using Pt::Application;
+using Pt::MainWindow;
 
 int main(int argc, char *argv[])
 {
-    QString title = QObject::tr("PvZ Tools 1.12.1");
+#ifdef _DEBUG
+    std::wcout.imbue(std::locale("chs"));
+#endif
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    QApplication app(argc, argv);
+    Application app(argc, argv);
+    if (app.isRunning())
+        return -1;
 
-    // font
-    QSysInfo::WinVersion wv = QSysInfo::windowsVersion();
-    if (wv == QSysInfo::WV_VISTA || wv == QSysInfo::WV_WINDOWS7 || wv == QSysInfo::WV_WINDOWS8 || wv == QSysInfo::WV_WINDOWS8_1 || wv == QSysInfo::WV_WINDOWS10)
-    {
-        QFont font = app.font();
-        font.setPointSize(9);
-        font.setFamily("Microsoft YaHei");
-        app.setFont(font);
-    }
+    MainWindow window;
+    QObject::connect(&app, &Application::ActivateWindow,
+                     &window, &MainWindow::ActivateWindow);
 
-    // single instance
-    QSharedMemory shared_memory;
-    shared_memory.setKey("42");
-    if (shared_memory.attach())
-    {
-        HWND hwnd_previous_instance = FindWindowA(nullptr, title.toStdString().c_str());
-        if (IsIconic(hwnd_previous_instance))
-            ShowWindow(hwnd_previous_instance, SW_RESTORE);
-        SetForegroundWindow(hwnd_previous_instance);
-        SetForegroundWindow(GetLastActivePopup(hwnd_previous_instance));
-        return 1; // already running
-    }
-    else
-        shared_memory.create(1);
-
-    // date limit for test version
-    QDate date_build(2018, 3, 7);
-    QDate date_limit = date_build.addDays(90);
-    QDate date_now = QDate::currentDate();
-    if (false) // (date_limit < date_now)
-    {
-        QMessageBox msg_box;
-        msg_box.setWindowTitle(QObject::tr("Warning"));
-        msg_box.setIcon(QMessageBox::Warning);
-        msg_box.setText(QObject::tr("This is a very old beta version."));
-        msg_box.setInformativeText(QObject::tr("Check for updates <a href='https://github.com/lmintlcx/PvZTools'>here</a>."));
-        msg_box.exec();
-        return 2; // expired
-    }
-
-    // i18n
-    QString locale = QLocale::system().name();
-    QTranslator tr_zh_CN;
-    tr_zh_CN.load(":/i18n/zh_CN.qm");
-    if (true) // (locale == "zh_CN")
-        app.installTranslator(&tr_zh_CN);
-
-    // dpi scale
-    HDC screen = GetDC(nullptr);
-    int dpi_x = GetDeviceCaps(screen, LOGPIXELSX);
-    int dpi_y = GetDeviceCaps(screen, LOGPIXELSY);
-    ReleaseDC(nullptr, screen);
-    const float default_dpi = 96.0f;
-    float scale_x = dpi_x / default_dpi;
-    float scale_y = dpi_y / default_dpi;
-    int width = 580 * scale_x;
-    int height = 280 * scale_y;
-
-    // main window
-    MainWindow *window = new MainWindow;
-    window->setAttribute(Qt::WA_DeleteOnClose);
-    window->setWindowTitle(title);
-    window->setFixedSize(width, height);
-    window->show();
+    window.show();
 
     return app.exec();
 }
-
-// LARGE_INTEGER m_liPerfFreq;
-// QueryPerformanceFrequency(&m_liPerfFreq);
-// LARGE_INTEGER m_liPerfStart;
-// QueryPerformanceCounter(&m_liPerfStart);
-
-// LARGE_INTEGER liPerfNow;
-// QueryPerformanceCounter(&liPerfNow);
-// int time = (((liPerfNow.QuadPart - m_liPerfStart.QuadPart) * 1000) / m_liPerfFreq.QuadPart);
-// std::cout << "time " << time << " ms" << std::endl;

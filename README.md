@@ -1,7 +1,7 @@
 
 # PvZ Tools
 
-Plants vs. Zombies toolset. Only works with original version 1.0.0.1051. 
+Plants vs. Zombies 1.0.0.1051 toolset. Download supported game version [here](https://pvz.lmintlcx.com/getpvz). 
 
 # Screenshots
 
@@ -9,8 +9,8 @@ Plants vs. Zombies toolset. Only works with original version 1.0.0.1051.
 
 # Build
 
-You will need a MSVC 2015 compiler and a static version of Qt 5.6 libraries to build it. MSVC 2017 and Qt 5.9 will do fine. 
-The UI is designed for display Chinese, when comes to English it becomes very ugly. 
+You will need a C++17 compiler and Qt libraries to build it. Already tested and confirmed works with: 
+MinGW-w64 8.1.0 + Qt 5.6.3 / MSVC 2017 15.8.1 + Qt 5.9.6 / Clang 6.0.1 + Qt 5.11.1
 
 # Contributing
 

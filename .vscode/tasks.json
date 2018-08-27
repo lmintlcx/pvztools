@@ -4,10 +4,7 @@
         {
             "label": "Build",
             "type": "shell",
-            "command": "${workspaceRoot}/scripts/build_vc140.bat",
-            "args": [
-                "debug"
-            ],
+            "command": "${workspaceRoot}/scripts/build_debug.bat",
             "group": {
                 "kind": "build",
                 "isDefault": true

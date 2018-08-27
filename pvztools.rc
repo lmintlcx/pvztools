@@ -1,0 +1,39 @@
+
+#include <Windows.h>
+
+#include "src\version.h"
+
+IDI_ICON1    ICON    DISCARDABLE    PRODUCT_ICON
+
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION VERSION_VER
+    PRODUCTVERSION VERSION_VER
+    FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+    FILEFLAGS VS_FF_DEBUG
+#else
+    FILEFLAGS 0x0L
+#endif
+    FILEOS VOS__WINDOWS32
+    FILETYPE VFT_DLL
+    FILESUBTYPE 0x0L
+    BEGIN
+        BLOCK "StringFileInfo"
+        BEGIN
+            BLOCK "080404b0"
+            BEGIN
+                VALUE "CompanyName", COMPANY_NAME
+                VALUE "FileDescription", FILE_DESCRIPTION
+                VALUE "FileVersion", VERSION_NAME_FULL
+                VALUE "LegalCopyright", LEGAL_COPYRIGHT
+                VALUE "InternalName", INTERNAL_NAME
+                VALUE "OriginalFilename", ORIGINAL_FILENAME
+                VALUE "ProductName", PRODUCT_NAME
+                VALUE "ProductVersion", VERSION_NAME_FULL
+            END
+        END
+        BLOCK "VarFileInfo"
+        BEGIN
+            VALUE "Translation", 0x0804, 1200
+        END
+    END

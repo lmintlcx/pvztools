@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>translations/qt_zh_CN.qm</file>
+        <file>translations/widgets_zh_CN.qm</file>
+        <file>translations/pvztools_zh_CN.qm</file>
+        <file>res/logo.ico</file>
+        <file>res/logo_about.png</file>
+    </qresource>
+</RCC>
