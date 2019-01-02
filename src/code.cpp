@@ -52,14 +52,23 @@ void Code::asm_push(int value)
 
 void Code::asm_mov_exx(Reg reg, int value)
 {
-    unsigned char mov_exx[] = {0xb8, 0xbb, 0xb9, 0xba, 0xbe, 0xbf, 0xbd};
+    unsigned char mov_exx[] = {0xb8, 0xbb, 0xb9, 0xba, 0xbe, 0xbf, 0xbd, 0xbc};
     asm_add_byte(mov_exx[static_cast<unsigned int>(reg)]);
+    asm_add_dword(value);
+}
+
+void Code::asm_add_exx(Reg reg, int value)
+{
+    unsigned char add_exx[] = {0x05, 0xc3, 0xc1, 0xc2, 0xc6, 0xc7, 0xc5, 0xc4};
+    if (reg != Reg::EAX)
+        asm_add_byte((unsigned char)(0x81));
+    asm_add_byte(add_exx[static_cast<unsigned int>(reg)]);
     asm_add_dword(value);
 }
 
 void Code::asm_mov_exx_dword_ptr(Reg reg, int value)
 {
-    unsigned char mov_exx_dword_ptr[] = {0xa1, 0x1d, 0x0d, 0x15, 0x35, 0x3d, 0x2d};
+    unsigned char mov_exx_dword_ptr[] = {0xa1, 0x1d, 0x0d, 0x15, 0x35, 0x3d, 0x2d, 0x25};
     asm_add_byte((unsigned char)(0x3e));
     if (reg != Reg::EAX)
         asm_add_byte((unsigned char)(0x8b));
@@ -69,29 +78,24 @@ void Code::asm_mov_exx_dword_ptr(Reg reg, int value)
 
 void Code::asm_mov_exx_dword_ptr_exx_add(Reg reg, int value)
 {
-    unsigned char mov_exx_dword_ptr_exx_add[] = {0x80, 0x9b, 0x89, 0x92, 0xb6, 0xbf, 0xad};
+    unsigned char mov_exx_dword_ptr_exx_add[] = {0x80, 0x9b, 0x89, 0x92, 0xb6, 0xbf, 0xad, 0xa4};
     asm_add_byte((unsigned char)(0x8b));
     asm_add_byte(mov_exx_dword_ptr_exx_add[static_cast<unsigned int>(reg)]);
+    if (reg == Reg::ESP)
+        asm_add_byte((unsigned char)(0x24));
     asm_add_dword(value);
 }
 
 void Code::asm_push_exx(Reg reg)
 {
-    unsigned char push_exx[] = {0x50, 0x53, 0x51, 0x52, 0x56, 0x57, 0x55};
+    unsigned char push_exx[] = {0x50, 0x53, 0x51, 0x52, 0x56, 0x57, 0x55, 0x54};
     asm_add_byte(push_exx[static_cast<unsigned int>(reg)]);
 }
 
 void Code::asm_pop_exx(Reg reg)
 {
-    unsigned char pop_exx[] = {0x58, 0x5b, 0x59, 0x5a, 0x5e, 0x5f, 0x5d};
+    unsigned char pop_exx[] = {0x58, 0x5b, 0x59, 0x5a, 0x5e, 0x5f, 0x5d, 0x5c};
     asm_add_byte(pop_exx[static_cast<unsigned int>(reg)]);
-}
-
-void Code::asm_add_esp(int value)
-{
-    asm_add_byte((unsigned char)(0x81));
-    asm_add_byte((unsigned char)(0xc4));
-    asm_add_dword(value);
 }
 
 void Code::asm_call(int addr)

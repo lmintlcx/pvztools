@@ -3,17 +3,17 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/VC/Tools/MSVC/14.14.26428/include",
+                "C:/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/VC/Tools/MSVC/14.16.27023/include",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.17134.0/um",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.17134.0/ucrt",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.17134.0/shared",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.17134.0/winrt",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.17134.0/cppwinrt",
-                "C:/Qt/v5.9.6_msvc2017_x86_static/include",
-                "C:/Qt/v5.9.6_msvc2017_x86_static/include/QtCore",
-                "C:/Qt/v5.9.6_msvc2017_x86_static/include/QtGui",
-                "C:/Qt/v5.9.6_msvc2017_x86_static/include/QtWidgets",
-                "C:/Qt/v5.9.6_msvc2017_x86_static/include/QtNetwork",
+                "C:/Qt/v5.9.7_msvc2017_x86_static/include",
+                "C:/Qt/v5.9.7_msvc2017_x86_static/include/QtCore",
+                "C:/Qt/v5.9.7_msvc2017_x86_static/include/QtGui",
+                "C:/Qt/v5.9.7_msvc2017_x86_static/include/QtWidgets",
+                "C:/Qt/v5.9.7_msvc2017_x86_static/include/QtNetwork",
                 "${workspaceFolder}/**"
             ],
             "defines": [
@@ -21,7 +21,7 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/VC/Tools/MSVC/14.14.26428/bin/Hostx86/x86/cl.exe",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/VC/Tools/MSVC/14.16.27023/bin/Hostx86/x86/cl.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "msvc-x64"

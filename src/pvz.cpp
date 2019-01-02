@@ -497,9 +497,9 @@ int PvZ::GetValue(int index)
             char _value = ReadMemory<char>(value_addr[index]);
             value = static_cast<int>(_value);
         }
+        emit Value(value);
     }
 
-    emit Value(value);
     return value;
 }
 
@@ -535,9 +535,9 @@ int PvZ::GetDamage(int index)
         {
             damage = ReadMemory<int>(damage_addr[index]);
         }
+        emit Damage(damage);
     }
 
-    emit Damage(damage);
     return damage;
 }
 
@@ -559,9 +559,11 @@ int PvZ::GetHP(int index)
     int hp = 0;
 
     if (GameOn())
+    {
         hp = ReadMemory<int>(hp_addr[index]);
+        emit HP(hp);
+    }
 
-    emit HP(hp);
     return hp;
 }
 
@@ -576,9 +578,11 @@ int PvZ::GetTime(int index)
     int t = 0;
 
     if (GameOn())
+    {
         t = ReadMemory<int>(time_addr[index]);
+        emit Time(t);
+    }
 
-    emit Time(t);
     return t;
 }
 
@@ -926,10 +930,8 @@ void PvZ::StopSpawning(bool on)
     if (GameOn())
     {
         if (on)
-            // WriteMemory<byte>(0x00, 0x00413e4b);
             WriteMemory<byte>(0xeb, 0x004265dc);
         else
-            // WriteMemory<byte>(0xff, 0x00413e4b);
             WriteMemory<byte>(0x74, 0x004265dc);
     }
 }
@@ -1283,9 +1285,8 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
 
         if (count > 0)
         {
-            std::vector<double> weights = {25, 0, 22, 43, 63, 22, 73, 43, 22, 0, 0, 43, 43, 43, 33, 22, 43, 22, 22, 0, 16, 22, 33, 33, 0, 0, 82, 63, 22, 43, 43, 43, 27};
-            std::vector<double> weights_flag = weights;
-            weights_flag[32] = 135; // increase giga density in flag wave
+            std::vector<double> weights = {20, 0, 37, 67, 95, 37, 108, 67, 37, 0, 0, 67, 67, 67, 52, 37, 67, 37, 37, 17, 0, 37, 52, 52, 0, 0, 120, 94, 37, 67, 67, 67, 36};
+            std::vector<double> weights_flag = {84, 10, 29, 50, 71, 29, 80, 50, 28, 0, 0, 50, 50, 49, 39, 29, 50, 29, 29, 10, 28, 29, 39, 39, 0, 0, 89, 70, 28, 50, 50, 50, 122};
             std::discrete_distribution<unsigned int> dist(weights.begin(), weights.end());
             std::discrete_distribution<unsigned int> dist_flag(weights_flag.begin(), weights_flag.end());
             auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
@@ -1297,12 +1298,16 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
                 do
                 {
                     if (simulate)
+                    {
                         if (((i / 50) % 10) == 9) // flag wave
                             type = dist_flag(gen);
                         else
                             type = dist(gen);
+                    }
                     else
+                    {
                         (++type) %= 33;
+                    }
                 } while ((!zombies[type])                              //
                          || (has_flag && limit_flag && type == 1)      //
                          || (has_yeti && limit_yeti && type == 19)     //
@@ -1333,8 +1338,8 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
                 do
                 {
                     i = rand() % 1000;
-                } while ((has_flag && limit_flag && find(index_flag.begin(), index_flag.end(), i) != index_flag.end()) //
-                         || (has_bungee && limit_bungee && find(index_bungee.begin(), index_bungee.end(), i) != index_bungee.end()));
+                } while ((has_flag && limit_flag && std::find(index_flag.begin(), index_flag.end(), i) != index_flag.end()) //
+                         || (has_bungee && limit_bungee && std::find(index_bungee.begin(), index_bungee.end(), i) != index_bungee.end()));
                 (*zombies_list)[i] = 19;
             }
         }
@@ -1468,7 +1473,7 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
                || (has_flag && limit_flag && ((flag_count[w] == 1) == flag_waves[w])));         //
         assert(!has_bungee                                                                      //
                || (has_bungee && !limit_bungee && (bungee_count[w] > 0))                        //
-               || (has_bungee && limit_bungee && ((bungee_count[w] == 3) == bungee_waves[w]))); //
+               || (has_bungee && limit_bungee && ((bungee_count[w] == 4) == bungee_waves[w]))); //
         assert(!has_yeti                                                                        //
                || (has_yeti && !limit_yeti && (yeti_count[w] > 0))                              //
                || (has_yeti && limit_yeti && ((yeti_count[w] == 0) || (yeti_count[w] == 1))));  //
@@ -1486,9 +1491,13 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
 int PvZ::GetRandomSeed()
 {
     int random_seed = 0;
+
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    {
         random_seed = ReadMemory<int>(0x6a9ec0, 0x768, 0x561c);
-    emit RandomSeed(random_seed);
+        emit RandomSeed(random_seed);
+    }
+
     return random_seed;
 }
 
@@ -1548,18 +1557,33 @@ void PvZ::LockShovel(bool on)
     }
 }
 
-int PvZ::GetSlotsSeed(int index)
+int PvZ::GetSeedType(int index)
 {
-    int type = -1;
+    int seed_type = 0;
+    int seed_imitater_type = 0;
+
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
-        type = ReadMemory<int>(0x6a9ec0, 0x768, 0x144, 0x5c + index * 0x50);
-    emit SlotsSeed(type);
-    return type;
+    {
+        seed_type = ReadMemory<int>(0x6a9ec0, 0x768, 0x144, 0x5c + index * 0x50);
+        seed_imitater_type = ReadMemory<int>(0x6a9ec0, 0x768, 0x144, 0x60 + index * 0x50);
+        if (seed_type == 48)
+        {
+            emit SeedType(seed_imitater_type);
+            emit SeedImitater(true);
+        }
+        else
+        {
+            emit SeedType(seed_type);
+            emit SeedImitater(false);
+        }
+    }
+
+    return seed_type;
 }
 
 // index: 0~9
 // type: 0~47 (Pea ~ Cob)
-void PvZ::SetSlotsSeed(int index, int type, bool imitater)
+void PvZ::SetSeedType(int index, int type, bool imitater = false)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
@@ -1571,20 +1595,25 @@ void PvZ::SetSlotsSeed(int index, int type, bool imitater)
         else
         {
             WriteMemory<int>(type, 0x6a9ec0, 0x768, 0x144, 0x5c + index * 0x50);
+            WriteMemory<int>(-1, 0x6a9ec0, 0x768, 0x144, 0x60 + index * 0x50);
         }
     }
 }
 
-bool PvZ::GetSlotsVisible(int index)
+bool PvZ::GetSeedVisible(int index)
 {
     bool visible = false;
+
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    {
         visible = ReadMemory<bool>(0x6a9ec0, 0x768, 0x144, 0x40 + index * 0x50);
-    emit SlotsVisible(visible);
+        emit SeedVisible(visible);
+    }
+
     return visible;
 }
 
-void PvZ::SetSlotsVisible(int index, bool visible)
+void PvZ::SetSeedVisible(int index, bool visible)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
         WriteMemory<bool>(visible, 0x6a9ec0, 0x768, 0x144, 0x40 + index * 0x50);
@@ -1685,12 +1714,33 @@ void PvZ::BeltNoDelay(bool on)
     }
 }
 
+void PvZ::HideMenuButton(bool on)
+{
+    if (GameOn())
+    {
+        if (on)
+        {
+            WriteMemory<int>(900, 0x6a9ec0, 0x768, 0x148, 0x8);
+            WriteMemory<int>(-10, 0x6a9ec0, 0x768, 0x148, 0xc);
+        }
+        else
+        {
+            WriteMemory<int>(681, 0x6a9ec0, 0x768, 0x148, 0x8);
+            WriteMemory<int>(-10, 0x6a9ec0, 0x768, 0x148, 0xc);
+        }
+    }
+}
+
 int PvZ::GetSpeed(int index)
 {
     int speed = 0;
+
     if (GameOn())
+    {
         speed = ReadMemory<int>(0x69f2cc + index * 0x24);
-    emit Speed(speed);
+        emit Speed(speed);
+    }
+
     return speed;
 }
 
@@ -1703,9 +1753,13 @@ void PvZ::SetSpeed(int index, int speed)
 int PvZ::GetCost(int index)
 {
     int cost = 0;
+
     if (GameOn())
+    {
         cost = ReadMemory<int>(0x69f2c0 + index * 0x24);
-    emit Cost(cost);
+        emit Cost(cost);
+    }
+
     return cost;
 }
 
@@ -1718,9 +1772,13 @@ void PvZ::SetCost(int index, int cost)
 int PvZ::GetRecharge(int index)
 {
     int recharge = 0;
+
     if (GameOn())
+    {
         recharge = ReadMemory<int>(0x69f2c4 + index * 0x24);
-    emit Recharge(recharge);
+        emit Recharge(recharge);
+    }
+
     return recharge;
 }
 
@@ -1735,9 +1793,13 @@ void PvZ::SetRecharge(int index, int recharge)
 int PvZ::GetScene()
 {
     int scene = -1;
+
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    {
         scene = ReadMemory<int>(0x6a9ec0, 0x768, 0x554c);
-    emit Scene(scene);
+        emit Scene(scene);
+    }
+
     return scene;
 }
 
@@ -1973,7 +2035,7 @@ void PvZ::asm_put_rake(int row, int col)
     asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x768);
     asm_push_exx(Reg::ECX);
     asm_call(0x0040b9c0);
-    asm_add_esp(0x08);
+    asm_add_exx(Reg::ESP, 0x08);
 }
 
 void PvZ::PutRake(int row, int col)
@@ -2016,25 +2078,19 @@ void PvZ::asm_put_coin(int row, int col, int type, int scene)
     int r = row + 1;
     int c = col + 1;
 
+    x = 80 * c;
     switch (scene)
     {
     case 2: // pool
     case 3: // fog
-        x = 80 * c;
-        y = 85 * r;
+        y = 55 + 85 * r;
         break;
     case 4: // roof
     case 5: // moon
-        if (c > 5.5)
-        {
-            x = 80 * c;
-            y = 85 * r;
-        }
+        if (c >= 6.0)
+            y = 45 + 85 * r;
         else
-        {
-            x = 80 * c;
-            y = 85 * r + (110 - 20 * c);
-        }
+            y = 45 + 85 * r + 20 * (6 - c);
         break;
     case 0: // day
     case 1: // night
@@ -2043,10 +2099,10 @@ void PvZ::asm_put_coin(int row, int col, int type, int scene)
     case 8: // aquarium garden
     case 9: // tree of wisdom
     default:
-        x = 80 * c;
-        y = 100 * r;
+        y = 40 + 100 * r;
         break;
     }
+    y -= 40;
 
     asm_push(2); // 0 ~ 5
     asm_push(type);
@@ -2161,9 +2217,13 @@ void PvZ::AutoLadder(bool imitater_pumpkin_only)
 int PvZ::GetBlockType(int row, int col)
 {
     int type = 1;
+
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    {
         type = ReadMemory<int>(0x6a9ec0, 0x768, 0x168 + row * 0x04 + col * 0x18);
-    emit BlockType(type);
+        emit BlockType(type);
+    }
+
     return type;
 }
 
@@ -2192,9 +2252,13 @@ void PvZ::SetBlockType(int row, int col, int type)
 int PvZ::GetRowType(int row)
 {
     int type = 0;
+
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    {
         type = ReadMemory<int>(0x6a9ec0, 0x768, 0x5d8 + row * 0x04);
-    emit RowType(type);
+        emit RowType(type);
+    }
+
     return type;
 }
 
@@ -2341,10 +2405,7 @@ void PvZ::SetQuickLineupMode(bool on)
             WriteMemory<byte>(0x70, 0x0045ee0a);
             WriteMemory<byte>(0x00, 0x0045ec66);
             // Stop Spawning
-            WriteMemory<byte>(0x00, 0x00413e4b);
-            // Purple Seed Unlimited
-            WriteMemory(std::array<byte, 3>{0xb0, 0x01, 0xc3}, 0x0041d7d0);
-            WriteMemory<byte>(0xeb, 0x0040e477);
+            WriteMemory<byte>(0xeb, 0x004265dc);
             // Ignore Sun
             WriteMemory<byte>(0x70, 0x0041ba72);
             WriteMemory<byte>(0x3b, 0x0041ba74);
@@ -2355,16 +2416,19 @@ void PvZ::SetQuickLineupMode(bool on)
             // Slots No CD
             WriteMemory<byte>(0x70, 0x00487296);
             WriteMemory<byte>(0xeb, 0x00488250);
+            // Purple Seed Unlimited
+            WriteMemory(std::array<byte, 3>{0xb0, 0x01, 0xc3}, 0x0041d7d0);
+            WriteMemory<byte>(0xeb, 0x0040e477);
             // No Fog
             WriteMemory<unsigned short>(0xd231, 0x0041a68d);
         }
         else
         {
-            //
+            // Auto Collect
             WriteMemory<byte>(0x75, 0x0043158f);
-            //
+            // Cob Cannon No CD
             WriteMemory<byte>(0x85, 0x0046103b);
-            //
+            // Plant Invincible
             WriteMemory(std::array<byte, 3>{0x46, 0x40, 0xfc}, 0x0052fcf1);
             WriteMemory(std::array<byte, 3>{0x29, 0x50, 0x40}, 0x0046cfeb);
             WriteMemory(std::array<byte, 3>{0x29, 0x4e, 0x40}, 0x0046d7a6);
@@ -2373,22 +2437,22 @@ void PvZ::SetQuickLineupMode(bool on)
             WriteMemory<byte>(0x75, 0x005276ea);
             WriteMemory<byte>(0x75, 0x0045ee0a);
             WriteMemory<byte>(0xe0, 0x0045ec66);
-            //
-            WriteMemory<byte>(0xff, 0x00413e4b);
-            //
-            WriteMemory(std::array<byte, 3>{0x51, 0x83, 0xf8}, 0x0041d7d0);
-            WriteMemory<byte>(0x74, 0x0040e477);
-            //
+            // Stop Spawning
+            WriteMemory<byte>(0x74, 0x004265dc);
+            // Ignore Sun
             WriteMemory<byte>(0x7f, 0x0041ba72);
             WriteMemory<byte>(0x2b, 0x0041ba74);
             WriteMemory<byte>(0x9e, 0x0041bac0);
             WriteMemory<byte>(0x8f, 0x00427a92);
             WriteMemory<byte>(0x8f, 0x00427dfd);
             WriteMemory<byte>(0x74, 0x0042487f);
-            //
+            // Slots No CD
             WriteMemory<byte>(0x7e, 0x00487296);
             WriteMemory<byte>(0x75, 0x00488250);
-            //
+            // Purple Seed Unlimited
+            WriteMemory(std::array<byte, 3>{0x51, 0x83, 0xf8}, 0x0041d7d0);
+            WriteMemory<byte>(0x74, 0x0040e477);
+            // No Fog
             WriteMemory<unsigned short>(0xf23b, 0x0041a68d);
         }
     }
@@ -2960,6 +3024,8 @@ std::string PvZ::GetLineup(bool keep_hp_status)
                                    + std::to_string(items[i][5]);
             str += item_str;
         }
+
+        emit LineupString(str);
     }
 
 #ifdef _DEBUG
@@ -2968,7 +3034,6 @@ std::string PvZ::GetLineup(bool keep_hp_status)
               << std::endl;
 #endif
 
-    emit LineupString(str);
     return str;
 }
 
@@ -3075,9 +3140,9 @@ std::vector<GardenPlant> PvZ::GetGardenPlants()
             plant.status = ReadMemory<int>(plant_offset + 0x2c + 0x58 * i);
             plants.push_back(plant);
         }
+        emit GardenPlants(plants);
     }
 
-    emit GardenPlants(plants);
     return plants;
 }
 
@@ -3144,9 +3209,9 @@ std::vector<Vase> PvZ::GetVases()
                 vases.push_back(vase);
             }
         }
+        emit Vases(vases);
     }
 
-    emit Vases(vases);
     return vases;
 }
 
@@ -3397,9 +3462,13 @@ void PvZ::BungeeBlitz(bool on)
 int PvZ::GetIceTrailX(int row)
 {
     int x = 0;
+
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    {
         x = ReadMemory<int>(0x6a9ec0, 0x768, 0x60c + 0x4 * row);
-    emit IceTrailX(x);
+        emit IceTrailX(x);
+    }
+
     return x;
 }
 
@@ -3600,9 +3669,9 @@ std::array<int, 54> PvZ::GetTargetMap(int mode)
             ReadProcessMemory(handle, (const void *)(0x006a3338), &tmp, 54 * sizeof(int), nullptr);
 
         std::copy(std::begin(tmp), std::end(tmp), std::begin(map));
+        emit TargetMap(map);
     }
 
-    emit TargetMap(map);
     return map;
 }
 
@@ -3639,8 +3708,8 @@ void PvZ::GetCobInfo(int index)
             row = ReadMemory<uint32_t>(plant_offset + 0x1c + 0x14c * index);
             col = ReadMemory<uint32_t>(plant_offset + 0x28 + 0x14c * index);
         }
+        emit CobInfo(is_cob_cannon, row, col);
     }
-    emit CobInfo(is_cob_cannon, row, col);
 }
 
 void PvZ::asm_launch_cannon(int index, int x, int y)

@@ -236,30 +236,30 @@ void List::Init()
         << tr("Garlic")
         << tr("Spikerock")
         << tr("Zombie", "Normal Zombie")
-        << tr("Conehead Zombie") // 7
+        << tr("Conehead Zombie") // 7 路障
         << tr("Pole Vaulting Zombie")
-        << tr("Buckethead Zombie")  // 9
-        << tr("Newspaper Zombie")   // 10
-        << tr("Screen Door Zombie") // 11
-        << tr("Football Zombie")    // 12
+        << tr("Buckethead Zombie")  // 9 铁桶
+        << tr("Newspaper Zombie")   // 10 报纸
+        << tr("Screen Door Zombie") // 11 铁栅门
+        << tr("Football Zombie")    // 12 橄榄球帽
         << tr("Dancing Zombie")
         << tr("Zomboni")
         << tr("Dolphin Rider Zombie")
         << tr("Jack-in-the-Box Zombie")
-        << tr("Digger Zombie") // 17
+        << tr("Digger Zombie") // 17 矿工帽
         << tr("Pogo Zombie")
         << tr("Zombie Yeti")
         << tr("Bungee Zombie")
-        << tr("Ladder Zombie")
+        << tr("Ladder Zombie") // 21 扶梯
         << tr("Gargantuar")
         << tr("Dr. Zomboss")
         << tr("Dr. Zomboss Extra")
-        << tr("Wall-nut Zombie") // 25
+        << tr("Wall-nut Zombie") // 25 僵尸坚果
         << tr("Jalapeno Zombie")
-        << tr("Tall-nut Zombie") // 27
+        << tr("Tall-nut Zombie") // 27 僵尸高坚果
         << tr("GigaGargantuar")
         << tr("Imp in I, Zombie")
-        << tr("Balloon");
+        << tr("Balloon"); // 30 气球
 
     coinList
         << tr("Silver Coin")

@@ -195,8 +195,8 @@ MainWindow::MainWindow(QWidget *parent)
         emit resourcePage->GetDamage(0);
         emit resourcePage->GetHP(0);
         emit resourcePage->GetTime(0);
-        emit slotsPage->GetSlotsSeed(0);
-        emit slotsPage->GetSlotsVisible(0);
+        emit slotsPage->GetSeedType(0);
+        emit slotsPage->GetSeedVisible(0);
         emit slotsPage->GetSpeed(0);
         emit slotsPage->GetCost(0);
         emit slotsPage->GetRecharge(0);
@@ -422,12 +422,12 @@ void MainWindow::CreateActions()
 
     connect(videoDemoAction, &QAction::triggered,
             this, [=]() {
-                QDesktopServices::openUrl(QUrl("https://www.bilibili.com/video/av20092046"));
+                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/pvztoolsdemo/"));
             });
 
     connect(visitWebsiteAction, &QAction::triggered,
             this, [=]() {
-                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com"));
+                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/"));
             });
 
     connect(sendFeedbackAction, &QAction::triggered,
@@ -834,17 +834,17 @@ void MainWindow::ConnectPages()
     connect(slotsPage, &SlotsPage::LockShovel,
             pvz, &PvZ::LockShovel);
 
-    connect(slotsPage, &SlotsPage::GetSlotsSeed,
-            pvz, &PvZ::GetSlotsSeed);
+    connect(slotsPage, &SlotsPage::GetSeedType,
+            pvz, &PvZ::GetSeedType);
 
-    connect(slotsPage, &SlotsPage::SetSlotsSeed,
-            pvz, &PvZ::SetSlotsSeed);
+    connect(slotsPage, &SlotsPage::SetSeedType,
+            pvz, &PvZ::SetSeedType);
 
-    connect(slotsPage, &SlotsPage::GetSlotsVisible,
-            pvz, &PvZ::GetSlotsVisible);
+    connect(slotsPage, &SlotsPage::GetSeedVisible,
+            pvz, &PvZ::GetSeedVisible);
 
-    connect(slotsPage, &SlotsPage::SetSlotsVisible,
-            pvz, &PvZ::SetSlotsVisible);
+    connect(slotsPage, &SlotsPage::SetSeedVisible,
+            pvz, &PvZ::SetSeedVisible);
 
     connect(slotsPage, &SlotsPage::IgnoreSun,
             pvz, &PvZ::IgnoreSun);
@@ -860,6 +860,9 @@ void MainWindow::ConnectPages()
 
     connect(slotsPage, &SlotsPage::BeltNoDelay,
             pvz, &PvZ::BeltNoDelay);
+
+    connect(slotsPage, &SlotsPage::HideMenuButton,
+            pvz, &PvZ::HideMenuButton);
 
     connect(slotsPage, &SlotsPage::GetSpeed,
             pvz, &PvZ::GetSpeed);
@@ -879,11 +882,14 @@ void MainWindow::ConnectPages()
     connect(slotsPage, &SlotsPage::SetRecharge,
             pvz, &PvZ::SetRecharge);
 
-    connect(pvz, &PvZ::SlotsSeed,
-            slotsPage, &SlotsPage::ShowSlotsSeed);
+    connect(pvz, &PvZ::SeedType,
+            slotsPage, &SlotsPage::ShowSeedType);
 
-    connect(pvz, &PvZ::SlotsVisible,
-            slotsPage, &SlotsPage::ShowSlotsVisible);
+    connect(pvz, &PvZ::SeedImitater,
+            slotsPage, &SlotsPage::ShowSeedImitater);
+
+    connect(pvz, &PvZ::SeedVisible,
+            slotsPage, &SlotsPage::ShowSeedVisible);
 
     connect(pvz, &PvZ::Speed,
             slotsPage, &SlotsPage::ShowSpeed);
@@ -966,6 +972,21 @@ void MainWindow::ConnectPages()
             scenePage, &ScenePage::ShowRow);
 
     // Lineup
+
+    connect(lineupPage, &LineupPage::SetQuickLineupMode,
+            resourcePage, &ResourcePage::SetQuickLineupMode);
+
+    connect(lineupPage, &LineupPage::SetQuickLineupMode,
+            plantsPage, &PlantsPage::SetQuickLineupMode);
+
+    connect(lineupPage, &LineupPage::SetQuickLineupMode,
+            zombiesPage, &ZombiesPage::SetQuickLineupMode);
+
+    connect(lineupPage, &LineupPage::SetQuickLineupMode,
+            slotsPage, &SlotsPage::SetQuickLineupMode);
+
+    connect(lineupPage, &LineupPage::SetQuickLineupMode,
+            effectPage, &EffectPage::SetQuickLineupMode);
 
     connect(lineupPage, &LineupPage::SetQuickLineupMode,
             pvz, &PvZ::SetQuickLineupMode);
@@ -1455,6 +1476,9 @@ void MainWindow::FindResult(Result result)
     if (result == Result::OK)
     {
         statusBar()->showMessage(tr("Game Found"), display_time);
+
+        // TODO 发射信号 维持已选功能
+        othersPage->GameFound();
     }
     else if (result == Result::WrongVersion)
     {

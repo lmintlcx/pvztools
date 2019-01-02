@@ -106,6 +106,7 @@ public slots:
   void ShowDamage(int);
   void ShowHP(int);
   void ShowTime(int);
+  void SetQuickLineupMode(bool);
 
 private:
   QLabel *sunLabel;
@@ -172,6 +173,9 @@ signals:
   void PlantUmbrella(bool);
   void PlantPaper(bool);
 
+public slots:
+  void SetQuickLineupMode(bool);
+
 private:
   QCheckBox *cobsNoCdCheckBox;
   QCheckBox *magnetsNoCdCheckBox;
@@ -223,6 +227,9 @@ signals:
   void GatherZombies(bool, float);
   void SpawningNextWave();
   void AllZombiesXXX(int);
+
+public slots:
+  void SetQuickLineupMode(bool);
 
 private:
   QCheckBox *zombieExplodeImmediatelyCheckBox;
@@ -383,15 +390,16 @@ signals:
   void HideSlots(bool);
   void ShowShovel(bool);
   void LockShovel(bool);
-  void GetSlotsSeed(int);
-  void SetSlotsSeed(int, int, bool);
-  void GetSlotsVisible(int);
-  void SetSlotsVisible(int, bool);
+  void GetSeedType(int);
+  void SetSeedType(int, int, bool);
+  void GetSeedVisible(int);
+  void SetSeedVisible(int, bool);
   void IgnoreSun(bool);
   void SlotsNoCoolDown(bool);
   void PurpleSeedUnlimited(bool);
   void PlantingFreely(bool);
   void BeltNoDelay(bool);
+  void HideMenuButton(bool);
   void GetSpeed(int);
   void SetSpeed(int, int);
   void GetCost(int);
@@ -400,11 +408,13 @@ signals:
   void SetRecharge(int, int);
 
 public slots:
-  void ShowSlotsSeed(int);
-  void ShowSlotsVisible(bool);
+  void ShowSeedType(int);
+  void ShowSeedImitater(bool);
+  void ShowSeedVisible(bool);
   void ShowSpeed(int);
   void ShowCost(int);
   void ShowRecharge(int);
+  void SetQuickLineupMode(bool);
 
 private:
   QLabel *slotsCountLabel;
@@ -423,6 +433,7 @@ private:
   QCheckBox *purpleSeedUnlimitedCheckBox;
   QCheckBox *plantingFreelyCheckBox;
   QCheckBox *beltNoDelayCheckBox;
+  QCheckBox *hideMenuButtonCheckBox;
   QLabel *seedLabel;
   QComboBox *seedCombo;
   QLabel *seedSpeedLabel;
@@ -687,6 +698,7 @@ signals:
 
 public slots:
   void ShowIceTrailX(int);
+  void SetQuickLineupMode(bool);
 
 private:
   QPushButton *sukhbirCodeButton;
@@ -743,6 +755,7 @@ public slots:
   void GetFolderName();
   void UnpackFinished();
   void PackFinished();
+  void GameFound();
 
 private:
   QCheckBox *disableSaveDataCheckBox;

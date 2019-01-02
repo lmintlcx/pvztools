@@ -277,38 +277,38 @@ ResourcePage::ResourcePage(QWidget *parent)
     timeLineEdit->setText("");
 
     mainLayout = new QGridLayout(this);
-    mainLayout->addWidget(sunLabel, 0, 0, 1, 1);
-    mainLayout->addWidget(sunLineEdit, 0, 1, 1, 1);
-    mainLayout->addWidget(sunButton, 0, 2, 1, 1);
-    mainLayout->addWidget(sunLimitLabel, 0, 3, 1, 1);
-    mainLayout->addWidget(sunLimitLineEdit, 0, 4, 1, 1);
-    mainLayout->addWidget(sunLimitButton, 0, 5, 1, 1);
-    mainLayout->addWidget(moneyLabel, 1, 0, 1, 1);
-    mainLayout->addWidget(moneyLineEdit, 1, 1, 1, 1);
-    mainLayout->addWidget(moneyButton, 1, 2, 1, 1);
-    mainLayout->addWidget(moneyLimitLabel, 1, 3, 1, 1);
-    mainLayout->addWidget(moneyLimitLineEdit, 1, 4, 1, 1);
-    mainLayout->addWidget(moneyLimitButton, 1, 5, 1, 1);
-    mainLayout->addWidget(manyFallingSunCheckBox, 2, 5, 1, 1);
-    mainLayout->addWidget(noFallingSunCheckBox, 3, 5, 1, 1);
-    mainLayout->addWidget(autoCollectCheckBox, 4, 5, 1, 1);
-    mainLayout->addWidget(zombieNoFallingCheckBox, 5, 5, 1, 1);
-    mainLayout->addWidget(valueLabel, 2, 0, 1, 1);
-    mainLayout->addWidget(valueCombo, 2, 1, 1, 1);
-    mainLayout->addWidget(valueLineEdit, 2, 2, 1, 1);
-    mainLayout->addWidget(valueButton, 2, 3, 1, 1);
-    mainLayout->addWidget(damageLabel, 3, 0, 1, 1);
-    mainLayout->addWidget(damageCombo, 3, 1, 1, 1);
-    mainLayout->addWidget(damageLineEdit, 3, 2, 1, 1);
-    mainLayout->addWidget(damageButton, 3, 3, 1, 1);
-    mainLayout->addWidget(hpLabel, 4, 0, 1, 1);
-    mainLayout->addWidget(hpCombo, 4, 1, 1, 1);
-    mainLayout->addWidget(hpLineEdit, 4, 2, 1, 1);
-    mainLayout->addWidget(hpButton, 4, 3, 1, 1);
-    mainLayout->addWidget(timeLabel, 5, 0, 1, 1);
-    mainLayout->addWidget(timeCombo, 5, 1, 1, 1);
-    mainLayout->addWidget(timeLineEdit, 5, 2, 1, 1);
-    mainLayout->addWidget(timeButton, 5, 3, 1, 1);
+    mainLayout->addWidget(sunLabel, 0, 0, 1, 2);
+    mainLayout->addWidget(sunLineEdit, 0, 2, 1, 2);
+    mainLayout->addWidget(sunButton, 0, 4, 1, 2);
+    mainLayout->addWidget(sunLimitLabel, 0, 6, 1, 2);
+    mainLayout->addWidget(sunLimitLineEdit, 0, 8, 1, 2);
+    mainLayout->addWidget(sunLimitButton, 0, 10, 1, 2);
+    mainLayout->addWidget(moneyLabel, 1, 0, 1, 2);
+    mainLayout->addWidget(moneyLineEdit, 1, 2, 1, 2);
+    mainLayout->addWidget(moneyButton, 1, 4, 1, 2);
+    mainLayout->addWidget(moneyLimitLabel, 1, 6, 1, 2);
+    mainLayout->addWidget(moneyLimitLineEdit, 1, 8, 1, 2);
+    mainLayout->addWidget(moneyLimitButton, 1, 10, 1, 2);
+    mainLayout->addWidget(manyFallingSunCheckBox, 2, 10, 1, 2);
+    mainLayout->addWidget(noFallingSunCheckBox, 3, 10, 1, 2);
+    mainLayout->addWidget(autoCollectCheckBox, 4, 10, 1, 2);
+    mainLayout->addWidget(zombieNoFallingCheckBox, 5, 10, 1, 2);
+    mainLayout->addWidget(valueLabel, 2, 0, 1, 2);
+    mainLayout->addWidget(valueCombo, 2, 2, 1, 3);
+    mainLayout->addWidget(valueLineEdit, 2, 5, 1, 2);
+    mainLayout->addWidget(valueButton, 2, 7, 1, 2);
+    mainLayout->addWidget(damageLabel, 3, 0, 1, 2);
+    mainLayout->addWidget(damageCombo, 3, 2, 1, 3);
+    mainLayout->addWidget(damageLineEdit, 3, 5, 1, 2);
+    mainLayout->addWidget(damageButton, 3, 7, 1, 2);
+    mainLayout->addWidget(hpLabel, 4, 0, 1, 2);
+    mainLayout->addWidget(hpCombo, 4, 2, 1, 3);
+    mainLayout->addWidget(hpLineEdit, 4, 5, 1, 2);
+    mainLayout->addWidget(hpButton, 4, 7, 1, 2);
+    mainLayout->addWidget(timeLabel, 5, 0, 1, 2);
+    mainLayout->addWidget(timeCombo, 5, 2, 1, 3);
+    mainLayout->addWidget(timeLineEdit, 5, 5, 1, 2);
+    mainLayout->addWidget(timeButton, 5, 7, 1, 2);
 
     for (int i = 0; i < mainLayout->rowCount(); i++)
         mainLayout->setRowStretch(i, 1);
@@ -452,7 +452,8 @@ ResourcePage::ResourcePage(QWidget *parent)
 
     connect(hpCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, [=](int index) {
-                if (index == 7 || index == 9 || index == 10 || index == 11 || index == 12 || index == 17 || index == 25 || index == 27)
+                std::vector<int> accessories = {7, 9, 10, 11, 12, 17, 21, 25, 27, 30};
+                if (std::find(accessories.begin(), accessories.end(), index) != accessories.end())
                     hpLabel->setText(tr("HP") + " " + "(" + tr("Accessories") + ")");
                 else
                     hpLabel->setText(tr("HP"));
@@ -532,6 +533,11 @@ void ResourcePage::ShowHP(int hp)
 void ResourcePage::ShowTime(int t)
 {
     timeLineEdit->setText(QString::number(t));
+}
+
+void ResourcePage::SetQuickLineupMode(bool on)
+{
+    autoCollectCheckBox->setChecked(on);
 }
 
 // Plants
@@ -744,6 +750,12 @@ void PlantsPage::TranslateUI()
     plantGarlicCheckBox->setText(tr("Plant Garlic"));
     plantUmbrellaCheckBox->setText(tr("Plant Umbrella"));
     plantPaperCheckBox->setText(tr("Plant Paper"));
+}
+
+void PlantsPage::SetQuickLineupMode(bool on)
+{
+    cobsNoCdCheckBox->setChecked(on);
+    plantInvincibleCheckBox->setChecked(on);
 }
 
 // Zombies
@@ -984,6 +996,11 @@ void ZombiesPage::TranslateUI()
     allZombiesLabel->setText(tr("All Zombies"));
     SET_COMBO_TEXT(allZombiesCombo, List::Get().zombieStatusList, 10);
     allZombiesButton->setText(tr("Set"));
+}
+
+void ZombiesPage::SetQuickLineupMode(bool on)
+{
+    stopSpawningCheckBox->setChecked(on);
 }
 
 // Spawn
@@ -1612,6 +1629,7 @@ SlotsPage::SlotsPage(QWidget *parent)
     purpleSeedUnlimitedCheckBox = new QCheckBox(this);
     plantingFreelyCheckBox = new QCheckBox(this);
     beltNoDelayCheckBox = new QCheckBox(this);
+    hideMenuButtonCheckBox = new QCheckBox(this);
 
     seedLabel = new QLabel(this);
     seedLabel->setAlignment(Qt::AlignCenter);
@@ -1638,6 +1656,9 @@ SlotsPage::SlotsPage(QWidget *parent)
     seedRechargeLineEdit->setValidator(new QIntValidator(0, 999999999, this));
     seedRechargeButton = new QPushButton(this);
 
+    // Set default status.
+    showShovelCheckBox->setChecked(true);
+
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(slotsCountLabel, 0, 0, 1, 1);
     mainLayout->addWidget(slotsCountSpinBox, 0, 1, 1, 1);
@@ -1655,6 +1676,7 @@ SlotsPage::SlotsPage(QWidget *parent)
     mainLayout->addWidget(purpleSeedUnlimitedCheckBox, 2, 2, 1, 1);
     mainLayout->addWidget(plantingFreelyCheckBox, 2, 3, 1, 1);
     mainLayout->addWidget(beltNoDelayCheckBox, 2, 4, 1, 1);
+    mainLayout->addWidget(hideMenuButtonCheckBox, 2, 5, 1, 1);
     mainLayout->addWidget(seedLabel, 3, 0, 1, 1);
     mainLayout->addWidget(seedCombo, 3, 1, 1, 2);
     mainLayout->addWidget(seedSpeedLabel, 3, 3, 1, 1);
@@ -1674,8 +1696,8 @@ SlotsPage::SlotsPage(QWidget *parent)
 
     connect(slotsSlotCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, [=](int index) {
-                emit GetSlotsSeed(index);
-                emit GetSlotsVisible(index);
+                emit GetSeedType(index);
+                emit GetSeedVisible(index);
             });
 
     connect(slotsSeedCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -1710,14 +1732,14 @@ SlotsPage::SlotsPage(QWidget *parent)
                 int slot = slotsSlotCombo->currentIndex();
                 int type = slotsSeedCombo->currentIndex();
                 bool imitater = imitaterCheckBox->isChecked();
-                emit SetSlotsSeed(slot, type, imitater);
+                emit SetSeedType(slot, type, imitater);
             });
 
     connect(hideSlotsSeedCheckBox, &QCheckBox::clicked,
             this, [=](bool checked) {
                 int slot = slotsSlotCombo->currentIndex();
                 bool visible = !checked;
-                emit SetSlotsVisible(slot, visible);
+                emit SetSeedVisible(slot, visible);
             });
 
     connect(ignoreSunCheckBox, &QCheckBox::clicked,
@@ -1734,6 +1756,9 @@ SlotsPage::SlotsPage(QWidget *parent)
 
     connect(beltNoDelayCheckBox, &QCheckBox::clicked,
             this, &SlotsPage::BeltNoDelay);
+
+    connect(hideMenuButtonCheckBox, &QCheckBox::clicked,
+            this, &SlotsPage::HideMenuButton);
 
     connect(seedCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [=](int index) {
@@ -1784,6 +1809,7 @@ void SlotsPage::TranslateUI()
     purpleSeedUnlimitedCheckBox->setText(tr("Purple Seed Unlimited"));
     plantingFreelyCheckBox->setText(tr("Planting Freely"));
     beltNoDelayCheckBox->setText(tr("Belt No Delay"));
+    hideMenuButtonCheckBox->setText(tr("Hide Menu Button"));
 
     seedLabel->setText(tr("Seed"));
     SET_COMBO_TEXT(seedCombo, List::Get().seedList, 48);
@@ -1798,13 +1824,17 @@ void SlotsPage::TranslateUI()
     seedRechargeButton->setText(tr("Set"));
 }
 
-void SlotsPage::ShowSlotsSeed(int type)
+void SlotsPage::ShowSeedType(int type)
 {
-    if (type != -1)
-        slotsSeedCombo->setCurrentIndex(type);
+    slotsSeedCombo->setCurrentIndex(type);
 }
 
-void SlotsPage::ShowSlotsVisible(bool visible)
+void SlotsPage::ShowSeedImitater(bool imitater)
+{
+    imitaterCheckBox->setChecked(imitater);
+}
+
+void SlotsPage::ShowSeedVisible(bool visible)
 {
     hideSlotsSeedCheckBox->setChecked(!visible);
 }
@@ -1822,6 +1852,13 @@ void SlotsPage::ShowCost(int cost)
 void SlotsPage::ShowRecharge(int recharge)
 {
     seedRechargeLineEdit->setText(QString::number(recharge));
+}
+
+void SlotsPage::SetQuickLineupMode(bool on)
+{
+    ignoreSunCheckBox->setChecked(on);
+    slotsNoCdCheckBox->setChecked(on);
+    purpleSeedUnlimitedCheckBox->setChecked(on);
 }
 
 // Scene
@@ -2000,8 +2037,18 @@ ScenePage::ScenePage(QWidget *parent)
 
     connect(sceneButton, &QPushButton::clicked,
             this, [=]() {
-                int scene = sceneCombo->currentIndex();
-                emit SetScene(scene);
+                QMessageBox msgBox;
+                msgBox.setWindowTitle(tr("Warning"));
+                msgBox.setText(tr("Modifying game scene may cause many problems, like texture error or game crash."));
+                msgBox.setInformativeText(tr("Are you sure you want to modify the game scene?"));
+                msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                msgBox.setDefaultButton(QMessageBox::No);
+                int ret = msgBox.exec();
+                if (ret == QMessageBox::Yes)
+                {
+                    int scene = sceneCombo->currentIndex();
+                    emit SetScene(scene);
+                }
             });
 
     connect(musicButton, &QPushButton::clicked,
@@ -2305,8 +2352,8 @@ LineupPage::LineupPage(QWidget *parent)
                 {
                     QMessageBox msgBox;
                     msgBox.setWindowTitle(tr("Warning"));
-                    msgBox.setText(tr("Modifying game scene can cause many problems, like a texture error or a game crash. It is recommended to reopen an archive from a \"Survival(Hard)\" level with desired scene. "));
-                    msgBox.setInformativeText(tr("Are you sure you want to allow the modifier to modify the scene?"));
+                    msgBox.setText(tr("Modifying game scene may cause many problems, like texture error or game crash."));
+                    msgBox.setInformativeText(tr("Are you sure you want to modify the game scene?"));
                     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
                     msgBox.setDefaultButton(QMessageBox::No);
                     int ret = msgBox.exec();
@@ -2328,7 +2375,7 @@ void LineupPage::TranslateUI()
     clearAllPlantsButton->setText(tr("Clear All Plants"));
 
     openLinkButton->setText(tr("Open Array Design Page"));
-    endlessBuildLabel->setText(tr("<a href='https://tieba.baidu.com/p/5272254427'>Endless Build</a>"));
+    endlessBuildLabel->setText(tr("<style>a {text-decoration: none}</style><a href='https://tieba.baidu.com/p/5272254427'>Endless Build</a>"));
     SET_COMBO_TEXT(endlessBuildCombo, List::Get().endlessBuildNameList, 171);
     oneKeySetupButton->setText(tr("One Key Setup"));
 
@@ -3237,6 +3284,11 @@ void EffectPage::ShowIceTrailX(int x)
     iceTrailLineEdit->setText(QString::number(x));
 }
 
+void EffectPage::SetQuickLineupMode(bool on)
+{
+    noFogCheckBox->setChecked(on);
+}
+
 // Others
 
 OthersPage::OthersPage(QWidget *parent)
@@ -3406,6 +3458,12 @@ void OthersPage::PackFinished()
 {
     unpackPakButton->setEnabled(true);
     packPakButton->setEnabled(true);
+}
+
+void OthersPage::GameFound()
+{
+    if (runningInBackgroundCheckBox->isChecked())
+        emit this->RunningInBackground(true);
 }
 
 // Status
@@ -3586,6 +3644,7 @@ void StatusPage::StartTimer()
 
 void StatusPage::StopTimer()
 {
+    autoRefreshCheckBox->setChecked(false);
     refreshStatusTimer->stop();
 }
 
@@ -3841,15 +3900,16 @@ void CannonLauncherPage::CalculateCoord(int scene)
     double col = colSpinBox->value();
     int x, y;
 
+    x = 80 * col;
     if (scene == 2 || scene == 3)
-        x = 80 * col, y = 60 + 85 * row;
+        y = 55 + 85 * row;
     else if (scene == 4 || scene == 5)
-        if (col > 5.0)
-            x = 80 * col, y = 50 + 85 * row;
+        if (col >= 6.0)
+            y = 45 + 85 * row;
         else
-            x = 80 * col, y = 60 + 85 * row + (110 - 20 * col);
+            y = 45 + 85 * row + 20 * (6 - col);
     else
-        x = 80 * col, y = 45 + 100 * row;
+        y = 40 + 100 * row;
 
     xValueLabel->setText(QString::number(x));
     yValueLabel->setText(QString::number(y));
@@ -3894,7 +3954,7 @@ void DocumentPage::TranslateUI()
                          "<p>When using extreme spawn in brief mode, there must be Zombie and Flag Zombie. Flag Zombie, Zombie Yeti and Bungee Zombie is limited, and GigaGargantuar has no limit.</p>"
                          "<p>When using simulate natural spawn in detailed mode, there must be Zombie and Flag Zombie. Flag Zombie, Zombie Yeti and Bungee Zombie is limited.</p>"
                          "<h2>Lineup</h2>"
-                         "<p>Checking \"Quick Lineup Mode\" will enable these features: Auto Collect, Cob Cannon No CD, Plant Invincible, Stop Spawning, Purple Seed Unlimited, Ignore Sun, Slots No CD, No Fog.</p>"
+                         "<p>Checking \"Quick Lineup Mode\" will enable these features: Auto Collect, Cob Cannon No CD, Plant Invincible, Stop Spawning, Ignore Sun, Slots No CD, Purple Seed Unlimited, No Fog.</p>"
                          "<p>Clicking \"Quick Pass\" will end current level directly, kill all zombies on the field, set the number of sunshine to 8000, and set the number of levels to 1008 (2018 flags completed). You can modify sunshine and level in corresponding page by pause the game immediately after clicking it.</p>"
                          "<p>Format of lineup string is compatible with <a href=\"http://lonelystar.org/ArrayDesign\">Array Design</a>.</p>"
                          "<p>The built-in lineup string includes <a href=\"https://tieba.baidu.com/p/5272254427\">Kaleidoscope of Endless Build Culture (2017 Poker)</a> and some well-known build in <a href=\"https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good\">good tab</a> at Baidu Tieba.</p>"

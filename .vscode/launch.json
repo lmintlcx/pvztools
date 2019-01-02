@@ -5,10 +5,10 @@
             "name": "Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "C:/work/pvztools_build/debug/pvztools.exe",
+            "program": "D:/tmp/pvztools_build/debug/pvztools.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "C:/work/pvztools_build/debug",
+            "cwd": "D:/tmp/pvztools_build/debug",
             "environment": [],
             "externalConsole": true,
             "preLaunchTask": "Build"

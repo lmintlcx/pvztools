@@ -136,28 +136,26 @@ void Bot::PressKey(char key)
 // index = 1 ~ 10
 void Bot::ClickSeed(int index)
 {
-    int y = 42;
+    int y = 12;
     int slots_count = GetSlotsCount();
     if (index >= 1 && index <= slots_count)
     {
         switch (slots_count)
         {
-        case 6:
-            Click(61 + 59 * index, y);
-            break;
-        case 7:
-            Click(61 + 59 * index, y);
-            break;
-        case 8:
-            Click(61 + 54 * index, y);
+        case 10:
+            Click(63 + 51 * index, y);
             break;
         case 9:
             Click(63 + 52 * index, y);
             break;
-        case 10:
-            Click(63 + 51 * index, y);
+        case 8:
+            Click(61 + 54 * index, y);
+            break;
+        case 7:
+            Click(61 + 59 * index, y);
             break;
         default:
+            Click(61 + 59 * index, y);
             break;
         }
     }
@@ -165,26 +163,24 @@ void Bot::ClickSeed(int index)
 
 void Bot::ClickShovel()
 {
-    int y = 42;
+    int y = 36;
     int slots_count = GetSlotsCount();
     switch (slots_count)
     {
-    case 6:
-        Click(490, y);
-        break;
-    case 7:
-        Click(550, y);
-        break;
-    case 8:
-        Click(570, y);
+    case 10:
+        Click(640, y);
         break;
     case 9:
         Click(600, y);
         break;
-    case 10:
-        Click(640, y);
+    case 8:
+        Click(570, y);
+        break;
+    case 7:
+        Click(550, y);
         break;
     default:
+        Click(490, y);
         break;
     }
 }
@@ -196,14 +192,14 @@ void Bot::ClickGrid(double row, double col)
     {
     case 2: // pool
     case 3: // fog
-        LeftClick(80 * col, 60 + 85 * row);
+        LeftClick(80 * col, 55 + 85 * row);
         break;
     case 4: // roof
     case 5: // moon
-        if (col > 5.5)
-            LeftClick(80 * col, 50 + 85 * row);
+        if (col >= 6.0)
+            LeftClick(80 * col, 45 + 85 * row);
         else
-            LeftClick(80 * col, 60 + 85 * row + (110 - 20 * col));
+            LeftClick(80 * col, 45 + 85 * row + 20 * (6 - col));
         break;
     case 0: // day
     case 1: // night
@@ -212,7 +208,7 @@ void Bot::ClickGrid(double row, double col)
     case 8: // aquarium garden
     case 9: // tree of wisdom
     default:
-        LeftClick(80 * col, 45 + 100 * row);
+        LeftClick(80 * col, 40 + 100 * row);
         break;
     }
 }
