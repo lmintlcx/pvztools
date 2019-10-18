@@ -26,11 +26,27 @@
 #include <QClipboard>
 #include <QTableWidget>
 #include <QHeaderView>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
+#include <QUrl>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QSettings>
+#include <QUuid>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QInputDialog>
+
+#include <QtZlib/zlib.h>
 
 #include <array>
+#include <functional>
 
 #include "src/list.h"
 #include "src/pages.h"
+#include "src/version.h"
 
 namespace Pt
 {
@@ -87,7 +103,15 @@ LevelPage::LevelPage(QWidget *parent)
     jumpLevelButton = new QPushButton(this);
 
     // set default status
-    adventureRadioButton->setChecked(true);
+
+    // adventureRadioButton->setChecked(false);
+    // miniGamesRadioButton->setChecked(false);
+    // puzzleRadioButton->setChecked(false);
+    survivalRadioButton->setChecked(true);
+    adventureCombo->setEnabled(false);
+    miniGamesCombo->setEnabled(false);
+    puzzleCombo->setEnabled(false);
+    // survivalCombo->setEnabled(true);
 
     levelLineEdit->setText("1008");
 
@@ -127,6 +151,18 @@ LevelPage::LevelPage(QWidget *parent)
 
     connect(directWinButton, &QPushButton::clicked,
             this, &LevelPage::DirectWin);
+
+    connect(adventureRadioButton, &QRadioButton::toggled,
+            adventureCombo, &QComboBox::setEnabled);
+
+    connect(miniGamesRadioButton, &QRadioButton::toggled,
+            miniGamesCombo, &QComboBox::setEnabled);
+
+    connect(puzzleRadioButton, &QRadioButton::toggled,
+            puzzleCombo, &QComboBox::setEnabled);
+
+    connect(survivalRadioButton, &QRadioButton::toggled,
+            survivalCombo, &QComboBox::setEnabled);
 
     connect(mixmodeButton, &QPushButton::clicked,
             this, [=]() {
@@ -181,6 +217,10 @@ void LevelPage::TranslateUI()
     unlockAllModeCheckBox->setText(tr("Unlock All Mode Temporarily"));
     directWinButton->setText(tr("Direct Win"));
 
+    getGoldSunflowerTrophyButton->setStatusTip(tr("Switch to another game interface (like help) and return to view results after the operation is done."));
+    getAllShopItemsButton->setStatusTip(tr("Switch to another game interface (like help) and return to view results after the operation is done."));
+    unlockAllModeCheckBox->setStatusTip(tr("Switch to another game interface (like help) and return to view results after the operation is done."));
+
     adventureRadioButton->setText(tr("Adventure"));
     miniGamesRadioButton->setText(tr("Mini-Games"));
     puzzleRadioButton->setText(tr("Puzzle"));
@@ -199,6 +239,21 @@ void LevelPage::TranslateUI()
     lockIzeArrayCheckBox->setText(tr("Lock IZE Array"));
 
     jumpLevelButton->setText(tr("Jump Level"));
+}
+
+void LevelPage::KeepSelectedFeatures()
+{
+    if (unlockAllModeCheckBox->isChecked())
+        emit UnlockAllMode(true);
+
+    if (showHideGamesCheckBox->isChecked())
+        emit ShowHideGames(true);
+
+    if (lockIzeArrayCheckBox->isChecked())
+    {
+        int mode = izeArrayCombo->currentIndex();
+        emit LockIZE(true, mode);
+    }
 }
 
 // Resources
@@ -498,6 +553,8 @@ void ResourcePage::TranslateUI()
     autoCollectCheckBox->setText(tr("Auto Collect"));
     zombieNoFallingCheckBox->setText(tr("Zombie No Falling"));
 
+    manyFallingSunCheckBox->setStatusTip(tr("This feature is available when \"Auto Collect\" is turned on."));
+
     valueLabel->setText(tr("Value") + " x10");
     SET_COMBO_TEXT(valueCombo, List::Get().coinList, 6);
     valueButton->setText(tr("Set"));
@@ -535,9 +592,32 @@ void ResourcePage::ShowTime(int t)
     timeLineEdit->setText(QString::number(t));
 }
 
+void ResourcePage::UpdateGameData()
+{
+    emit GetValue(valueCombo->currentIndex());
+    emit GetDamage(damageCombo->currentIndex());
+    emit GetHP(hpCombo->currentIndex());
+    emit GetTime(timeCombo->currentIndex());
+}
+
 void ResourcePage::SetQuickLineupMode(bool on)
 {
     autoCollectCheckBox->setChecked(on);
+}
+
+void ResourcePage::KeepSelectedFeatures()
+{
+    if (manyFallingSunCheckBox->isChecked())
+        emit SetFallingSun(Sun::Many);
+
+    if (noFallingSunCheckBox->isChecked())
+        emit SetFallingSun(Sun::None);
+
+    if (autoCollectCheckBox->isChecked())
+        emit AutoCollect(true);
+
+    if (zombieNoFallingCheckBox->isChecked())
+        emit ZombieNoFalling(true);
 }
 
 // Plants
@@ -756,6 +836,69 @@ void PlantsPage::SetQuickLineupMode(bool on)
 {
     cobsNoCdCheckBox->setChecked(on);
     plantInvincibleCheckBox->setChecked(on);
+}
+
+void PlantsPage::KeepSelectedFeatures()
+{
+    if (cobsNoCdCheckBox->isChecked())
+        emit CobCannonNoCD(true);
+
+    if (magnetsNoCdCheckBox->isChecked())
+        emit MagnetsNoCD(true);
+
+    if (potatoMineNoCdCheckBox->isChecked())
+        emit PotatoMineNoCD(true);
+
+    if (chomperNoCdCheckBox->isChecked())
+        emit ChomperNoCD(true);
+
+    if (plantInvincibleCheckBox->isChecked())
+        emit SetPlantStrength(Strength::Invincible);
+
+    if (plantWeakCheckBox->isChecked())
+        emit SetPlantStrength(Strength::Weak);
+
+    if (lockKernelCheckBox->isChecked())
+        emit LockPult(Bullet::Kernel);
+
+    if (lockButterCheckBox->isChecked())
+        emit LockPult(Bullet::Butter);
+
+    if (noCraterCheckBox->isChecked())
+        emit NoCrater(true);
+
+    if (mushroomsAwakeCheckBox->isChecked())
+        emit MushroomsAwake(true);
+
+    if (strongBloverCheckBox->isChecked())
+        emit StrongBlover(true);
+
+    if (strongPeasCheckBox->isChecked())
+        emit StrongPeas(true);
+
+    if (explodeImmediatelyCheckBox->isChecked())
+        emit SetPlantExplode(Explode::Immediately);
+
+    if (explodeNeverCheckBox->isChecked())
+        emit SetPlantExplode(Explode::Never);
+
+    if (beghouledFreeMoveCheckBox->isChecked())
+        emit BeghouledFreeMove(true);
+
+    if (attackSuperpositionCheckBox->isChecked())
+        emit AttackSuperposition(true);
+
+    if (plantTorchwoodCheckBox->isChecked())
+        emit PlantTorchwood(true);
+
+    if (plantGarlicCheckBox->isChecked())
+        emit PlantGarlic(true);
+
+    if (plantUmbrellaCheckBox->isChecked())
+        emit PlantUmbrella(true);
+
+    if (plantPaperCheckBox->isChecked())
+        emit PlantPaper(true);
 }
 
 // Zombies
@@ -1001,6 +1144,63 @@ void ZombiesPage::TranslateUI()
 void ZombiesPage::SetQuickLineupMode(bool on)
 {
     stopSpawningCheckBox->setChecked(on);
+}
+
+void ZombiesPage::KeepSelectedFeatures()
+{
+    if (zombieExplodeImmediatelyCheckBox->isChecked())
+        emit SetZombieExplode(Explode::Immediately);
+
+    if (zombieExplodeNeverCheckBox->isChecked())
+        emit SetZombieExplode(Explode::Never);
+
+    if (zombieInvisibleCheckBox->isChecked())
+        emit SetZombieVisibility(Visibility::Invisible);
+
+    if (zombieShowCheckBox->isChecked())
+        emit SetZombieVisibility(Visibility::Visible);
+
+    if (zombieInvincibleCheckBox->isChecked())
+        emit SetZombieStrength(Strength::Invincible);
+
+    if (zombieWeakCheckBox->isChecked())
+        emit SetZombieStrength(Strength::Weak);
+
+    if (stopSpawningCheckBox->isChecked())
+        emit StopSpawning(true);
+
+    if (zombiesNoMoveCheckBox->isChecked())
+        emit ZombiesNoMove(true);
+
+    if (noIceSlowDownCheckBox->isChecked())
+        emit NoIceSlowDown(true);
+
+    if (noButterImmobilizeCheckBox->isChecked())
+        emit NoButterImmobilize(true);
+
+    if (no3ZombiesGroupCheckBox->isChecked())
+        emit No3zGroup(true);
+
+    if (noIceTrailCheckBox->isChecked())
+        emit NoIceTrail(true);
+
+    if (noThrowImpCheckBox->isChecked())
+        emit NoThrowImp(true);
+
+    if (gargantuarEatableCheckBox->isChecked())
+        emit GargantuarEatable(true);
+
+    if (zombossNoMoveCheckBox->isChecked())
+        emit ZombossNoMove(true);
+
+    if (balloonBurstCheckBox->isChecked())
+        emit BalloonBurst(true);
+
+    if (gatherZombiesCheckBox->isChecked())
+    {
+        float pos = static_cast<float>(gatherZombiesSlider->value());
+        emit GatherZombies(true, pos);
+    }
 }
 
 // Spawn
@@ -1441,10 +1641,21 @@ void SpawnDetailedPage::TranslateUI()
     extremeSpawnRadioButton->setText(tr("Extreme Spawn"));
     simulateSpawnRadioButton->setText(tr("Simulate Natural Spawn"));
 
+    naturalSpawnRadioButton->setStatusTip(tr("Calls built-in function of game to generates zombies list."));
+    extremeSpawnRadioButton->setStatusTip(tr("Continuously and evenly populate the zombies list."));
+    simulateSpawnRadioButton->setStatusTip(tr("Randomly fill the zombies list according to some ratio."));
+
     limitFlagCheckBox->setText(tr("Limit Flag"));
     limitYetiCheckBox->setText(tr("Limit Yeti"));
     limitBungeeCheckBox->setText(tr("Limit Bungee"));
     limitGigaCheckBox->setText(tr("Limit Giga"));
+
+    limitFlagCheckBox->setStatusTip(tr("Flag Zombie will only appear in each flag wave (huge wave)."));
+    limitYetiCheckBox->setStatusTip(tr("There will be only one Zombie Yeti."));
+    limitBungeeCheckBox->setStatusTip(tr("Bungee Zombie will only appear in flag wave (huge wave)."));
+    limitGigaCheckBox->setStatusTip(tr("GigaGargantuar will only appear in selected wave(s) (20 waves total)."));
+
+    gigaWavesWidget->setStatusTip(tr("These check boxes shows or controls the waves of GigaGargantuar appear."));
 
     spawnResetButton->setText(tr("Reset"));
     spawnSetButton->setText(tr("Set"));
@@ -1854,11 +2065,50 @@ void SlotsPage::ShowRecharge(int recharge)
     seedRechargeLineEdit->setText(QString::number(recharge));
 }
 
+void SlotsPage::UpdateGameData()
+{
+    emit GetSeedType(slotsSlotCombo->currentIndex());
+    emit GetSeedVisible(slotsSlotCombo->currentIndex());
+    emit GetSpeed(seedCombo->currentIndex());
+    emit GetCost(seedCombo->currentIndex());
+    emit GetRecharge(seedCombo->currentIndex());
+}
+
 void SlotsPage::SetQuickLineupMode(bool on)
 {
     ignoreSunCheckBox->setChecked(on);
     slotsNoCdCheckBox->setChecked(on);
     purpleSeedUnlimitedCheckBox->setChecked(on);
+}
+
+void SlotsPage::KeepSelectedFeatures()
+{
+    if (hideSlotsCheckBox->isChecked())
+        emit HideSlots(true);
+
+    if (!showShovelCheckBox->isChecked())
+        emit ShowShovel(false);
+
+    if (lockShovelCheckBox->isChecked())
+        emit LockShovel(true);
+
+    if (ignoreSunCheckBox->isChecked())
+        emit IgnoreSun(true);
+
+    if (slotsNoCdCheckBox->isChecked())
+        emit SlotsNoCoolDown(true);
+
+    if (purpleSeedUnlimitedCheckBox->isChecked())
+        emit PurpleSeedUnlimited(true);
+
+    if (plantingFreelyCheckBox->isChecked())
+        emit PlantingFreely(true);
+
+    if (beltNoDelayCheckBox->isChecked())
+        emit BeltNoDelay(true);
+
+    if (hideMenuButtonCheckBox->isChecked())
+        emit HideMenuButton(true);
 }
 
 // Scene
@@ -2037,14 +2287,23 @@ ScenePage::ScenePage(QWidget *parent)
 
     connect(sceneButton, &QPushButton::clicked,
             this, [=]() {
-                QMessageBox msgBox;
-                msgBox.setWindowTitle(tr("Warning"));
-                msgBox.setText(tr("Modifying game scene may cause many problems, like texture error or game crash."));
-                msgBox.setInformativeText(tr("Are you sure you want to modify the game scene?"));
-                msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-                msgBox.setDefaultButton(QMessageBox::No);
-                int ret = msgBox.exec();
-                if (ret == QMessageBox::Yes)
+                if (!already_warned_you)
+                {
+                    QMessageBox msgBox;
+                    msgBox.setWindowTitle(tr("Warning"));
+                    msgBox.setText(tr("Modifying game scene may cause some unknown problems, therefore it is not allowed by default.<br>It is recommended to enter the hidden scene in a <a href=\"https://pvz.lmintlcx.com/pvztoolsdemo/hidenscene/\">more conventional way</a> and then mix to \"Survival Endless\" mode."));
+                    msgBox.setInformativeText(tr("Are you sure you want to modify the game scene?"));
+                    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                    msgBox.setDefaultButton(QMessageBox::No);
+                    int ret = msgBox.exec();
+                    if (ret == QMessageBox::Yes)
+                    {
+                        int scene = sceneCombo->currentIndex();
+                        emit SetScene(scene);
+                        already_warned_you = true;
+                    }
+                }
+                else
                 {
                     int scene = sceneCombo->currentIndex();
                     emit SetScene(scene);
@@ -2226,8 +2485,7 @@ LineupPage::LineupPage(QWidget *parent)
     clearAllPlantsButton = new QPushButton(this);
 
     openLinkButton = new QPushButton(this);
-    endlessBuildLabel = new QLabel(this);
-    endlessBuildLabel->setOpenExternalLinks(true);
+    updateCheckButton = new QPushButton(this);
     endlessBuildCombo = new QComboBox(this);
     oneKeySetupButton = new QPushButton(this);
 
@@ -2238,9 +2496,16 @@ LineupPage::LineupPage(QWidget *parent)
 
     copyStringButton = new QPushButton(this);
     pasteStringButton = new QPushButton(this);
+    saveStringButton = new QPushButton(this);
+    deleteStringButton = new QPushButton(this);
 
     allowSwitchSceneCheckBox = new QCheckBox(this);
     keepHpStatusCheckBox = new QCheckBox(this);
+
+    deleteStringButton->setEnabled(false);
+
+    allowSwitchSceneCheckBox->setEnabled(false); // TODO
+    allowSwitchSceneCheckBox->setVisible(false); // TODO
 
     stringTextEdit->setPlainText("0,E 1 1 0 0 0,E 2 1 0 0 0,E 3 1 0 0 0,E 4 1 0 0 0,E 5 1 0 0 0,E 5 2 0 0 0,E 1 5 0 0 0,E 1 4 0 0 0,E 2 4 0 0 0,E 3 4 0 0 0,E 4 4 0 0 0,E 5 4 0 0 0,E 5 5 0 0 0,E 1 7 0 0 0,E 2 7 0 0 0,E 3 8 0 0 0,E 4 9 0 0 0,E 5 9 0 0 0,E 1 9 0 0 0,E 2 9 0 0 0,E 4 7 0 0 0,E 5 7 0 0 0"); // LCX
 
@@ -2253,15 +2518,17 @@ LineupPage::LineupPage(QWidget *parent)
     mainLayout->addWidget(flowerPotOnRoofButton, 1, 6, 1, 3);
     mainLayout->addWidget(clearAllPlantsButton, 1, 9, 1, 3);
     mainLayout->addWidget(openLinkButton, 2, 0, 1, 3);
-    mainLayout->addWidget(endlessBuildLabel, 2, 3, 1, 3);
+    mainLayout->addWidget(updateCheckButton, 2, 3, 1, 2);
     mainLayout->addWidget(endlessBuildCombo, 2, 5, 1, 4);
     mainLayout->addWidget(oneKeySetupButton, 2, 9, 1, 3);
-    mainLayout->addWidget(stringTextEdit, 3, 0, 2, 8);
-    mainLayout->addWidget(string2buildButton, 3, 8, 1, 4);
-    mainLayout->addWidget(build2stringButton, 4, 8, 1, 4);
+    mainLayout->addWidget(stringTextEdit, 3, 0, 2, 9); //
+    mainLayout->addWidget(string2buildButton, 3, 9, 1, 3);
+    mainLayout->addWidget(build2stringButton, 4, 9, 1, 3);
     mainLayout->addWidget(copyStringButton, 5, 0, 1, 2);
     mainLayout->addWidget(pasteStringButton, 5, 2, 1, 2);
-    mainLayout->addWidget(allowSwitchSceneCheckBox, 5, 6, 1, 3);
+    mainLayout->addWidget(saveStringButton, 5, 5, 1, 2);
+    mainLayout->addWidget(deleteStringButton, 5, 7, 1, 2);
+    mainLayout->addWidget(allowSwitchSceneCheckBox, 5, 9, 1, 3);
     mainLayout->addWidget(keepHpStatusCheckBox, 5, 9, 1, 3);
 
     for (int i = 0; i < mainLayout->rowCount(); i++)
@@ -2294,35 +2561,54 @@ LineupPage::LineupPage(QWidget *parent)
 
     connect(openLinkButton, &QPushButton::clicked,
             this, [=]() {
-                QDesktopServices::openUrl(QUrl("http://lonelystar.org/ArrayDesign"));
+                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/arraydesign/"));
+            });
+
+    connect(updateCheckButton, &QPushButton::clicked,
+            this, &LineupPage::UpdateLineupString);
+
+    connect(endlessBuildCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, [=](int index) {
+                if (index != -1)
+                {
+                    lastSelectedBuildName = endlessBuildNameList[index];                                // save current selected
+                    stringTextEdit->setPlainText(endlessBuildStringList[index]);                        // show string
+                    deleteStringButton->setEnabled(endlessBuildGroupList[index] == "v2/Lineup/Custom"); // deleteable
+                }
             });
 
     connect(oneKeySetupButton, &QPushButton::clicked,
             this, [=]() {
                 int index = endlessBuildCombo->currentIndex();
-                QString text = List::Get().endlessBuildStringList[index];
-                // if (StringCheck(text)) // no need
+                QString string = endlessBuildStringList[index];
+                // if (StringCheck(string)) // no need
                 {
-                    std::string str = text.toStdString();
-                    bool switchable = allowSwitchSceneCheckBox->isChecked();
+                    std::string str = string.toStdString();
+                    bool switch_scene = allowSwitchSceneCheckBox->isChecked();
+#ifdef _DEBUG
+                    switch_scene = true;
+#endif
                     bool keep_status = false;
-                    emit SetLineup(str, switchable, keep_status);
+                    emit SetLineup(str, switch_scene, keep_status);
                 }
             });
 
     connect(string2buildButton, &QPushButton::clicked,
             this, [=]() {
-                QString text = stringTextEdit->toPlainText();
-                if (StringCheck(text))
+                QString string = stringTextEdit->toPlainText();
+                if (StringCheck(string))
                 {
-                    std::string str = text.toStdString();
-                    bool switchable = allowSwitchSceneCheckBox->isChecked();
+                    std::string str = string.toStdString();
+                    bool switch_scene = allowSwitchSceneCheckBox->isChecked();
+#ifdef _DEBUG
+                    switch_scene = true;
+#endif
                     bool keep_status = keepHpStatusCheckBox->isChecked();
-                    emit SetLineup(str, switchable, keep_status);
+                    emit SetLineup(str, switch_scene, keep_status);
                 }
                 else
                 {
-                    QMessageBox::warning(this, tr("Error"), tr("Wrong string format."), QMessageBox::Ok);
+                    emit ShowMessageStatusBar(tr("Wrong string format!"));
                 }
             });
 
@@ -2337,6 +2623,7 @@ LineupPage::LineupPage(QWidget *parent)
                 QClipboard *clipboard = QApplication::clipboard();
                 QString text = stringTextEdit->toPlainText();
                 clipboard->setText(text);
+                emit ShowMessageStatusBar(tr("Already copied."));
             });
 
     connect(pasteStringButton, &QPushButton::clicked,
@@ -2344,23 +2631,16 @@ LineupPage::LineupPage(QWidget *parent)
                 QClipboard *clipboard = QApplication::clipboard();
                 QString text = clipboard->text();
                 stringTextEdit->setPlainText(text);
+                emit ShowMessageStatusBar(tr("Already pasted."));
             });
 
-    connect(allowSwitchSceneCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
-                if (checked)
-                {
-                    QMessageBox msgBox;
-                    msgBox.setWindowTitle(tr("Warning"));
-                    msgBox.setText(tr("Modifying game scene may cause many problems, like texture error or game crash."));
-                    msgBox.setInformativeText(tr("Are you sure you want to modify the game scene?"));
-                    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-                    msgBox.setDefaultButton(QMessageBox::No);
-                    int ret = msgBox.exec();
-                    if (ret == QMessageBox::No)
-                        allowSwitchSceneCheckBox->setChecked(false);
-                }
-            });
+    connect(saveStringButton, &QPushButton::clicked,
+            this, &LineupPage::SaveLineupString);
+
+    connect(deleteStringButton, &QPushButton::clicked,
+            this, &LineupPage::DeleteLineupString);
+
+    RefreshLineupString();
 }
 
 void LineupPage::TranslateUI()
@@ -2369,14 +2649,16 @@ void LineupPage::TranslateUI()
     quickPassButton->setText(tr("Quick Pass"));
     mixModeToSurvivalEndlessButton->setText(tr("Mix Mode To Survival Endless"));
 
+    quickLineupModeCheckBox->setStatusTip(tr("Turn on a series of features that are convenient for manual lineup."));
+    quickPassButton->setStatusTip(tr("Kill all zombies and end current level directly with 8000 sunshine and 2018 flags."));
+
     eatAllGravesButton->setText(tr("Eat All Graves"));
     lilyPadOnPoolButton->setText(tr("Lily Pad On Pool"));
     flowerPotOnRoofButton->setText(tr("Flower Pot On Roof"));
     clearAllPlantsButton->setText(tr("Clear All Plants"));
 
     openLinkButton->setText(tr("Open Array Design Page"));
-    endlessBuildLabel->setText(tr("<style>a {text-decoration: none}</style><a href='https://tieba.baidu.com/p/5272254427'>Endless Build</a>"));
-    SET_COMBO_TEXT(endlessBuildCombo, List::Get().endlessBuildNameList, 171);
+    updateCheckButton->setText(tr("Update"));
     oneKeySetupButton->setText(tr("One Key Setup"));
 
     string2buildButton->setText(tr("String -> Lineup"));
@@ -2384,6 +2666,8 @@ void LineupPage::TranslateUI()
 
     copyStringButton->setText(tr("Copy"));
     pasteStringButton->setText(tr("Paste"));
+    saveStringButton->setText(tr("Save"));
+    deleteStringButton->setText(tr("Delete"));
 
     allowSwitchSceneCheckBox->setText(tr("Allow Switch Scene"));
     keepHpStatusCheckBox->setText(tr("Keep HP Status"));
@@ -2391,8 +2675,9 @@ void LineupPage::TranslateUI()
 
 bool LineupPage::StringCheck(const QString &text)
 {
-    QRegExp reg("[0-5](,[a-fA-F0-9]{1,2} [1-6] [1-9] [0-2] [0-2] [0-1]){0,}");
+    QRegExp reg("[0-5](,[a-fA-F0-9]{1,2} [1-6] [1-9] [0-2] [0-4] [0-1]){0,}");
     return reg.exactMatch(text);
+    // return true;
 }
 
 void LineupPage::ShowLineup(std::string str)
@@ -2400,6 +2685,411 @@ void LineupPage::ShowLineup(std::string str)
     QString text = QString::fromStdString(str);
     stringTextEdit->clear();
     stringTextEdit->setPlainText(text);
+}
+
+void LineupPage::InitLineupString(QString str)
+{
+    QString content;
+    if (str == "")
+    {
+        QFile file(":/res/lineup_string.json");
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        content = file.readAll();
+        file.close();
+    }
+    else
+    {
+        content = str;
+    }
+    // std::wcout << content.toStdWString().c_str();
+
+    QJsonParseError parse_json_err;
+    QJsonDocument document = QJsonDocument::fromJson(content.toUtf8(), &parse_json_err);
+    if (parse_json_err.error != QJsonParseError::NoError)
+        return;
+
+    QJsonObject json_object = document.object();
+    // qDebug() << "json_object[version] = " << json_object["version"].toInt();
+    // qDebug() << "json_object[author] = " << json_object["author"].toString();
+
+    if (!(json_object.contains(QStringLiteral("lineup"))))
+        return;
+
+    QJsonValue array_value = json_object.value(QStringLiteral("lineup"));
+    if (!(array_value.isArray()))
+        return;
+    QJsonArray array = array_value.toArray();
+
+    QSettings settings;
+    settings.remove("v2/Lineup/Official");
+    settings.beginGroup("v2/Lineup/Official");
+    for (int i = 0; i < array.size(); i++)
+    {
+        QJsonValue arr = array.at(i);
+        QJsonObject key = arr.toObject();
+        // qDebug() << "key[name] = " << key["name"].toString();
+        // qDebug() << "key[string] = " << key["string"].toString();
+        QString uuid = QUuid::createUuid().toString();
+        settings.beginGroup(uuid);
+        settings.setValue("Name", key["name"].toString());
+        settings.setValue("String", key["string"].toString());
+        settings.endGroup();
+    }
+    settings.endGroup();
+}
+
+void LineupPage::RefreshLineupString()
+{
+    QStringList lineup_stringlist;
+
+    QStringList groups;
+    groups << "v2/Lineup/Official"
+           << "v2/Lineup/Custom";
+
+    QSettings settings;
+    foreach (QString group, groups)
+    {
+        settings.beginGroup(group);
+        foreach (QString uuid, settings.childGroups())
+        {
+            settings.beginGroup(uuid);
+            QString name = settings.value("Name", QString("")).toString();
+            QString string = settings.value("String", QString("")).toString();
+            QString lineup_string = QString("") + group + "|" + uuid + "|" + name + "|" + string;
+            lineup_stringlist << lineup_string;
+            settings.endGroup();
+        }
+        settings.endGroup();
+    }
+
+    auto LessThan = [&](const QString &s1, const QString &s2) {
+        auto GetWeight = [&](const QString &s) {
+            //    场地 1000000000000
+            // 2F 春哥 10000000000
+            // 2A 曾哥 100000000
+            // 1E 南瓜 1000000
+            // 10 睡莲 10000
+            // 21 花盆 100
+            // 30 梯子 1
+            long long w = 0;
+            QStringList items = s.split("|")[3].split(",");
+            for (int i = 0; i < items.size(); i++)
+            {
+                if (i == 0) // scene
+                {
+                    int scene = items[i].toInt();
+                    switch (scene)
+                    {
+                    case 0: // pool
+                        w += 2 * 1000000000000;
+                        break;
+                    case 1: // fog
+                        w += 3 * 1000000000000;
+                        break;
+                    case 2: // day
+                        w += 0 * 1000000000000;
+                        break;
+                    case 3: // night
+                        w += 1 * 1000000000000;
+                        break;
+                    case 4: // roof
+                        w += 4 * 1000000000000;
+                        break;
+                    case 5: // moon
+                        w += 5 * 1000000000000;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                else
+                {
+                    QString plant = items[i].split(" ")[0];
+                    if (plant == "2F") // Cob Cannon
+                        w += 10000000000;
+                    else if (plant == "2A") // Gloom-shroom
+                        w += 100000000;
+                    else if (plant == "1E")
+                        w += 1000000;
+                    else if (plant == "10")
+                        w += 10000;
+                    else if (plant == "21")
+                        w += 100;
+                    else if (plant == "30")
+                        w += 1;
+                }
+            }
+            return w;
+        };
+        return GetWeight(s1) < GetWeight(s2);
+    };
+    qSort(lineup_stringlist.begin(), lineup_stringlist.end(), LessThan);
+    // qDebug() << lineup_stringlist;
+
+    endlessBuildGroupList.clear();
+    endlessBuildUuidList.clear();
+    endlessBuildNameList.clear();
+    endlessBuildStringList.clear();
+    for (int i = 0; i < lineup_stringlist.size(); i++)
+    {
+        QStringList strs = lineup_stringlist[i].split("|");
+        QString group = strs[0];
+        QString uuid = strs[1];
+        QString name = strs[2];
+        QString string = strs[3];
+        endlessBuildGroupList << group;
+        endlessBuildUuidList << uuid;
+        endlessBuildNameList << name;
+        endlessBuildStringList << string;
+    }
+    // qDebug() << endlessBuildNameList;
+    // qDebug() << endlessBuildStringList;
+    endlessBuildCombo->blockSignals(true); // hack
+    endlessBuildCombo->clear();
+    endlessBuildCombo->addItems(endlessBuildNameList);
+    endlessBuildCombo->blockSignals(false); // hack
+
+    if (lastSelectedBuildName.isEmpty())
+        lastSelectedBuildName = QString("[PE].经典八炮");
+    int index = endlessBuildNameList.indexOf(lastSelectedBuildName);
+    // qDebug() << index << lastSelectedBuildName;
+    if (index != -1)
+        endlessBuildCombo->setCurrentIndex(index);
+}
+
+void LineupPage::UpdateLineupString()
+{
+    lastSelectedBuildName = endlessBuildCombo->currentText(); // save current selected
+
+    updateCheckButton->setEnabled(false);
+    endlessBuildCombo->setEnabled(false);
+    oneKeySetupButton->setEnabled(false);
+
+    auto decompress_gzip = [&](const QByteArray &gzip_data) -> QByteArray {
+        QByteArray raw_data;
+
+        const int CHUNK_SIZE = 1024 * 16;
+        unsigned char buffer[CHUNK_SIZE];
+
+        z_stream gzip_stream;
+        gzip_stream.zalloc = Z_NULL;
+        gzip_stream.zfree = Z_NULL;
+        gzip_stream.opaque = Z_NULL;
+        gzip_stream.avail_in = gzip_data.size();
+        gzip_stream.next_in = (Bytef *)(gzip_data.data());
+
+        int status = inflateInit2(&gzip_stream, MAX_WBITS + 16); // gzip decoding
+        if (status != Z_OK)
+            return QByteArray();
+
+        do // run inflate()
+        {
+            // memset(buffer, 0, CHUNK_SIZE);
+            gzip_stream.avail_out = CHUNK_SIZE;
+            gzip_stream.next_out = buffer;
+            int status = inflate(&gzip_stream, Z_NO_FLUSH);
+            switch (status)
+            {
+            case Z_NEED_DICT:
+            case Z_DATA_ERROR:
+            case Z_STREAM_ERROR:
+            case Z_MEM_ERROR:
+                inflateEnd(&gzip_stream);
+                return QByteArray();
+            default:
+                raw_data.append((char *)buffer, CHUNK_SIZE - gzip_stream.avail_out);
+                // qDebug() << raw_data.size();
+            }
+        } while (status == Z_OK && status != Z_STREAM_END && gzip_stream.avail_out == 0);
+        // 3->1 should be ok
+        // } while (status == Z_OK);
+        // } while (status != Z_STREAM_END);
+        // } while (gzip_stream.avail_out == 0);
+
+        inflateEnd(&gzip_stream);
+        return raw_data;
+    };
+
+    QNetworkAccessManager manager;
+    QNetworkRequest request;
+    request.setUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/lineup_string.json"));
+    request.setRawHeader("User-Agent", PRODUCT_NAME "/" VERSION_NAME " "
+                                                    "(" COMPANY_NAME ")");
+    request.setRawHeader("Accept-Encoding", "gzip, deflate");
+    request.setRawHeader("Cache-Control", "no-cache");
+    QNetworkReply *reply = manager.get(request);
+
+    // while (!reply->isFinished())
+    //     qApp->processEvents();
+    QEventLoop loop;
+    connect(reply, &QNetworkReply::finished,
+            &loop, &QEventLoop::quit);
+    // connect(reply, &QNetworkReply::downloadProgress,
+    //         [=](qint64 bytesReceived, qint64 bytesTotal) {
+    //             qDebug() << "total: " << bytesTotal << " "
+    //                      << "received: " << bytesReceived;
+    //         });
+    loop.exec();
+
+    if (manager.networkAccessible() == QNetworkAccessManager::NotAccessible)
+    {
+        emit ShowMessageStatusBar(tr("Unable to connect to network."));
+        reply->deleteLater();
+        updateCheckButton->setEnabled(true);
+        endlessBuildCombo->setEnabled(true);
+        oneKeySetupButton->setEnabled(true);
+        return;
+    }
+
+    if (reply->error() == QNetworkReply::NoError)
+    {
+        QString lineup_string;
+        QByteArray content = reply->readAll();
+        if (reply->hasRawHeader("Content-Encoding") && reply->rawHeader("Content-Encoding") == "gzip" //
+            && (unsigned char)content.at(0) == 0x1F && (unsigned char)content.at(1) == 0x8B)          //
+            lineup_string = decompress_gzip(content);
+        else
+            lineup_string = content;
+        // std::wcout << lineup_string.toStdWString().c_str();
+        // qDebug() << lineup_string.size();
+
+        QJsonParseError parse_json_err;
+        QJsonDocument document = QJsonDocument::fromJson(lineup_string.toUtf8(), &parse_json_err);
+        if (parse_json_err.error != QJsonParseError::NoError)
+        {
+            emit ShowMessageStatusBar(tr("Update failed, lineup string database parsing error."));
+        }
+        else
+        {
+            QJsonObject json_object = document.object();
+            QString author = json_object["author"].toString();
+            int version = json_object["version"].toInt();
+            // qDebug() << author << version;
+            if (author == "lmintlcx")
+            {
+                InitLineupString(lineup_string);
+                RefreshLineupString();
+                emit ShowMessageStatusBar(tr("Lineup string update succeeded, current version: %1.").arg(version));
+            }
+            else
+            {
+                //
+            }
+        }
+    }
+    else
+    {
+        emit ShowMessageStatusBar(tr("Error while connecting to update server."));
+    }
+
+    reply->deleteLater();
+
+    updateCheckButton->setEnabled(true);
+    endlessBuildCombo->setEnabled(true);
+    oneKeySetupButton->setEnabled(true);
+}
+
+void LineupPage::SaveLineupString()
+{
+    QString string = stringTextEdit->toPlainText();
+    if (!(StringCheck(string)))
+    {
+        emit ShowMessageStatusBar(tr("Wrong string format!"));
+        return;
+    }
+
+    QString name_header = "";
+    int scene = string.split(",")[0].toInt();
+    switch (scene)
+    {
+    case 0: // pool
+        name_header = "[PE].";
+        break;
+    case 1: // fog
+        name_header = "[FE].";
+        break;
+    case 2: // day
+        name_header = "[DE].";
+        break;
+    case 3: // night
+        name_header = "[NE].";
+        break;
+    case 4: // roof
+        name_header = "[RE].";
+        break;
+    case 5: // moon
+        name_header = "[ME].";
+        break;
+    default:
+        break;
+    }
+
+    bool ok;
+    QString name = QInputDialog::getText(this,                            //
+                                         tr("Name"),                      //
+                                         tr("Please input lineup name:"), //
+                                         QLineEdit::Normal,               //
+                                         name_header,                     //
+                                         &ok,                             //
+                                         Qt::WindowCloseButtonHint);      //
+
+    if (ok && !name.isEmpty())
+    {
+        if (name.contains("|"))
+        {
+            ShowMessageStatusBar(tr("Save failed, name cannot contain character \"|\"."));
+            return;
+        }
+        QSettings settings;
+        QString uuid = QUuid::createUuid().toString();
+        settings.beginGroup("v2/Lineup/Custom");
+        settings.beginGroup(uuid);
+        settings.setValue("Name", name);
+        settings.setValue("String", string);
+        settings.endGroup();
+        settings.endGroup();
+        emit ShowMessageStatusBar(tr("Lineup %1 already saved.").arg(name));
+        lastSelectedBuildName = name; //  save current selected
+        RefreshLineupString();
+    }
+}
+
+void LineupPage::DeleteLineupString()
+{
+    QString name = endlessBuildCombo->currentText();
+
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(tr("Warning"));
+    msgBox.setText(tr("Are you sure you want to delete lineup %1?").arg(name));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::Yes)
+    {
+        int index = endlessBuildCombo->currentIndex();
+        QString group = endlessBuildGroupList[index];
+        QString uuid = endlessBuildUuidList[index];
+        QString name = endlessBuildNameList[index]; //
+        QString string = endlessBuildStringList[index];
+
+        endlessBuildGroupList.removeAt(index);
+        endlessBuildUuidList.removeAt(index);
+        endlessBuildNameList.removeAt(index);
+        endlessBuildStringList.removeAt(index);
+
+        endlessBuildCombo->removeItem(index);
+
+        QSettings settings;
+        settings.remove(group + "/" + uuid);
+
+        emit ShowMessageStatusBar(tr("Lineup %1 already deleted.").arg(name));
+    }
+}
+
+void LineupPage::KeepSelectedFeatures()
+{
+    if (quickLineupModeCheckBox->isChecked())
+        emit SetQuickLineupMode(true);
 }
 
 // Garden
@@ -2685,6 +3375,21 @@ void GardenPage::ShowGardenPlants(std::vector<GardenPlant> plants)
 
     table->resizeColumnsToContents();
     table->resizeRowsToContents();
+}
+
+void GardenPage::KeepSelectedFeatures()
+{
+    if (fertilizerUnlimitedCheckBox->isChecked())
+        emit FertilizerUnlimited(true);
+
+    if (bugSprayUnlimitedCheckBox->isChecked())
+        emit BugSprayUnlimited(true);
+
+    if (chocolateUnlimitedCheckBox->isChecked())
+        emit ChocolateUnlimited(true);
+
+    if (treeFoodUnlimitedCheckBox->isChecked())
+        emit TreeFoodUnlimited(true);
 }
 
 void GardenPage::UpdateContent()
@@ -3289,6 +3994,45 @@ void EffectPage::SetQuickLineupMode(bool on)
     noFogCheckBox->setChecked(on);
 }
 
+void EffectPage::KeepSelectedFeatures()
+{
+    if (itsRainingCheckBox->isChecked())
+        emit ItsRaining(true);
+
+    if (littleZombieCheckBox->isChecked())
+        emit LittleZombie(true);
+
+    if (columnLikeCheckBox->isChecked())
+        emit ColumnLike(true);
+
+    if (zombieQuickCheckBox->isChecked())
+        emit ZombieQuick(true);
+
+    if (whackZombieCheckBox->isChecked())
+        emit WhackZombie(true);
+
+    if (highGravityCheckBox->isChecked())
+        emit HighGravity(true);
+
+    if (graveDangerCheckBox->isChecked())
+        emit GraveDanger(true);
+
+    if (stormyNightCheckBox->isChecked())
+        emit StormyNight(true);
+
+    if (bungeeBlitzCheckBox->isChecked())
+        emit BungeeBlitz(true);
+
+    if (fullFogCheckBox->isChecked())
+        emit FullFog(true);
+
+    if (noFogCheckBox->isChecked())
+        emit NoFog(true);
+
+    if (seeVaseCheckBox->isChecked())
+        emit SeeVase(true);
+}
+
 // Others
 
 OthersPage::OthersPage(QWidget *parent)
@@ -3398,6 +4142,8 @@ OthersPage::OthersPage(QWidget *parent)
 
     connect(cannonLauncherButton, &QPushButton::clicked,
             this, &OthersPage::ShowCannonLauncherPage);
+
+    setAcceptDrops(true);
 }
 
 void OthersPage::TranslateUI()
@@ -3460,10 +4206,54 @@ void OthersPage::PackFinished()
     packPakButton->setEnabled(true);
 }
 
-void OthersPage::GameFound()
+void OthersPage::KeepSelectedFeatures()
 {
+    if (disableSaveDataCheckBox->isChecked())
+        emit DisableSaveData(true);
+
+    if (disableDeleteDataCheckBox->isChecked())
+        emit DisableDeleteData(true);
+
     if (runningInBackgroundCheckBox->isChecked())
-        emit this->RunningInBackground(true);
+        emit RunningInBackground(true);
+
+    if (disablePauseCheckBox->isChecked())
+        emit DisablePause(true);
+}
+
+void OthersPage::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (true)
+        event->acceptProposedAction();
+}
+
+void OthersPage::dropEvent(QDropEvent *event)
+{
+    QList<QUrl> urls = event->mimeData()->urls();
+    if (urls.isEmpty())
+        return;
+
+    QString first_file_name = urls.first().toLocalFile();
+    if (first_file_name.isEmpty())
+        return;
+
+    foreach (QUrl u, urls)
+    {
+        // qDebug() << u.toString().mid(8).toStdString().c_str();
+        QString input_url = u.toString().mid(8);
+        QFileInfo input_url_info(input_url);
+
+        if (input_url_info.isFile() && input_url_info.suffix() == "pak") // pak file
+        {
+            pakFileLineEdit->setText(input_url);
+            pakPathLineEdit->setText(QCoreApplication::applicationDirPath() + "/" + QString::number(QDateTime::currentDateTime().toTime_t(), 16));
+        }
+        else if (input_url_info.isDir()) // folder
+        {
+            pakPathLineEdit->setText(input_url);
+        }
+    }
+    // qDebug() << urls.size();
 }
 
 // Status
@@ -3642,10 +4432,12 @@ void StatusPage::StartTimer()
     refreshStatusTimer->start();
 }
 
-void StatusPage::StopTimer()
+void StatusPage::StopTimer(bool uncheck_it)
 {
-    autoRefreshCheckBox->setChecked(false);
-    refreshStatusTimer->stop();
+    if (uncheck_it)
+        autoRefreshCheckBox->setChecked(false);
+    else
+        refreshStatusTimer->stop();
 }
 
 // Target Map
@@ -3934,21 +4726,21 @@ void DocumentPage::TranslateUI()
 {
     document->setText(tr("<style>a {text-decoration: none; color: blue}</style>"
                          "<h2>About</h2>"
-                         "<p>This software is applicable to Plants vs. Zombies 1.0.0.1051 original English version (<a href=\"https://pvz.lmintlcx.com/getpvz\">download here</a>), the 2nd Chinese edition is theoretically supported but the probability of game crash is very high.</p>"
-                         "<p>Excessive modification or forced use of non-corresponding game versions can easily cause the game to crash, please back up user data before use. All effects caused by using this software are responsibility of user himself.</p>"
-                         "<p>Some behavior of this software (finding game progress, modifying memory data, remote injection code, etc.) may be considered dangerous by anti-virus software. Please decide whether to trust this software yourself.</p>"
-                         "<p>Reasonable uses of this software include, but are not limited to, demonstrations, testing, research, and entertainment. Abuse of modifiers may reduce the fun of game seriously, please use it with caution, especially newbies.</p>"
-                         "<p>There may be some bugs with this software, users can summit feedback or feature requirements to the author. The beta version of this software has a time limit, please download latest version if it prompt expires.</p>"
-                         "<p>Configuration information of this software is saved in \"HKEY_CURRENT_USER\\SOFTWARE\\Cube Studio\\PvZ Tools\\v2\". You can clean this registry item after delete this software.</p>"
-                         "<p>Almost all core data of this software comes from existing information and other modifiers (Including <a href=\"https://tieba.baidu.com/p/870532241\">here</a> <a href=\"https://tieba.baidu.com/p/1014349785\">here</a> <a href=\"https://tieba.baidu.com/p/2843347257\">here</a> and <a href=\"https://tieba.baidu.com/p/5575921846\">here</a>).</p>"
-                         "<p>All source code of this software is located at <a href=\"https://github.com/lmintlcx/pvztools\">Github</a>.</p>"
+                         "<p>This software (PvZ Tools) is applicable to Plants vs. Zombies 1.0.0.1051 original English version only (which you can <a href=\"https://pvz.lmintlcx.com/getpvz\">download here</a>), other localization version is theoretically supported but the probability of game crash is very high.</p>"
+                         "<p>Excessive modification or forced use of non-corresponding game versions can easily cause the game to crash, please back up data file before use. All effects caused by using this software are responsibility of user himself.</p>"
+                         "<p>Some behavior of trainer (finding game progress, modifying memory data, remote injection code, etc.) may be considered dangerous by anti-virus software. Please decide whether to trust this software yourself.</p>"
+                         "<p>Reasonable uses of trainer include, but not limited to, demonstrations, testing, research, and entertainment. Abuse of modifiers may reduce the fun of game seriously, please use it with caution, especially newbies.</p>"
+                         "<p>There may be some bugs with this software, users can summit feedback or feature request to the author. The beta version of this software has a time limit, please download latest version if it prompt expires.</p>"
+                         "<p>Configuration information is saved in \"HKEY_CURRENT_USER\\SOFTWARE\\Cube Studio\\PvZ Tools\\v2\". You can export this registry item for back up, or clean it after delete this software.</p>"
+                         "<p>Most important data (memory address) comes from existing public information and other open source modifiers. And source code is copy and paste from Stack Overflow.</p>"
+                         "<p>All source code is located at <a href=\"https://github.com/lmintlcx/pvztools\">https://github.com/lmintlcx/pvztools</a>.</p>"
                          "<h2>Spawn</h2>"
                          "<p>This feature is suitable for later period of survival endless. Size of zombie's spawning list is 1000, which is 20 waves per level and 50 zombies per wave.</p>"
                          "<p>The spawn page has two modes: \"brief\" and \"detailed\".</p>"
                          "<p>When switching between different pages, if the number of zombie types selected on target page is 0, selected zombie types on current page will be synchronized to target page (not one-to-one correspondence).</p>"
                          "<p>In brief mode, you can switch layout of the option boxes, in order of zombies in almanac or in same position as the PVZombiesSeed.exe.</p>"
-                         "<p>In brief mode, Conehead Zombie and Newspaper Zombie are mutually exclusive. If \"Limit Spawn Count\" is checked, it will limit the number of selected zombie types (up to 10 types except Bungee Zombie and Zombie Yeti).</p>"
-                         "<p>The difference between different spawn mode:<br>Natural spawn changes the zombie types only and calls built-in function of game to generates zombies list.<br>Extreme spawn is to evenly populate the zombies list with seleted zombie types.<br>Simulate natural spawn is randomly fill the zombie list with seleted zombie types according to the ratio which is get by statistical law, meanwhile increase the probability of GigaGargantuar in flag wave.</p>"
+                         "<p>In brief mode, Conehead Zombie and Newspaper Zombie are mutually exclusive. If \"Limit Spawn Count\" is checked, it will limit the number of selected zombie types, up to 10 types except Bungee Zombie and Zombie Yeti. (Note that this limitation is not exactly same as the game itself.)</p>"
+                         "<p>The difference between different spawn mode:<br>Natural spawn changes the zombie types only and calls built-in function of game to generates zombies list.<br>Extreme spawn is to evenly populate the zombies list with seleted zombie types.<br>Simulate natural spawn is randomly fill the zombies list with seleted zombie types according to the ratio which is get by statistical law, meanwhile increase the probability of GigaGargantuar in flag wave.</p>"
                          "<p>Special deal with some zombies:<br>When limit Flag Zombie, Flag Zombie will only appear in each flag wave (huge wave).<br>When limit Zombie Yeti, there will be only one Zombie Yeti.<br>When limit Bungee Zombie, Bungee Zombie will only appear in flag wave (huge wave).<br>When limit GigaGargantuar, GigaGargantuar will only appear in selected wave(s) (20 waves total).</p>"
                          "<p>When using natural spawn in brief mode, there must be Zombie.</p>"
                          "<p>When using extreme spawn in brief mode, there must be Zombie and Flag Zombie. Flag Zombie, Zombie Yeti and Bungee Zombie is limited, and GigaGargantuar has no limit.</p>"
@@ -3956,12 +4748,47 @@ void DocumentPage::TranslateUI()
                          "<h2>Lineup</h2>"
                          "<p>Checking \"Quick Lineup Mode\" will enable these features: Auto Collect, Cob Cannon No CD, Plant Invincible, Stop Spawning, Ignore Sun, Slots No CD, Purple Seed Unlimited, No Fog.</p>"
                          "<p>Clicking \"Quick Pass\" will end current level directly, kill all zombies on the field, set the number of sunshine to 8000, and set the number of levels to 1008 (2018 flags completed). You can modify sunshine and level in corresponding page by pause the game immediately after clicking it.</p>"
-                         "<p>Format of lineup string is compatible with <a href=\"http://lonelystar.org/ArrayDesign\">Array Design</a>.</p>"
-                         "<p>The built-in lineup string includes <a href=\"https://tieba.baidu.com/p/5272254427\">Kaleidoscope of Endless Build Culture (2017 Poker)</a> and some well-known build in <a href=\"https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good\">good tab</a> at Baidu Tieba.</p>"
-                         "<p>Modifying game scene may cause problems such as texture errors or game crashes. Therefore the \"Allow Switch Scene\" option is not checked by default. It is recommended to reopen a new archive from \"Survival(Hard)\" level with desired scene, and then mix to \"Survival Endless\" mode after finishing design.</p>"
+                         "<p>Format of lineup string is compatible with <a href=\"https://pvz.lmintlcx.com/arraydesign/\">Array Design</a>.</p>"
+                         "<p>The built-in lineup string includes some well-known build in <a href=\"https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good\">good tab</a> at Baidu Tieba. Players can adjust lineup as needed, don't have to follow the original array completely.</p>"
+                         "<p>Clicking \"Update\" will update built-in array list via Internet. Which is collected by me and will be update if I'm happy.</p>"
+                         "<p>Modifying game scene may cause some unknown problems, therefore the \"Allow Switch Scene\" option is not checked by default. It is recommended to enter the hidden scene in a <a href=\"https://pvz.lmintlcx.com/pvztoolsdemo/hidenscene/\">more conventional way</a> and then mix to \"Survival Endless\" mode.</p>"
                          "<p>When \"Keep HP Status\" is checked, appearance status of some plants (Wall-nut, Tall-nut, Pumpkin, Garlic, Spikerock) will be preserved when importing or exporting lineup strings.</p>"
                          "<h2>Others</h2>"
-                         "<p>The \"Open Data Dir\" feature is temporarily unavailable on XP systems (the data file is located in the \"userdata\" folder in game directory).</p>"));
+                         "<p>The \"Open Data Dir\" feature is temporarily unavailable on XP systems (the data file is located in the \"userdata\" folder in game directory). For Vista and above, it's located in \"C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata\\\" folder.</p>"
+                         "<p>The unpacked file is located in the specified folder. But the packaged file will be named with \"main_&lt;number&gt;.pak\", please rename it to \"main.pak\" and replace the original game file (remember to backup first).</p>"));
+
+    // <style>a {text-decoration: none; color: blue}</style>
+    // <h2>关于</h2>
+    // <p>本软件（PvZ Tools）仅适用于植物大战僵尸 1.0.0.1051 英文原版（可从 <a href="https://pvz.lmintlcx.com/getpvz">这里下载</a>），其他语言版本理论上可用但是崩溃概率非常高。</p>
+    // <p>过度修改或者强行使用不对应的游戏版本很容易造成游戏崩溃，使用前请及时备份存档。对于使用本软件造成的所有影响由用户自己负责。</p>
+    // <p>修改器的部分行为（查找游戏进程，修改内存数据，远程注入代码等）可能会被杀毒软件视为危险行为，请自行决定是否信任本软件。</p>
+    // <p>修改器的合理用途包括但不限于演示、测试、研究和娱乐。滥用修改器会严重降低游戏乐趣，新手请慎重使用。</p>
+    // <p>本软件可能存在一些问题，用户可以向作者提供问题反馈或者功能需求。测试版有使用期限限制，如果提示过期请下载最新版本。</p>
+    // <p>配置信息保存在“HKEY_CURRENT_USER\SOFTWARE\Cube Studio\PvZ Tools\v2”。你可以导出这个注册表项目来备份，或者在删除本软件后清理它。</p>
+    // <p>大部分核心数据（内存基址）来自于已有公开资料和其他开源修改器。而源代码是从栈溢出（Stack Overflow）复制粘贴的。</p>
+    // <p>所有源代码位于 <a href="https://github.com/lmintlcx/pvztools">https://github.com/lmintlcx/pvztools</a> 。</p>
+    // <h2>出怪</h2>
+    // <p>此功能适用于无尽后期调节出怪。出怪列表共用到 1000 只僵尸，其中每一次选卡 20 波，每波 50 只。</p>
+    // <p>出怪页面有两种模式：“简略” 和 “详细”。</p>
+    // <p>切换不同出怪页面时，如果目标页面所选的僵尸种类数量为 0，则会将当前页面已选的僵尸种类同步到另一页面上（并不是一一对应的）。</p>
+    // <p>简略模式下可以切换选项框的排列布局，按僵尸在图鉴的顺序或者和小王子出怪修改器一样的位置。</p>
+    // <p>在简略模式下，路障和读报互斥。勾选“限制出怪种类数”后会限制能够选择的出怪种类数量，除蹦极和雪人外最多 10 种。（注意这个限制和游戏本身的出怪情况并不完全相同）。</p>
+    // <p>不同出怪模式的区别：<br>自然出怪只改变出怪种类，再由游戏内置的函数生成出怪列表。<br>极限出怪是把所选僵尸种类按顺序均匀地填充到出怪列表。<br>模拟自然出怪则是根据统计规律按一定的比例随机填充出怪列表，在旗帜波会增加红眼的出现概率。</p>
+    // <p>一些僵尸的特殊处理：<br>限制旗帜后，旗帜只在每个旗帜波（大波）出现一只。<br>限制雪人后，雪人只出现一只。<br>限制蹦极后，蹦极只在旗帜波（大波）出现。<br>限制红眼后，红眼只在所选的波次出现（总共 20 波）。</p>
+    // <p>简略模式下使用自然出怪，普僵必出。</p>
+    // <p>简略模式下使用极限出怪，普僵旗帜必出，限制旗帜雪人蹦极，不限制红眼。</p>
+    // <p>详细模式下使用模拟自然出怪，普僵旗帜必出，限制旗帜雪人蹦极。</p>
+    // <h2>布阵</h2>
+    // <p>勾选“快捷布阵模式”会开启这些功能：自动收集、玉米炮无冷却、植物无敌、暂停出怪、无视阳光、卡片无冷却、紫卡无限制、浓雾透视。</p>
+    // <p>点击“快速过关”后会直接结束本关卡，秒杀所有场上僵尸，并将阳光数设置为 8000，关卡数设置为 1008（已完成 2018 面旗帜数）。可以在点击后立即暂停游戏并去对应的页面修改阳光和关卡数。</p>
+    // <p>布阵字符串格式和 <a href="https://pvz.lmintlcx.com/arraydesign/">网页布阵器</a> 互通。</p>
+    // <p>内置布阵字符串包括一些贴吧 <a href="https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good">精品区</a> 知名阵型。玩家可根据需要调整阵型，不需要完全遵循原阵。</p>
+    // <p>点击“更新”后会联网更新内置的阵型列表。个人整理，随缘更新。</p>
+    // <p>修改游戏场地可能会造成一些不为人知的问题，因此“允许切换场景”选项默认不勾选。建议用 <a href="https://pvz.lmintlcx.com/pvztoolsdemo/hidenscene/">更加常规的方法</a> 进入隐藏场地再混乱到“生存无尽”模式。</p>
+    // <p>勾选“保持血量状态”后，导入或导出字符串时部分植物（坚果、高坚果、南瓜头、大蒜、地刺王）的残血状态会得到保留。</p>
+    // <h2>其他</h2>
+    // <p>“打开存档目录”功能在 XP 系统上暂时不可用（存档文件位于游戏目录内的“userdata”文件夹）。对于 Vista 以及更高版本的系统，存档文件位于“C:\ProgramData\PopCap Games\PlantsVsZombies\userdata\”文件夹。</p>
+    // <p>解包文件位于指定的文件夹内。而打包文件会以“main_&lt;数字&gt;.pak”的格式命名，请将其改名为“main.pak”并且替换掉原来的游戏文件（记得先备份）。</p>
 
     setWindowTitle(tr("Document"));
 }

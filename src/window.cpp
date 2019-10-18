@@ -164,6 +164,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(pvz, &PvZ::FindResult,
             this, &MainWindow::FindResult);
 
+    connect(pvz, &PvZ::ShowMessageBox,
+            this, &MainWindow::ShowMessageBox);
+
+    connect(pvz, &PvZ::ShowMessageStatusBar,
+            this, &MainWindow::ShowMessageStatusBar);
+
     connect(thread, &QThread::finished,
             pvz, &QObject::deleteLater);
 
@@ -185,21 +191,24 @@ MainWindow::MainWindow(QWidget *parent)
     QSettings settings;
     bool first_open = settings.value("v2/FirstOpen", true).toBool();
     if (first_open)
-        QTimer::singleShot(2000, documentPage, &QWidget::show);
+    {
+        QTimer::singleShot(1618, documentPage, &QWidget::show);
+    }
+    settings.beginGroup("v2");
+    QStringList groups = settings.childGroups();
+    bool has_lineup = groups.contains("Lineup");
+    settings.endGroup();
+    if (!has_lineup)
+    {
+        lineupPage->InitLineupString();
+        lineupPage->RefreshLineupString(); // page create before string for first time
+    }
 
     // ...
 
     if (pvz->GameOn())
     {
-        emit resourcePage->GetValue(0);
-        emit resourcePage->GetDamage(0);
-        emit resourcePage->GetHP(0);
-        emit resourcePage->GetTime(0);
-        emit slotsPage->GetSeedType(0);
-        emit slotsPage->GetSeedVisible(0);
-        emit slotsPage->GetSpeed(0);
-        emit slotsPage->GetCost(0);
-        emit slotsPage->GetRecharge(0);
+        // TODO
     }
 
     pvz->moveToThread(thread);
@@ -270,9 +279,14 @@ void MainWindow::CreateActions()
             });
 
     findGameAction = new QAction(this);
+    keepSelectedAction = new QAction(this);
 
     connect(findGameAction, &QAction::triggered,
             pvz, &PvZ::FindPvZ);
+
+    keepSelectedAction->setCheckable(true);
+
+    keepSelectedAction->setChecked(true);
 
     levelPageAction = new QAction(this);
     resourcePageAction = new QAction(this);
@@ -447,8 +461,12 @@ void MainWindow::CreateActions()
                 request.setUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/version.txt"));
                 request.setRawHeader("User-Agent", PRODUCT_NAME "/" VERSION_NAME " "
                                                                 "(" COMPANY_NAME ")");
+                request.setRawHeader("Accept-Encoding", "deflate"); // no gzip
+                request.setRawHeader("Cache-Control", "no-cache");
                 QNetworkReply *reply = manager.get(request);
 
+                // while (!reply->isFinished())
+                //     qApp->processEvents();
                 QEventLoop loop;
                 connect(reply, &QNetworkReply::finished,
                         &loop, &QEventLoop::quit);
@@ -465,12 +483,15 @@ void MainWindow::CreateActions()
                 {
                     int remote_version = QString(reply->readAll()).toInt();
                     int local_version = VERSION_BUILD;
+                    //     qDebug() << "remote_version: " << remote_version;
+                    //     qDebug() << "local_version: " << local_version;
 
                     if (remote_version > local_version)
                     {
-                        auto ret = QMessageBox::question(this, tr("Update Check"),
-                                                         tr("New version detected, download it now?"),
-                                                         QMessageBox::Yes | QMessageBox::No);
+                        auto ret = QMessageBox::question(this,                                         //
+                                                         tr("Update Check"),                           //
+                                                         tr("New version detected, download it now?"), //
+                                                         QMessageBox::Yes | QMessageBox::No);          //
                         if (ret == QMessageBox::Yes)
                             QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/"));
                     }
@@ -495,28 +516,33 @@ void MainWindow::CreateActions()
                 QString compiler = QString("Unknown");
 #ifdef _MSC_VER
                 QString msvc_version;
-                if (_MSC_VER > 1900 && _MSC_VER < 2000)
+                if (_MSC_VER >= 1910 && _MSC_VER < 1920)
                     msvc_version = "2017";
+                else if (_MSC_VER >= 1920 && _MSC_VER < 1930)
+                    msvc_version = "2019";
                 else
                     ; // TODO
-                compiler = QString("MSVC") + " " + msvc_version;
+                compiler = QString("MSVC") + " " + msvc_version + " " + QString::number(_MSC_VER);
 #endif
 #ifdef __MINGW32__
-                compiler = QString("GCC") + " " + QString::number(__GNUC__) + "." + QString::number(__GNUC_MINOR__);
+                compiler = QString("GCC") + " " + QString::number(__GNUC__) + "." + QString::number(__GNUC_MINOR__) + "." + QString::number(__GNUC_PATCHLEVEL__);
 #endif
 #ifdef __clang__
                 compiler = QString("Clang") + " " + QString::number(__clang_major__) + "." + QString::number(__clang_minor__) + "." + QString::number(__clang_patchlevel__);
 #endif
 
                 QString qt_version = QString("Qt") + " " + QT_VERSION_STR;
+                QString openssl_version = QString("OpenSSL") + " " + QSslSocket::sslLibraryBuildVersionString().split(" ")[1];
 
                 QString copyright = QString("") + "©" + " " + (build_date.left(4) == QString("2018") ? QString("2018") : QString("2018") + "-" + build_date.left(4)) + " " + "lmintlcx";
 
-                QString info = QString("<p>")                                                     //
-                               + tr("Version") + "  " + VERSION_NAME_FULL + "<br>"                //
-                               + tr("Date") + "  " + build_date + "  " + build_time + "<br>"      //
-                               + tr("Build with") + "  " + compiler + " / " + qt_version + "<br>" //
-                               + tr("Copyright") + "  " + copyright + "<br>" + "</p>";
+                QString info = QString("<p>")                                                                    //
+                               + tr("Version") + ":" + "  " + VERSION_NAME_FULL + "<br>"                         //
+                               + tr("Date") + ":" + "  " + build_date + "  " + build_time + "<br>"               //
+                               + tr("Toolchain") + ":" + "  " + compiler + "<br>"                                //
+                               + qt_version + " / " + openssl_version + "<br>"                                   //
+                               + tr("Copyright") + ":" + "  " + copyright + "<br>"                               //
+                               + tr("Credit") + ":" + "  " + "a418569882" + "  " + "kmtohoem" + "<br>" + "</p>"; //
 
                 QMessageBox msgBox;
                 msgBox.setWindowTitle(tr("About"));
@@ -545,6 +571,8 @@ void MainWindow::CreateMenus()
 
     gameMenu = new QMenu(this);
     gameMenu->addAction(findGameAction);
+    gameMenu->addSeparator();
+    gameMenu->addAction(keepSelectedAction);
 
     pageMenu = new QMenu(this);
     pageMenu->addActions(pageGroup->actions());
@@ -1018,6 +1046,9 @@ void MainWindow::ConnectPages()
     connect(pvz, &PvZ::LineupString,
             lineupPage, &LineupPage::ShowLineup);
 
+    connect(lineupPage, &LineupPage::ShowMessageStatusBar,
+            this, &MainWindow::ShowMessageStatusBar);
+
     // Garden
 
     connect(gardenPage, &GardenPage::FertilizerUnlimited,
@@ -1192,6 +1223,10 @@ void MainWindow::ReadSettings()
 
     settings.beginGroup("v2");
 
+    bool keep_selected = settings.value("KeepSelectedFeatures", true).toBool();
+    keepSelectedAction->setChecked(keep_selected);
+    // emit keepSelectedAction->triggered(keep_selected);
+
     bool sidebar_visible = settings.value("ShowSidebar", false).toBool();
     showSidebarAction->setChecked(sidebar_visible);
     emit showSidebarAction->triggered(sidebar_visible);
@@ -1266,6 +1301,8 @@ void MainWindow::WriteSettings()
     settings.beginGroup("v2");
 
     settings.setValue("FirstOpen", false);
+
+    settings.setValue("KeepSelectedFeatures", keepSelectedAction->isChecked());
 
     settings.setValue("ShowSidebar", showSidebarAction->isChecked());
 
@@ -1422,7 +1459,8 @@ void MainWindow::TranslateUI()
     restartAction->setText(tr("Restart"));
     exitAction->setText(tr("Exit"));
 
-    findGameAction->setText(tr("Find Game"));
+    findGameAction->setText(tr("Find Game Again"));
+    keepSelectedAction->setText(tr("Keep Selected Features"));
 
     levelPageAction->setText(List::Get().pageList[0]);
     resourcePageAction->setText(List::Get().pageList[1]);
@@ -1472,27 +1510,35 @@ void MainWindow::TranslateUI()
 
 void MainWindow::FindResult(Result result)
 {
-    const int display_time = 0x1437;
     if (result == Result::OK)
     {
-        statusBar()->showMessage(tr("Game Found"), display_time);
+        ShowMessageStatusBar(tr("Game Found"));
 
-        // TODO 发射信号 维持已选功能
-        othersPage->GameFound();
+        resourcePage->UpdateGameData();
+        slotsPage->UpdateGameData();
+
+        if (keepSelectedAction->isChecked())
+        {
+            othersPage->KeepSelectedFeatures(); // first
+            lineupPage->KeepSelectedFeatures(); // first
+            levelPage->KeepSelectedFeatures();
+            resourcePage->KeepSelectedFeatures();
+            plantsPage->KeepSelectedFeatures();
+            zombiesPage->KeepSelectedFeatures();
+            slotsPage->KeepSelectedFeatures();
+            gardenPage->KeepSelectedFeatures();
+            effectPage->KeepSelectedFeatures();
+        }
     }
     else if (result == Result::WrongVersion)
     {
-        statusBar()->showMessage(tr("Unsupported Version"), display_time);
-        statusPage->StopTimer();
-        if (!muteAction->isChecked())
-            MessageBeep(MB_SETFOREGROUND);
+        ShowMessageStatusBar(tr("Unsupported Version"));
+        statusPage->StopTimer(true);
     }
     else if (result == Result::NotFound)
     {
-        statusBar()->showMessage(tr("Game Not Found"), display_time);
-        statusPage->StopTimer();
-        if (!muteAction->isChecked())
-            MessageBeep(MB_SETFOREGROUND);
+        ShowMessageStatusBar(tr("Game Not Found"));
+        statusPage->StopTimer(true);
     }
 }
 
@@ -1516,6 +1562,19 @@ void MainWindow::ActivateWindow()
     showNormal();
     raise();
     activateWindow();
+}
+
+void MainWindow::ShowMessageBox(QString msg)
+{
+    QMessageBox::information(this, tr("Message"), msg, QMessageBox::Ok);
+}
+
+void MainWindow::ShowMessageStatusBar(QString msg)
+{
+    const int display_time = 0x1437;
+    statusBar()->showMessage(msg, display_time);
+    if (!muteAction->isChecked())
+        QApplication::beep();
 }
 
 } // namespace Pt

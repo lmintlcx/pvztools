@@ -52,6 +52,9 @@ signals:
   void LockIZE(bool, int);
   void JumpLevel(int);
 
+public slots:
+  void KeepSelectedFeatures();
+
 private:
   QPushButton *getGoldSunflowerTrophyButton;
   QPushButton *getAllShopItemsButton;
@@ -106,7 +109,9 @@ public slots:
   void ShowDamage(int);
   void ShowHP(int);
   void ShowTime(int);
+  void UpdateGameData();
   void SetQuickLineupMode(bool);
+  void KeepSelectedFeatures();
 
 private:
   QLabel *sunLabel;
@@ -175,6 +180,7 @@ signals:
 
 public slots:
   void SetQuickLineupMode(bool);
+  void KeepSelectedFeatures();
 
 private:
   QCheckBox *cobsNoCdCheckBox;
@@ -230,6 +236,7 @@ signals:
 
 public slots:
   void SetQuickLineupMode(bool);
+  void KeepSelectedFeatures();
 
 private:
   QCheckBox *zombieExplodeImmediatelyCheckBox;
@@ -414,7 +421,9 @@ public slots:
   void ShowSpeed(int);
   void ShowCost(int);
   void ShowRecharge(int);
+  void UpdateGameData();
   void SetQuickLineupMode(bool);
+  void KeepSelectedFeatures();
 
 private:
   QLabel *slotsCountLabel;
@@ -489,6 +498,7 @@ private:
   void Check();
 
 private:
+  bool already_warned_you = false;
   QLabel *sceneRowLabel;
   QLabel *sceneColLabel;
   QSpinBox *sceneRowSpinBox;
@@ -545,11 +555,23 @@ signals:
   void ClearAllPlants();
   void SetLineup(std::string, bool, bool);
   void GetLineup(bool);
+  void ShowMessageStatusBar(QString);
 
 public slots:
   void ShowLineup(std::string);
+  void InitLineupString(QString str = "");
+  void RefreshLineupString();
+  void UpdateLineupString();
+  void SaveLineupString();
+  void DeleteLineupString();
+  void KeepSelectedFeatures();
 
 private:
+  QString lastSelectedBuildName;
+  QStringList endlessBuildGroupList;
+  QStringList endlessBuildUuidList;
+  QStringList endlessBuildNameList;
+  QStringList endlessBuildStringList;
   bool StringCheck(const QString &);
 
 private:
@@ -561,7 +583,7 @@ private:
   QPushButton *flowerPotOnRoofButton;
   QPushButton *clearAllPlantsButton;
   QPushButton *openLinkButton;
-  QLabel *endlessBuildLabel;
+  QPushButton *updateCheckButton;
   QComboBox *endlessBuildCombo;
   QPushButton *oneKeySetupButton;
   QPlainTextEdit *stringTextEdit;
@@ -569,6 +591,8 @@ private:
   QPushButton *build2stringButton;
   QPushButton *copyStringButton;
   QPushButton *pasteStringButton;
+  QPushButton *saveStringButton;
+  QPushButton *deleteStringButton;
   QCheckBox *allowSwitchSceneCheckBox;
   QCheckBox *keepHpStatusCheckBox;
   QGridLayout *mainLayout;
@@ -595,6 +619,7 @@ signals:
 
 public slots:
   void ShowGardenPlants(std::vector<GardenPlant>);
+  void KeepSelectedFeatures();
 
 private:
   void UpdateContent();
@@ -699,6 +724,7 @@ signals:
 public slots:
   void ShowIceTrailX(int);
   void SetQuickLineupMode(bool);
+  void KeepSelectedFeatures();
 
 private:
   QPushButton *sukhbirCodeButton;
@@ -755,7 +781,11 @@ public slots:
   void GetFolderName();
   void UnpackFinished();
   void PackFinished();
-  void GameFound();
+  void KeepSelectedFeatures();
+
+protected:
+  void dragEnterEvent(QDragEnterEvent *);
+  void dropEvent(QDropEvent *);
 
 private:
   QCheckBox *disableSaveDataCheckBox;
@@ -794,7 +824,7 @@ public slots:
   void ShowStatus(std::array<int, 12>);
   bool IsAutoRefresh();
   void StartTimer();
-  void StopTimer();
+  void StopTimer(bool uncheck_it = false);
 
 private:
   QTimer *refreshStatusTimer;

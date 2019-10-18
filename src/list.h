@@ -54,8 +54,6 @@ public:
   QStringList vaseSkinList;
   QStringList vaseTypeList;
   QStringList debugModeList;
-  QStringList endlessBuildNameList;
-  QStringList endlessBuildStringList;
 };
 
 } // namespace Pt

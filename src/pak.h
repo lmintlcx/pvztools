@@ -4,12 +4,15 @@
  * @Description: Pack and unpack ".pak" file.
  */
 
-// constructor of std::fstream in mingw-w64 does not support std::wstring, use win32 api instead
-
 #pragma once
 
 namespace Pt
 {
+
+typedef std::vector<std::wstring> v_name;
+typedef std::vector<unsigned int> v_size;
+typedef std::vector<FILETIME> v_time;
+typedef std::tuple<v_name, v_size, v_time> file_info;
 
 class PAK
 {
@@ -17,11 +20,13 @@ public:
   PAK();
   ~PAK();
 
-  void Unpack(std::wstring, std::wstring);
-  void Pack(std::wstring);
+  bool Unpack(std::wstring, std::wstring);
+  bool Pack(std::wstring, std::wstring);
 
 private:
   std::wstring FormatPath(const std::wstring &);
+  bool CreatePath(const std::wstring &);
+  file_info GetFiles(const std::wstring &);
 };
 
 } // namespace Pt

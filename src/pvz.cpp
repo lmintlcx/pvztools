@@ -119,7 +119,7 @@ PvZ::PvZ()
     qRegisterMetaType<std::array<int, 12>>("std::array<int, 12>");
     qRegisterMetaType<std::array<int, 54>>("std::array<int, 54>");
 
-    // FindPvZ(); // no need
+    // FindPvZ(); // 不能在这里用!
 }
 
 PvZ::~PvZ()
@@ -238,6 +238,8 @@ void PvZ::GetGoldSunflowerTrophy()
         for (size_t i = 0; i < 5; i++)
             if (ReadMemory<int>(0x6a9ec0, 0x82c, 0x44 + i * 4) != 10)
                 WriteMemory<int>(10, 0x6a9ec0, 0x82c, 0x44 + i * 4);
+
+        emit ShowMessageStatusBar(tr("Already unlocked golden sunflower trophy."));
     }
 }
 
@@ -282,6 +284,8 @@ void PvZ::GetAllShopItems()
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x210);        // Snail
         if (ReadMemory<int>(0x6a9ec0, 0x82c, 0x228) == 0)   //
             WriteMemory<int>(1020, 0x6a9ec0, 0x82c, 0x228); // Chocolate 20->1020
+
+        emit ShowMessageStatusBar(tr("Already get all shop items."));
     }
 }
 
@@ -2640,7 +2644,10 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                            || (str_scene == "5" && game_scene == 5));
 
         if (!same_scene && !enable_switch_scene)
+        {
+            emit ShowMessageStatusBar(tr("The target lineup scene is inconsistent with the current scene."));
             return;
+        }
 
         switch (atoi(str_scene.c_str()))
         {
@@ -3599,7 +3606,7 @@ void PvZ::OpenDataDir()
     }
     else
     {
-        // Fuck XP!
+        emit ShowMessageBox(tr("The user data file of XP system is located in the \"userdata\" folder with game executable."));
     }
 }
 
@@ -3613,14 +3620,32 @@ void PvZ::UnpackPAK(QString src, QString dst)
 {
     std::wstring src_file = src.toStdWString();
     std::wstring dst_dir = dst.toStdWString();
-    Unpack(src_file, dst_dir);
+    bool success = Unpack(src_file, dst_dir);
+    if (success)
+    {
+        emit ShowMessageStatusBar(tr("Unpack pak Succeeded!"));
+    }
+    else
+    {
+        emit ShowMessageStatusBar(tr("Unpack pak Failed!"));
+    }
     emit UnpackFinished();
 }
 
 void PvZ::PackPAK(QString src)
 {
     std::wstring src_dir = src.toStdWString();
-    Pack(src_dir);
+    std::wstring dst_file_name = L"main_" + std::to_wstring(std::time(nullptr)) + L".pak";
+    std::wstring dst_file = src_dir + L"\\" + L".." + L"\\" + dst_file_name;
+    bool success = Pack(src_dir, dst_file);
+    if (success)
+    {
+        emit ShowMessageStatusBar(tr("Pack pak Succeeded! File name: \"%1\".").arg(QString::fromWCharArray(dst_file_name.c_str())));
+    }
+    else
+    {
+        emit ShowMessageStatusBar(tr("Pack pak Failed!"));
+    }
     emit PackFinished();
 }
 

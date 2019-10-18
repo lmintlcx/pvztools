@@ -5,6 +5,10 @@ TARGET = "pvztools"
 CONFIG += qt
 QT += core gui widgets network
 
+# CONFIG -= import_plugins
+# QTPLUGIN += qwindows  # 5.6
+# QTPLUGIN += qwindows qgenericbearer qwindowsvistastyle  # 5.12
+
 DEFINES += UNICODE _UNICODE
 
 win32-msvc*:QMAKE_CXXFLAGS += /MP /utf-8
@@ -15,7 +19,7 @@ win32-clang-msvc:QMAKE_CXXFLAGS += -Xclang -std=c++17
 
 INCLUDEPATH += .
 
-PRECOMPILED_HEADER = src/stable.h
+win32-msvc*:PRECOMPILED_HEADER = src/stable.h
 
 HEADERS += src/version.h \
            src/process.h \

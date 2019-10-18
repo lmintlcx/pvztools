@@ -11,6 +11,7 @@
 #define PRODUCT_ICON       "res\\logo.ico"
 
 #define COMPANY_NAME       "Cube Studio"
+#define COMPANY_WEBSITE    "https://pvz.lmintlcx.com"
 #define FILE_DESCRIPTION   "PvZ Tools"
 #define LEGAL_COPYRIGHT    "(C) 2018-2019 lmintlcx"
 #define INTERNAL_NAME      "pvztools"
@@ -20,8 +21,8 @@
 
 #define VERSION_MAJOR      2
 #define VERSION_MINOR      0
-#define VERSION_PATCH      1
-#define VERSION_BUILD      4966
+#define VERSION_PATCH      2
+#define VERSION_BUILD      5398
 
 
 #define TOSTRING_(arg) #arg

@@ -61,6 +61,7 @@ private:
   QAction *exitAction;
 
   QAction *findGameAction;
+  QAction *keepSelectedAction;
 
   QAction *levelPageAction;
   QAction *resourcePageAction;
@@ -146,6 +147,8 @@ private:
 
 public slots:
   void ActivateWindow();
+  void ShowMessageBox(QString);
+  void ShowMessageStatusBar(QString);
 };
 
 } // namespace Pt

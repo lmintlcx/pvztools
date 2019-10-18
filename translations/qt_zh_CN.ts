@@ -536,9 +536,10 @@ have libgstreamer-plugins-base installed.</source>
         <source>%1
 File not found.
 Check path and filename.</source>
-        <translation>%1
-文件未找到。
-请检查路径和文件名。</translation>
+        <translation>文件%1
+未找到。
+请检查路径和文件名。
+</translation>
     </message>
     <message>
         <location filename="../src/qt3support/dialogs/q3filedialog_win.cpp" line="-289"/>
@@ -548,7 +549,7 @@ Check path and filename.</source>
     <message>
         <location line="+375"/>
         <source>Open </source>
-        <translation>打开 </translation>
+        <translation>打开</translation>
     </message>
     <message>
         <location line="+155"/>
@@ -1460,7 +1461,7 @@ to
     <message>
         <location line="+120"/>
         <source>Cannot open %1 for input</source>
-        <translation>无法输入 %1</translation>
+        <translation>无法输入 %1 </translation>
     </message>
     <message>
         <location line="+17"/>
@@ -1475,7 +1476,7 @@ to
     <message>
         <location line="+13"/>
         <source>Cannot create %1 for output</source>
-        <translation>无法创建 %1</translation>
+        <translation>无法创建 %1 </translation>
     </message>
 </context>
 <context>
@@ -2267,7 +2268,7 @@ Do you want to delete it anyway?</source>
     <message>
         <location line="+179"/>
         <source>Unknown authentication method</source>
-        <translation>未知的认证模式</translation>
+        <translation>未知的认证方式</translation>
     </message>
     <message>
         <location line="+183"/>
@@ -4520,7 +4521,7 @@ Please choose a different file name.</source>
     <message>
         <location line="+912"/>
         <source>No program defined</source>
-        <translation>没有定义程序</translation>
+        <translation>未指定进程</translation>
     </message>
     <message>
         <location filename="../src/corelib/io/qprocess_win.cpp" line="-341"/>
@@ -5869,7 +5870,7 @@ Please choose a different file name.</source>
         <location line="+10"/>
         <source>This is a searchable index. Enter search keywords: </source>
         <comment>text that appears at the start of nearly-obsolete web pages in the form of a &apos;searchable index&apos;</comment>
-        <translation>这是一个可以搜索的索引。请输入要搜索的关键字： </translation>
+        <translation>这是一个可以搜索的索引。请输入要搜索的关键字：</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -7656,7 +7657,7 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/xmlpatterns/acceltree/qacceltreeresourceloader.cpp" line="+314"/>
         <source>%1 is an unsupported encoding.</source>
-        <translation>%1 是不被支持的编码。</translation>
+        <translation> %1 是不被支持的编码。</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -7680,7 +7681,7 @@ Please choose a different file name.</source>
     <message>
         <location filename="../src/xmlpatterns/expr/qcomputednamespaceconstructor.cpp" line="+69"/>
         <source>In a namespace constructor, the value for a namespace cannot be an empty string.</source>
-        <translation>在命名空间构造函数中，命名空间的值不能是空字符串。</translation>
+        <translation>在一个命名空间构造中，命名空间的值不能为空字符串。</translation>
     </message>
     <message>
         <location line="+11"/>

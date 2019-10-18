@@ -129,6 +129,16 @@
         "qtablewidget": "cpp",
         "qstatusbar": "cpp",
         "qplaintextedit": "cpp",
-        "qdate": "cpp"
-    }
+        "qdate": "cpp",
+        "any": "cpp",
+        "optional": "cpp",
+        "variant": "cpp",
+        "execution": "cpp",
+        "memory_resource": "cpp",
+        "strstream": "cpp",
+        "qlist": "cpp",
+        "qjsonarray": "cpp",
+        "qtplugin": "cpp"
+    },
+    "python.pythonPath": "C:\\Python37\\python.exe"
 }

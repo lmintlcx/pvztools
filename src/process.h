@@ -22,7 +22,7 @@ namespace Pt
 
 class Process
 {
-  public:
+public:
     Process();
     ~Process();
 
@@ -49,7 +49,7 @@ class Process
     template <typename T, size_t size, typename... Args>
     void WriteMemory(std::array<T, size>, Args...);
 
-  protected:
+protected:
     HWND hwnd;
     DWORD pid;
     HANDLE handle;

@@ -293,6 +293,8 @@ signals:
   void GardenPlants(std::vector<GardenPlant>);
   void Vases(std::vector<Vase>);
   void IceTrailX(int);
+  void ShowMessageBox(QString);
+  void ShowMessageStatusBar(QString);
   void UnpackFinished();
   void PackFinished();
   void GameStatus(std::array<int, 12>);

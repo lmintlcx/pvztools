@@ -1,11 +1,11 @@
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <cassert>
 #include <functional>
-#include <ctime>
 
 #include <Windows.h>
 
@@ -22,7 +22,7 @@ PAK::~PAK()
 {
 }
 
-void PAK::Unpack(std::wstring src_file, std::wstring dst_dir)
+bool PAK::Unpack(std::wstring src_file, std::wstring dst_dir)
 {
     std::wstring src_path = FormatPath(src_file);
     std::wstring dst_path = FormatPath(dst_dir);
@@ -70,7 +70,7 @@ void PAK::Unpack(std::wstring src_file, std::wstring dst_dir)
     if (!header_ok)
     {
         delete[] buffer;
-        return;
+        return false;
     }
 
     unsigned int index = 9; // skip file header
@@ -129,30 +129,6 @@ void PAK::Unpack(std::wstring src_file, std::wstring dst_dir)
 #endif
     } while (eof_flag == 0x00); // eof_flag != 0x80
 
-    // create path recursively
-    std::function<bool(const std::wstring &)> CreatePath;
-
-    CreatePath = [&CreatePath](const std::wstring &path) -> bool {
-        // path exist
-        if (GetFileAttributes(path.c_str()) == FILE_ATTRIBUTE_DIRECTORY)
-            return true;
-
-        // create success
-        if (CreateDirectory(path.c_str(), nullptr))
-            return true;
-
-        // parent path not exist, failed
-        if (path.substr(0, path.find_last_of(L"\\")) == path)
-            return false;
-
-        // parent path create failed
-        if (!CreatePath(path.substr(0, path.find_last_of(L"\\"))))
-            return false;
-
-        // parent path create succeed, create this path
-        return CreateDirectory(path.c_str(), nullptr);
-    };
-
     // extract all files
     for (size_t i = 0; i < count; i++)
     {
@@ -190,61 +166,13 @@ void PAK::Unpack(std::wstring src_file, std::wstring dst_dir)
 #endif
 
     delete[] buffer;
+    return true;
 }
 
-void PAK::Pack(std::wstring src_dir)
+bool PAK::Pack(std::wstring src_dir, std::wstring dst_file)
 {
     std::wstring src_path = FormatPath(src_dir);
-    std::wstring dst_path = src_path + L"\\" + L".." + L"\\" //
-                            + L"main_" + std::to_wstring(std::time(nullptr)) + L".pak";
-
-    typedef std::vector<std::wstring> v_name;
-    typedef std::vector<unsigned int> v_size;
-    typedef std::vector<FILETIME> v_time;
-    typedef std::tuple<v_name, v_size, v_time> file_info;
-
-    std::function<file_info(const std::wstring &)> GetFiles;
-
-    GetFiles = [&GetFiles](const std::wstring &find_path) -> file_info {
-        v_name names;
-        v_size sizes;
-        v_time times;
-
-        std::wstring path = find_path + L"\\*";
-        WIN32_FIND_DATA ffd;
-        HANDLE hf;
-
-        hf = FindFirstFile(path.c_str(), &ffd);
-        if (hf != INVALID_HANDLE_VALUE)
-        {
-            do
-            {
-                std::wstring name = ffd.cFileName;
-                if (name == L"." || name == L".." || name == L"Thumbs.db")
-                    continue;
-                if (ffd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
-                {
-                    std::wstring sub_path = find_path + L"\\" + name;
-                    auto [_names, _sizes, _times] = GetFiles(sub_path);
-                    for (size_t i = 0; i < _names.size(); i++)
-                    {
-                        names.push_back(name + L"\\" + _names[i]);
-                        sizes.push_back(_sizes[i]);
-                        times.push_back(_times[i]);
-                    }
-                }
-                else
-                {
-                    names.push_back(ffd.cFileName);
-                    sizes.push_back(ffd.nFileSizeLow);
-                    times.push_back(ffd.ftLastWriteTime);
-                }
-            } while (FindNextFile(hf, &ffd) != 0);
-            FindClose(hf);
-        }
-
-        return {names, sizes, times};
-    };
+    std::wstring dst_path = FormatPath(dst_file);
 
     auto [files_name, files_size, files_time] = GetFiles(src_path);
     unsigned int count = files_name.size();
@@ -285,13 +213,16 @@ void PAK::Pack(std::wstring src_dir)
     char eof_flag;            // 1
 
     // output file
-    DWORD write_size = 0;
     HANDLE hfw = CreateFile(dst_path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (hfw == INVALID_HANDLE_VALUE)
-        return;
+        return false;
 
     // write header
+    DWORD write_size = 0;
     WriteFile(hfw, file_header, 9, &write_size, nullptr);
+#ifdef _DEBUG
+    assert(9 == write_size);
+#endif
 
     // write index section
     for (size_t i = 0; i < count; i++)
@@ -338,7 +269,11 @@ void PAK::Pack(std::wstring src_dir)
             buff[k] = buff[k] ^ 0xf7;
 
         // write buff to file
+        DWORD write_size = 0;
         WriteFile(hfw, buff, struct_size, &write_size, nullptr);
+#ifdef _DEBUG
+        assert(struct_size == write_size);
+#endif
 
         delete[] buff;
     }
@@ -363,14 +298,18 @@ void PAK::Pack(std::wstring src_dir)
             for (size_t i = 0; i < size; ++i)
                 buffer[i] = buffer[i] ^ 0xf7;
 
+            DWORD write_size = 0;
             WriteFile(hfw, buffer, size, &write_size, nullptr);
-
+#ifdef _DEBUG
+            assert(size == write_size);
+#endif
             delete[] buffer;
             CloseHandle(hfr);
         }
     }
 
     CloseHandle(hfw);
+    return true;
 }
 
 std::wstring PAK::FormatPath(const std::wstring &wstr)
@@ -401,6 +340,71 @@ std::wstring PAK::FormatPath(const std::wstring &wstr)
 #endif
 
     return result;
+}
+
+// create path recursively
+bool PAK::CreatePath(const std::wstring &path)
+{
+    // path exist
+    if (GetFileAttributes(path.c_str()) == FILE_ATTRIBUTE_DIRECTORY)
+        return true;
+
+    // create success
+    if (CreateDirectory(path.c_str(), nullptr))
+        return true;
+
+    // parent path not exist, failed
+    if (path.substr(0, path.find_last_of(L"\\")) == path)
+        return false;
+
+    // parent path create failed
+    if (!CreatePath(path.substr(0, path.find_last_of(L"\\"))))
+        return false;
+
+    // parent path create succeed, create this path
+    return CreateDirectory(path.c_str(), nullptr);
+}
+
+file_info PAK::GetFiles(const std::wstring &find_path)
+{
+    v_name names;
+    v_size sizes;
+    v_time times;
+
+    std::wstring path = find_path + L"\\*";
+    WIN32_FIND_DATA ffd;
+    HANDLE hf;
+
+    hf = FindFirstFile(path.c_str(), &ffd);
+    if (hf != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            std::wstring name = ffd.cFileName;
+            if (name == L"." || name == L".." || name == L"Thumbs.db")
+                continue;
+            if (ffd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+            {
+                std::wstring sub_path = find_path + L"\\" + name;
+                auto [_names, _sizes, _times] = GetFiles(sub_path);
+                for (size_t i = 0; i < _names.size(); i++)
+                {
+                    names.push_back(name + L"\\" + _names[i]);
+                    sizes.push_back(_sizes[i]);
+                    times.push_back(_times[i]);
+                }
+            }
+            else
+            {
+                names.push_back(ffd.cFileName);
+                sizes.push_back(ffd.nFileSizeLow);
+                times.push_back(ffd.ftLastWriteTime);
+            }
+        } while (FindNextFile(hf, &ffd) != 0);
+        FindClose(hf);
+    }
+
+    return {names, sizes, times};
 }
 
 } // namespace Pt
