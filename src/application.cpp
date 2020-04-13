@@ -25,17 +25,15 @@ Application::Application(int argc, char *argv[])
             msg_box.setWindowTitle("Attention!");
             msg_box.setIcon(QMessageBox::Warning);
             msg_box.setText("<style>a {text-decoration: none; color: blue}</style>"
-                            "This is a very old beta version, please download new version <a href='https://pvz.lmintlcx.com/getpvztools/'>here</a>."
+                            "This is a very old beta version, please download new version <a href='https://pvz.lmintlcx.com/tools/'>here</a>."
                             "<br>"
-                            "这是很旧很旧的测试版哦, 去 <a href='https://pvz.lmintlcx.com/getpvztools/'>这里</a> 下载最新版吧.");
+                            "这是很旧很旧的测试版哦, 去 <a href='https://pvz.lmintlcx.com/tools/'>这里</a> 下载最新版吧.");
             msg_box.exec();
 
             qApp->quit();
             return;
         }
     }
-
-    // QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // TODO
 
     QCoreApplication::setOrganizationName(COMPANY_NAME);
     QCoreApplication::setOrganizationDomain(COMPANY_WEBSITE);

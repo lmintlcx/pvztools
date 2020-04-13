@@ -113,24 +113,35 @@ void Code::asm_ret()
 
 void Code::asm_code_inject(HANDLE handle)
 {
-    LPVOID thread_addr = VirtualAllocEx(handle, nullptr, length, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-    if (thread_addr != nullptr)
+    LPVOID addr = VirtualAllocEx(handle, nullptr, this->length, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    if (addr == nullptr)
+        return;
+
+    DWORD write_size = 0;
+    BOOL ret = WriteProcessMemory(handle, addr, this->code, this->length, &write_size);
+    if (ret == 0 || write_size != this->length)
     {
-        WriteProcessMemory(handle, thread_addr, code, length, nullptr);
-        HANDLE thread_handle = CreateRemoteThread(handle, nullptr, 0, LPTHREAD_START_ROUTINE(thread_addr), nullptr, 0, nullptr);
-        if (thread_handle != nullptr)
-        {
-            WaitForSingleObject(thread_handle, INFINITE);
-            CloseHandle(thread_handle);
-        }
-        VirtualFreeEx(handle, thread_addr, 0, MEM_RELEASE);
+        VirtualFreeEx(handle, addr, 0, MEM_RELEASE);
+        return;
     }
 
+    HANDLE thread = CreateRemoteThread(handle, nullptr, 0, LPTHREAD_START_ROUTINE(addr), nullptr, 0, nullptr);
+    if (thread == nullptr)
+    {
+        VirtualFreeEx(handle, addr, 0, MEM_RELEASE);
+        return;
+    }
+
+    DWORD wait_status = WaitForSingleObject(thread, INFINITE);
+    CloseHandle(thread);
+    VirtualFreeEx(handle, addr, 0, MEM_RELEASE);
+
 #ifdef _DEBUG
-    assert(length > 0);
-    assert(length < 4096 * 16);
-    std::cout << "Asm Code: ";
-    for (size_t i = 0; i < length; i++)
+    std::wcout << L"Wait Status: " << wait_status << std::endl;
+    assert(this->length > 0);
+    assert(this->length < 4096 * 16);
+    std::wcout << L"Asm Code: ";
+    for (size_t i = 0; i < this->length; i++)
         std::cout << std::hex << int(code[i]) << " ";
     std::cout << std::endl;
 #endif

@@ -13,6 +13,7 @@
 
 class QListWidget;
 class QPushButton;
+class QAbstractButton;
 class QCheckBox;
 class QLabel;
 class QComboBox;
@@ -48,7 +49,7 @@ signals:
   void UnlockAllMode(bool);
   void DirectWin();
   void MixMode(int, int);
-  void ShowHideGames(bool);
+  void ShowHiddenGames(bool);
   void LockIZE(bool, int);
   void JumpLevel(int);
 
@@ -69,7 +70,7 @@ private:
   QComboBox *puzzleCombo;
   QComboBox *survivalCombo;
   QPushButton *mixmodeButton;
-  QCheckBox *showHideGamesCheckBox;
+  QCheckBox *showHiddenGamesCheckBox;
   QComboBox *izeArrayCombo;
   QCheckBox *lockIzeArrayCheckBox;
   QLineEdit *levelLineEdit;
@@ -278,6 +279,7 @@ public:
 
 signals:
   void SwitchToDetailedPage();
+  void ShowSpawnCountPage();
   void InternalSpawn(std::array<bool, 33>, bool);
   void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>);
   void GetRandomSeed();
@@ -298,6 +300,7 @@ private:
   QPushButton *naturalSpawnButton;
   QPushButton *extremeSpawnButton;
   QPushButton *detailedModeButton;
+  QPushButton *showSpawnCountButton;
   QGridLayout *mainLayout;
 };
 
@@ -320,7 +323,7 @@ signals:
 
 public slots:
   void ShowRandomSeed(int);
-  void ShowGigaWaves(std::array<bool, 20>);
+  void ShowGigaWaves(std::array<uint32_t, 1000>);
 
 private:
   QLineEdit *randomSeedLineEdit;
@@ -366,6 +369,7 @@ public:
   void SetDetailedZombies(std::array<bool, 33>);
 
 signals:
+  void ShowSpawnCountPage();
   void InternalSpawn(std::array<bool, 33>, bool);
   void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>);
   void GetRandomSeed();
@@ -373,7 +377,7 @@ signals:
 
 public slots:
   void ShowRandomSeed(int);
-  void ShowGigaWaves(std::array<bool, 20>);
+  void ShowGigaWaves(std::array<uint32_t, 1000>);
   void SwitchLayout(bool);
   void LimitSpawnCount(bool);
 
@@ -498,7 +502,6 @@ private:
   void Check();
 
 private:
-  bool already_warned_you = false;
   QLabel *sceneRowLabel;
   QLabel *sceneColLabel;
   QSpinBox *sceneRowSpinBox;
@@ -549,9 +552,9 @@ signals:
   void SetQuickLineupMode(bool);
   void QuickPass();
   void MixMode(int, int);
-  void EatAllGraves();
-  void LilyPadOnPool();
-  void FlowerPotOnRoof();
+  void ClearAllGraves();
+  void LilyPadOnPool(int);
+  void FlowerPotOnRoof(int);
   void ClearAllPlants();
   void SetLineup(std::string, bool, bool);
   void GetLineup(bool);
@@ -578,9 +581,13 @@ private:
   QCheckBox *quickLineupModeCheckBox;
   QPushButton *quickPassButton;
   QPushButton *mixModeToSurvivalEndlessButton;
-  QPushButton *eatAllGravesButton;
+  QPushButton *clearAllGravesButton;
   QPushButton *lilyPadOnPoolButton;
+  QMenu *lilyPadOnPoolMenu;
+  QAction *lilyPadPlantToAction[9];
   QPushButton *flowerPotOnRoofButton;
+  QMenu *flowerPotOnRoofMenu;
+  QAction *flowerPotPlantToAction[9];
   QPushButton *clearAllPlantsButton;
   QPushButton *openLinkButton;
   QPushButton *updateCheckButton;
@@ -775,6 +782,7 @@ signals:
   void PackPAK(QString);
   void ShowTargetMapPage();
   void ShowCannonLauncherPage();
+  void ShowPortalPage();
 
 public slots:
   void GetFileName();
@@ -804,6 +812,7 @@ private:
   QPushButton *packPakButton;
   QPushButton *targetMapButton;
   QPushButton *cannonLauncherButton;
+  QPushButton *portalButton;
   QGridLayout *mainLayout;
 };
 
@@ -856,6 +865,28 @@ private:
   QLabel *zombieCountLabel;
   QLabel *zombieCountValueLabel;
   QGridLayout *mainLayout;
+};
+
+// SpawnCount
+
+class SpawnCountPage : public QWidget
+{
+  Q_OBJECT
+
+public:
+  SpawnCountPage(QWidget *parent = nullptr);
+  void TranslateUI();
+
+signals:
+  void GetSpawnList();
+
+public slots:
+  void UpdateSpawnCount(std::array<uint32_t, 1000>);
+
+private:
+  QTableWidget *table;
+  QGridLayout *mainLayout;
+  QAbstractButton *cornerButton;
 };
 
 // Target Map
@@ -923,6 +954,36 @@ private:
   QCheckBox *randomFallCheckBox;
   QPushButton *launchAllButton;
   QPushButton *launchButton;
+  QGridLayout *mainLayout;
+};
+
+// Portal
+
+class PortalPage : public QWidget
+{
+  Q_OBJECT
+
+public:
+  PortalPage(QWidget *parent = nullptr);
+  void TranslateUI();
+
+signals:
+  void StartPortal(bool);
+  void LockPortal(bool);
+  void SetPortal(int, int, int, int, int, int, int, int);
+
+private:
+  QLabel *label_black_row, *label_black_col;
+  QLabel *label_white_row, *label_white_col;
+  QLabel *label_black_1, *label_black_2;
+  QLabel *label_white_1, *label_white_2;
+  QLineEdit *line_edit_black_1_row, *line_edit_black_1_col;
+  QLineEdit *line_edit_black_2_row, *line_edit_black_2_col;
+  QLineEdit *line_edit_white_1_row, *line_edit_white_1_col;
+  QLineEdit *line_edit_white_2_row, *line_edit_white_2_col;
+  QCheckBox *check_box_portal_start;
+  QCheckBox *check_box_portal_lock;
+  QPushButton *push_button_portal_set;
   QGridLayout *mainLayout;
 };
 

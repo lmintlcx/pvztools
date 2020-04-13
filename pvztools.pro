@@ -5,11 +5,19 @@ TARGET = "pvztools"
 CONFIG += qt
 QT += core gui widgets network
 
-# CONFIG -= import_plugins
-# QTPLUGIN += qwindows  # 5.6
-# QTPLUGIN += qwindows qgenericbearer qwindowsvistastyle  # 5.12
+# # 5.6
+# contains(CONFIG, static) {
+#   CONFIG -= import_plugins
+# }
 
-DEFINES += UNICODE _UNICODE
+# 5.14
+contains(CONFIG, static) {
+  CONFIG -= import_plugins
+  QTPLUGIN += qwindows qwindowsvistastyle qjpeg qico qgenericbearer
+}
+
+# DEFINES += UNICODE _UNICODE _WIN32_WINNT=0x0501 _USING_V110_SDK71_ _ATL_XP_TARGETING PSAPI_VERSION=1
+DEFINES += UNICODE _UNICODE _WIN32_WINNT=0x0601
 
 win32-msvc*:QMAKE_CXXFLAGS += /MP /utf-8
 

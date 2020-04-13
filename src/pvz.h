@@ -10,7 +10,6 @@
 
 #include "src/process.h"
 #include "src/code.h"
-#include "src/pak.h"
 
 namespace Pt
 {
@@ -19,6 +18,7 @@ enum class Result : int
 {
   NotFound,
   WrongVersion,
+  OpenError,
   OK
 };
 
@@ -81,7 +81,7 @@ struct Vase
   int content_sun;
 };
 
-class PvZ : public QObject, public Process, public Code, public PAK
+class PvZ : public QObject, public Process, public Code
 {
   Q_OBJECT
 
@@ -89,12 +89,17 @@ public:
   PvZ();
   ~PvZ();
 
+protected:
+  void *extra_code_addr;
+
+public:
   static uintptr_t value_addr[];
   static uintptr_t damage_addr[];
   static uintptr_t hp_addr[];
   static uintptr_t time_addr[];
 
   void FindPvZ();
+  void GameWindowTopMost();
   bool GameOn();
   void asm_code_inject();
   int GameMode();
@@ -106,7 +111,7 @@ public:
   void UnlockAllMode(bool);
   void DirectWin();
   void MixMode(int, int);
-  void ShowHideGames(bool);
+  void ShowHiddenGames(bool);
   void LockIZE(bool, int);
   void JumpLevel(int);
   // Resources
@@ -164,6 +169,7 @@ public:
   void UpdateZombiesType();
   void UpdateZombiesList();
   void UpdateZombiesPreview();
+  std::array<uint32_t, 1000> PvZ::GetSpawnList();
   void InternalSpawn(std::array<bool, 33>, bool);
   void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>);
   int GetRandomSeed();
@@ -218,9 +224,9 @@ public:
   // Lineup
   void SetQuickLineupMode(bool);
   void QuickPass();
-  void EatAllGraves();
-  void LilyPadOnPool();
-  void FlowerPotOnRoof();
+  void ClearAllGraves();
+  void LilyPadOnPool(int);
+  void FlowerPotOnRoof(int);
   void ClearAllPlants();
   void SetLineup(std::string, bool, bool);
   std::string GetLineup(bool);
@@ -259,8 +265,6 @@ public:
   void DisablePause(bool);
   void OpenDataDir();
   void DebugMode(int);
-  void UnpackPAK(QString, QString);
-  void PackPAK(QString);
   // Status
   std::array<int, 12> GetStatus();
   // Target Map
@@ -271,6 +275,10 @@ public:
   void asm_launch_cannon(int, int, int);
   void LaunchCannon(int, int, int);
   void LaunchAllCannon(bool, int, int);
+  // Portal
+  void StartPortal(bool);
+  void LockPortal(bool);
+  void SetPortal(int, int, int, int, int, int, int, int);
 
 signals:
   void FindResult(Result);
@@ -279,7 +287,7 @@ signals:
   void HP(int);
   void Time(int);
   void RandomSeed(int);
-  void GigaWaves(std::array<bool, 20>);
+  void SpawnList(std::array<uint32_t, 1000>);
   void SeedType(int);
   void SeedImitater(bool);
   void SeedVisible(bool);
@@ -295,8 +303,6 @@ signals:
   void IceTrailX(int);
   void ShowMessageBox(QString);
   void ShowMessageStatusBar(QString);
-  void UnpackFinished();
-  void PackFinished();
   void GameStatus(std::array<int, 12>);
   void TargetMap(std::array<int, 54>);
   void CobInfo(bool, int, int);

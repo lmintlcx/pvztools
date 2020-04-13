@@ -38,6 +38,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QInputDialog>
+#include <QAction>
+#include <QMenu>
 
 #include <QtZlib/zlib.h>
 
@@ -92,7 +94,7 @@ LevelPage::LevelPage(QWidget *parent)
 
     mixmodeButton = new QPushButton(this);
 
-    showHideGamesCheckBox = new QCheckBox(this);
+    showHiddenGamesCheckBox = new QCheckBox(this);
 
     izeArrayCombo = new QComboBox(this);
     lockIzeArrayCheckBox = new QCheckBox(this);
@@ -108,12 +110,15 @@ LevelPage::LevelPage(QWidget *parent)
     // miniGamesRadioButton->setChecked(false);
     // puzzleRadioButton->setChecked(false);
     survivalRadioButton->setChecked(true);
+
     adventureCombo->setEnabled(false);
     miniGamesCombo->setEnabled(false);
     puzzleCombo->setEnabled(false);
     // survivalCombo->setEnabled(true);
 
-    levelLineEdit->setText("1008");
+    showHiddenGamesCheckBox->setChecked(true);
+
+    levelLineEdit->setText("1009");
 
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(getGoldSunflowerTrophyButton, 0, 0, 1, 1);
@@ -129,7 +134,7 @@ LevelPage::LevelPage(QWidget *parent)
     mainLayout->addWidget(puzzleCombo, 3, 1, 1, 2);
     mainLayout->addWidget(survivalCombo, 4, 1, 1, 2);
     mainLayout->addWidget(mixmodeButton, 1, 4, 1, 1);
-    mainLayout->addWidget(showHideGamesCheckBox, 2, 3, 1, 2);
+    mainLayout->addWidget(showHiddenGamesCheckBox, 2, 3, 1, 2);
     mainLayout->addWidget(izeArrayCombo, 3, 3, 1, 1);
     mainLayout->addWidget(lockIzeArrayCheckBox, 3, 4, 1, 1);
     mainLayout->addWidget(levelLineEdit, 4, 3, 1, 1);
@@ -186,8 +191,8 @@ LevelPage::LevelPage(QWidget *parent)
                 emit MixMode(mode, level);
             });
 
-    connect(showHideGamesCheckBox, &QCheckBox::clicked,
-            this, &LevelPage::ShowHideGames);
+    connect(showHiddenGamesCheckBox, &QCheckBox::clicked,
+            this, &LevelPage::ShowHiddenGames);
 
     connect(izeArrayCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, [=](int index) {
@@ -226,14 +231,42 @@ void LevelPage::TranslateUI()
     puzzleRadioButton->setText(tr("Puzzle"));
     survivalRadioButton->setText(tr("Survival"));
 
-    SET_COMBO_TEXT(adventureCombo, List::Get().adventureList, 50);
-    SET_COMBO_TEXT(miniGamesCombo, List::Get().miniGamesList, 35);
-    SET_COMBO_TEXT(puzzleCombo, List::Get().puzzleList, 22);
-    SET_COMBO_TEXT(survivalCombo, List::Get().survivalList, 15);
+    // SET_COMBO_TEXT(adventureCombo, List::Get().adventureList, 50);
+    // SET_COMBO_TEXT(miniGamesCombo, List::Get().miniGamesList, 35);
+    // SET_COMBO_TEXT(puzzleCombo, List::Get().puzzleList, 22);
+    // SET_COMBO_TEXT(survivalCombo, List::Get().survivalList, 15);
+
+    if (adventureCombo->count() == 0)
+        for (size_t i = 0; i < 50; i++)
+            adventureCombo->addItem(QString("[0]") + " " + List::Get().adventureList[i]);
+    else
+        for (size_t i = 0; i < 50; i++)
+            adventureCombo->setItemText(i, QString("[0]") + " " + List::Get().adventureList[i]);
+
+    if (miniGamesCombo->count() == 0)
+        for (size_t i = 0; i < 35; i++)
+            miniGamesCombo->addItem(QString("[") + QString::number(i + 16) + "]" + " " + List::Get().miniGamesList[i]);
+    else
+        for (size_t i = 0; i < 35; i++)
+            miniGamesCombo->setItemText(i, QString("[") + QString::number(i + 16) + "]" + " " + List::Get().miniGamesList[i]);
+
+    if (puzzleCombo->count() == 0)
+        for (size_t i = 0; i < 22; i++)
+            puzzleCombo->addItem(QString("[") + QString::number(i + 51) + "]" + " " + List::Get().puzzleList[i]);
+    else
+        for (size_t i = 0; i < 22; i++)
+            puzzleCombo->setItemText(i, QString("[") + QString::number(i + 51) + "]" + " " + List::Get().puzzleList[i]);
+
+    if (survivalCombo->count() == 0)
+        for (size_t i = 0; i < 15; i++)
+            survivalCombo->addItem(QString("[") + QString::number(i + 1) + "]" + " " + List::Get().survivalList[i]);
+    else
+        for (size_t i = 0; i < 15; i++)
+            survivalCombo->setItemText(i, QString("[") + QString::number(i + 1) + "]" + " " + List::Get().survivalList[i]);
 
     mixmodeButton->setText(tr("Mix Mode"));
 
-    showHideGamesCheckBox->setText(tr("Show Hide Games"));
+    showHiddenGamesCheckBox->setText(tr("Show Hidden Games"));
 
     SET_COMBO_TEXT(izeArrayCombo, List::Get().izeArrayList, 8);
     lockIzeArrayCheckBox->setText(tr("Lock IZE Array"));
@@ -246,8 +279,8 @@ void LevelPage::KeepSelectedFeatures()
     if (unlockAllModeCheckBox->isChecked())
         emit UnlockAllMode(true);
 
-    if (showHideGamesCheckBox->isChecked())
-        emit ShowHideGames(true);
+    if (showHiddenGamesCheckBox->isChecked())
+        emit ShowHiddenGames(true);
 
     if (lockIzeArrayCheckBox->isChecked())
     {
@@ -1238,12 +1271,14 @@ SpawnBriefPage::SpawnBriefPage(QWidget *parent)
     extremeSpawnButton = new QPushButton(this);
 
     detailedModeButton = new QPushButton(this);
+    showSpawnCountButton = new QPushButton(this);
 
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(spawnBriefWidget, 0, 0, 10, 4);
     mainLayout->addWidget(naturalSpawnButton, 10, 2, 1, 1);
     mainLayout->addWidget(extremeSpawnButton, 10, 3, 1, 1);
     mainLayout->addWidget(detailedModeButton, 10, 0, 1, 1);
+    mainLayout->addWidget(showSpawnCountButton, 10, 1, 1, 1);
 
     for (int i = 0; i < mainLayout->rowCount(); i++)
         mainLayout->setRowStretch(i, 1);
@@ -1253,12 +1288,12 @@ SpawnBriefPage::SpawnBriefPage(QWidget *parent)
     // zombieTypes[i] == 2 / 5, i == 0 / 3
     connect(spawnCheckBox[0], &QCheckBox::stateChanged,
             this, [=](int state) {
-                if (state == Qt::Checked)
+                if (limit_count && state == Qt::Checked)
                     spawnCheckBox[3]->setChecked(false);
             });
     connect(spawnCheckBox[3], &QCheckBox::stateChanged,
             this, [=](int state) {
-                if (state == Qt::Checked)
+                if (limit_count && state == Qt::Checked)
                     spawnCheckBox[0]->setChecked(false);
             });
 
@@ -1272,6 +1307,9 @@ SpawnBriefPage::SpawnBriefPage(QWidget *parent)
 
     connect(detailedModeButton, &QPushButton::clicked,
             this, &SpawnBriefPage::GetRandomSeed);
+
+    connect(showSpawnCountButton, &QPushButton::clicked,
+            this, &SpawnBriefPage::ShowSpawnCountPage);
 
     connect(naturalSpawnButton, &QPushButton::clicked,
             this, [=]() {
@@ -1296,10 +1334,11 @@ void SpawnBriefPage::TranslateUI()
     for (size_t i = 0; i < 20; i++)
         spawnCheckBox[i]->setText(List::Get().zombieList[zombieTypes[i]]);
 
-    naturalSpawnButton->setText(tr("Natural Spawn"));
-    extremeSpawnButton->setText(tr("Extreme Spawn"));
+    naturalSpawnButton->setText(tr("Natural (Built-in Generate)"));
+    extremeSpawnButton->setText(tr("Extreme (Filling Evenly)"));
 
     detailedModeButton->setText(tr("Switch Detailed Mode"));
+    showSpawnCountButton->setText(tr("Spawning Counting"));
 }
 
 void SpawnBriefPage::SwitchLayout(bool on)
@@ -1632,7 +1671,15 @@ void SpawnDetailedPage::TranslateUI()
 {
     randomSeedButton->setText(tr("Set Seed"));
 
-    SET_COMBO_TEXT(spawnZombieCombo, List::Get().zombieList, 33);
+    // SET_COMBO_TEXT(spawnZombieCombo, List::Get().zombieList, 33);
+
+    if (spawnZombieCombo->count() == 0)
+        for (size_t i = 0; i < 33; i++)
+            spawnZombieCombo->addItem(QString("[") + QString::number(i) + "]" + " " + List::Get().zombieList[i]);
+    else
+        for (size_t i = 0; i < 33; i++)
+            spawnZombieCombo->setItemText(i, QString("[") + QString::number(i) + "]" + " " + List::Get().zombieList[i]);
+
     spawnAddButton->setText(tr("Add >>"));
     spawnDeleteButton->setText(tr("<< Delete"));
     spawnClearButton->setText(tr("Clear List"));
@@ -1692,8 +1739,17 @@ std::array<bool, 20> SpawnDetailedPage::GetGigaWaves()
     return giga_waves;
 }
 
-void SpawnDetailedPage::ShowGigaWaves(std::array<bool, 20> giga_waves)
+void SpawnDetailedPage::ShowGigaWaves(std::array<uint32_t, 1000> zombies_list)
 {
+    std::array<bool, 20> giga_waves = {false};
+    for (size_t i = 0; i < 20; i++)
+        for (size_t j = 0; j < 50; j++)
+            if (zombies_list[i * 50 + j] == 32)
+            {
+                giga_waves[i] = true;
+                break;
+            }
+
     for (size_t i = 0; i < 20; i++)
         waveCheckBox[i]->setChecked(giga_waves[i]);
 }
@@ -1749,6 +1805,9 @@ SpawnPage::SpawnPage(QWidget *parent)
                 }
             });
 
+    connect(briefPage, &SpawnBriefPage::ShowSpawnCountPage,
+            this, &SpawnPage::ShowSpawnCountPage);
+
     connect(briefPage, &SpawnBriefPage::InternalSpawn,
             this, &SpawnPage::InternalSpawn);
 
@@ -1799,7 +1858,7 @@ void SpawnPage::ShowRandomSeed(int random_seed)
     detailedPage->ShowRandomSeed(random_seed);
 }
 
-void SpawnPage::ShowGigaWaves(std::array<bool, 20> giga_waves)
+void SpawnPage::ShowGigaWaves(std::array<uint32_t, 1000> giga_waves)
 {
     detailedPage->ShowGigaWaves(giga_waves);
 }
@@ -2010,7 +2069,15 @@ void SlotsPage::TranslateUI()
     lockShovelCheckBox->setText(tr("Lock Shovel"));
 
     SET_COMBO_TEXT(slotsSlotCombo, List::Get().slotsIndexList, 10);
-    SET_COMBO_TEXT(slotsSeedCombo, List::Get().seedList, 76);
+    // SET_COMBO_TEXT(slotsSeedCombo, List::Get().seedList, 76);
+
+    if (slotsSeedCombo->count() == 0)
+        for (size_t i = 0; i < 76; i++)
+            slotsSeedCombo->addItem(QString("[") + QString::number(i) + "]" + " " + List::Get().seedList[i]);
+    else
+        for (size_t i = 0; i < 76; i++)
+            slotsSeedCombo->setItemText(i, QString("[") + QString::number(i) + "]" + " " + List::Get().seedList[i]);
+
     slotsSetButton->setText(tr("Set"));
     imitaterCheckBox->setText(tr("Imitater"));
     hideSlotsSeedCheckBox->setText(tr("Hide"));
@@ -2023,7 +2090,14 @@ void SlotsPage::TranslateUI()
     hideMenuButtonCheckBox->setText(tr("Hide Menu Button"));
 
     seedLabel->setText(tr("Seed"));
-    SET_COMBO_TEXT(seedCombo, List::Get().seedList, 48);
+    // SET_COMBO_TEXT(seedCombo, List::Get().seedList, 48);
+
+    if (seedCombo->count() == 0)
+        for (size_t i = 0; i < 48; i++)
+            seedCombo->addItem(QString("[") + QString::number(i) + "]" + " " + List::Get().seedList[i]);
+    else
+        for (size_t i = 0; i < 48; i++)
+            seedCombo->setItemText(i, QString("[") + QString::number(i) + "]" + " " + List::Get().seedList[i]);
 
     seedSpeedLabel->setText(tr("Speed"));
     seedSpeedButton->setText(tr("Set"));
@@ -2122,11 +2196,11 @@ ScenePage::ScenePage(QWidget *parent)
     sceneRowSpinBox = new QSpinBox(this);
     sceneRowSpinBox->setRange(0, 9);
     sceneRowSpinBox->setSingleStep(1);
-    sceneRowSpinBox->setValue(0);
+    sceneRowSpinBox->setValue(1);
     sceneColSpinBox = new QSpinBox(this);
     sceneColSpinBox->setRange(0, 99);
     sceneColSpinBox->setSingleStep(1);
-    sceneColSpinBox->setValue(0);
+    sceneColSpinBox->setValue(1);
 
     plantMenuCombo = new QComboBox(this);
     putPlantButton = new QPushButton(this);
@@ -2287,27 +2361,8 @@ ScenePage::ScenePage(QWidget *parent)
 
     connect(sceneButton, &QPushButton::clicked,
             this, [=]() {
-                if (!already_warned_you)
-                {
-                    QMessageBox msgBox;
-                    msgBox.setWindowTitle(tr("Warning"));
-                    msgBox.setText(tr("Modifying game scene may cause some unknown problems, therefore it is not allowed by default.<br>It is recommended to enter the hidden scene in a <a href=\"https://pvz.lmintlcx.com/pvztoolsdemo/hidenscene/\">more conventional way</a> and then mix to \"Survival Endless\" mode."));
-                    msgBox.setInformativeText(tr("Are you sure you want to modify the game scene?"));
-                    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-                    msgBox.setDefaultButton(QMessageBox::No);
-                    int ret = msgBox.exec();
-                    if (ret == QMessageBox::Yes)
-                    {
-                        int scene = sceneCombo->currentIndex();
-                        emit SetScene(scene);
-                        already_warned_you = true;
-                    }
-                }
-                else
-                {
-                    int scene = sceneCombo->currentIndex();
-                    emit SetScene(scene);
-                }
+                int scene = sceneCombo->currentIndex();
+                emit SetScene(scene);
             });
 
     connect(musicButton, &QPushButton::clicked,
@@ -2374,16 +2429,30 @@ void ScenePage::TranslateUI()
     sceneRowLabel->setText(tr("Row") + " (1~6)");
     sceneColLabel->setText(tr("Column") + " (1~9)");
 
-    SET_COMBO_TEXT(plantMenuCombo, List::Get().seedList, 51);
+    // SET_COMBO_TEXT(plantMenuCombo, List::Get().seedList, 51);
+    if (plantMenuCombo->count() == 0)
+        for (size_t i = 0; i < 51; i++)
+            plantMenuCombo->addItem(QString("[") + QString::number(i) + "]" + " " + List::Get().seedList[i]);
+    else
+        for (size_t i = 0; i < 51; i++)
+            plantMenuCombo->setItemText(i, QString("[") + QString::number(i) + "]" + " " + List::Get().seedList[i]);
+
     putPlantButton->setText(tr("Planting"));
     imitaterCheckBox->setText(tr("Imitater"));
 
-    SET_COMBO_TEXT(zombieMenuCombo, List::Get().zombieList, 33);
+    // SET_COMBO_TEXT(zombieMenuCombo, List::Get().zombieList, 33);
+    if (zombieMenuCombo->count() == 0)
+        for (size_t i = 0; i < 33; i++)
+            zombieMenuCombo->addItem(QString("[") + QString::number(i) + "]" + " " + List::Get().zombieList[i]);
+    else
+        for (size_t i = 0; i < 33; i++)
+            zombieMenuCombo->setItemText(i, QString("[") + QString::number(i) + "]" + " " + List::Get().zombieList[i]);
+
     putZombieButton->setText(tr("Put"));
 
     putGraveButton->setText(tr("Grave"));
     putRakeButton->setText(tr("Rake"));
-    SET_COMBO_TEXT(coinTypeCombo, List::Get().coinList, 6);
+    SET_COMBO_TEXT(coinTypeCombo, List::Get().coinList, 27);
     putCoinButton->setText(tr("Coin"));
     putLadderButton->setText(tr("Ladder"));
     autoLadderButton->setText(tr("Ladder Pumpkin"));
@@ -2398,7 +2467,15 @@ void ScenePage::TranslateUI()
     rowTypeButton->setText(tr("Set"));
 
     sceneLabel->setText(tr("Game Scene"));
-    SET_COMBO_TEXT(sceneCombo, List::Get().sceneList, 10);
+
+    // SET_COMBO_TEXT(sceneCombo, List::Get().sceneList, 10);
+    if (sceneCombo->count() == 0)
+        for (size_t i = 0; i < 10; i++)
+            sceneCombo->addItem(QString("[") + QString::number(i) + "]" + " " + List::Get().sceneList[i]);
+    else
+        for (size_t i = 0; i < 10; i++)
+            sceneCombo->setItemText(i, QString("[") + QString::number(i) + "]" + " " + List::Get().sceneList[i]);
+
     sceneButton->setText(tr("Set"));
 
     startLawnMowersButton->setText(tr("Start Lawn Mowers"));
@@ -2479,10 +2556,26 @@ LineupPage::LineupPage(QWidget *parent)
     quickPassButton = new QPushButton(this);
     mixModeToSurvivalEndlessButton = new QPushButton(this);
 
-    eatAllGravesButton = new QPushButton(this);
+    clearAllGravesButton = new QPushButton(this);
     lilyPadOnPoolButton = new QPushButton(this);
     flowerPotOnRoofButton = new QPushButton(this);
     clearAllPlantsButton = new QPushButton(this);
+
+    lilyPadOnPoolMenu = new QMenu(this);
+    for (size_t i = 0; i < 9; i++)
+    {
+        lilyPadPlantToAction[i] = new QAction(this);
+        lilyPadOnPoolMenu->addAction(lilyPadPlantToAction[i]);
+    }
+    lilyPadOnPoolButton->setMenu(lilyPadOnPoolMenu);
+
+    flowerPotOnRoofMenu = new QMenu(this);
+    for (size_t i = 0; i < 9; i++)
+    {
+        flowerPotPlantToAction[i] = new QAction(this);
+        flowerPotOnRoofMenu->addAction(flowerPotPlantToAction[i]);
+    }
+    flowerPotOnRoofButton->setMenu(flowerPotOnRoofMenu);
 
     openLinkButton = new QPushButton(this);
     updateCheckButton = new QPushButton(this);
@@ -2504,16 +2597,13 @@ LineupPage::LineupPage(QWidget *parent)
 
     deleteStringButton->setEnabled(false);
 
-    allowSwitchSceneCheckBox->setEnabled(false); // TODO
-    allowSwitchSceneCheckBox->setVisible(false); // TODO
-
     stringTextEdit->setPlainText("0,E 1 1 0 0 0,E 2 1 0 0 0,E 3 1 0 0 0,E 4 1 0 0 0,E 5 1 0 0 0,E 5 2 0 0 0,E 1 5 0 0 0,E 1 4 0 0 0,E 2 4 0 0 0,E 3 4 0 0 0,E 4 4 0 0 0,E 5 4 0 0 0,E 5 5 0 0 0,E 1 7 0 0 0,E 2 7 0 0 0,E 3 8 0 0 0,E 4 9 0 0 0,E 5 9 0 0 0,E 1 9 0 0 0,E 2 9 0 0 0,E 4 7 0 0 0,E 5 7 0 0 0"); // LCX
 
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(quickLineupModeCheckBox, 0, 0, 1, 3);
     mainLayout->addWidget(quickPassButton, 0, 3, 1, 3);
     mainLayout->addWidget(mixModeToSurvivalEndlessButton, 0, 8, 1, 4);
-    mainLayout->addWidget(eatAllGravesButton, 1, 0, 1, 3);
+    mainLayout->addWidget(clearAllGravesButton, 1, 0, 1, 3);
     mainLayout->addWidget(lilyPadOnPoolButton, 1, 3, 1, 3);
     mainLayout->addWidget(flowerPotOnRoofButton, 1, 6, 1, 3);
     mainLayout->addWidget(clearAllPlantsButton, 1, 9, 1, 3);
@@ -2521,15 +2611,15 @@ LineupPage::LineupPage(QWidget *parent)
     mainLayout->addWidget(updateCheckButton, 2, 3, 1, 2);
     mainLayout->addWidget(endlessBuildCombo, 2, 5, 1, 4);
     mainLayout->addWidget(oneKeySetupButton, 2, 9, 1, 3);
-    mainLayout->addWidget(stringTextEdit, 3, 0, 2, 9); //
+    mainLayout->addWidget(stringTextEdit, 3, 0, 3, 9); //
     mainLayout->addWidget(string2buildButton, 3, 9, 1, 3);
     mainLayout->addWidget(build2stringButton, 4, 9, 1, 3);
-    mainLayout->addWidget(copyStringButton, 5, 0, 1, 2);
-    mainLayout->addWidget(pasteStringButton, 5, 2, 1, 2);
-    mainLayout->addWidget(saveStringButton, 5, 5, 1, 2);
-    mainLayout->addWidget(deleteStringButton, 5, 7, 1, 2);
+    mainLayout->addWidget(copyStringButton, 6, 0, 1, 2);
+    mainLayout->addWidget(pasteStringButton, 6, 2, 1, 2);
+    mainLayout->addWidget(saveStringButton, 6, 5, 1, 2);
+    mainLayout->addWidget(deleteStringButton, 6, 7, 1, 2);
     mainLayout->addWidget(allowSwitchSceneCheckBox, 5, 9, 1, 3);
-    mainLayout->addWidget(keepHpStatusCheckBox, 5, 9, 1, 3);
+    mainLayout->addWidget(keepHpStatusCheckBox, 6, 9, 1, 3);
 
     for (int i = 0; i < mainLayout->rowCount(); i++)
         mainLayout->setRowStretch(i, 1);
@@ -2547,14 +2637,24 @@ LineupPage::LineupPage(QWidget *parent)
                 emit MixMode(13, 0);
             });
 
-    connect(eatAllGravesButton, &QPushButton::clicked,
-            this, &LineupPage::EatAllGraves);
+    connect(clearAllGravesButton, &QPushButton::clicked,
+            this, &LineupPage::ClearAllGraves);
 
-    connect(lilyPadOnPoolButton, &QPushButton::clicked,
-            this, &LineupPage::LilyPadOnPool);
+    for (size_t i = 0; i < 9; i++)
+    {
+        connect(lilyPadPlantToAction[i], &QAction::triggered,
+                this, [=]() {
+                    emit this->LilyPadOnPool(i + 1);
+                });
+    }
 
-    connect(flowerPotOnRoofButton, &QPushButton::clicked,
-            this, &LineupPage::FlowerPotOnRoof);
+    for (size_t i = 0; i < 9; i++)
+    {
+        connect(flowerPotPlantToAction[i], &QAction::triggered,
+                this, [=]() {
+                    emit this->FlowerPotOnRoof(i + 1);
+                });
+    }
 
     connect(clearAllPlantsButton, &QPushButton::clicked,
             this, &LineupPage::ClearAllPlants);
@@ -2650,12 +2750,18 @@ void LineupPage::TranslateUI()
     mixModeToSurvivalEndlessButton->setText(tr("Mix Mode To Survival Endless"));
 
     quickLineupModeCheckBox->setStatusTip(tr("Turn on a series of features that are convenient for manual lineup."));
-    quickPassButton->setStatusTip(tr("Kill all zombies and end current level directly with 8000 sunshine and 2018 flags."));
+    quickPassButton->setStatusTip(tr("Kill all zombies and end current level directly with 8000 sunshine and 2020 flags."));
 
-    eatAllGravesButton->setText(tr("Eat All Graves"));
+    clearAllGravesButton->setText(tr("Clear All Graves"));
     lilyPadOnPoolButton->setText(tr("Lily Pad On Pool"));
     flowerPotOnRoofButton->setText(tr("Flower Pot On Roof"));
     clearAllPlantsButton->setText(tr("Clear All Plants"));
+
+    for (size_t i = 0; i < 9; i++)
+        lilyPadPlantToAction[i]->setText(QString("1 -> ") + QString::number(i + 1));
+
+    for (size_t i = 0; i < 9; i++)
+        flowerPotPlantToAction[i]->setText(QString("1 -> ") + QString::number(i + 1));
 
     openLinkButton->setText(tr("Open Array Design Page"));
     updateCheckButton->setText(tr("Update"));
@@ -3113,6 +3219,7 @@ GardenPage::GardenPage(QWidget *parent)
     table->setColumnCount(8);
     table->setRowCount(0); // 4 x 8 + 8 + 8 + 1
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     table->verticalHeader()->setVisible(false);
     table->horizontalHeader()->setVisible(false);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -3430,6 +3537,7 @@ VasePage::VasePage(QWidget *parent)
     table->setColumnCount(6);
     table->setRowCount(0); // 6 x 9
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     table->verticalHeader()->setVisible(false);
     table->horizontalHeader()->setVisible(false);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -4060,6 +4168,11 @@ OthersPage::OthersPage(QWidget *parent)
 
     targetMapButton = new QPushButton(this);
     cannonLauncherButton = new QPushButton(this);
+    portalButton = new QPushButton(this);
+
+    // default
+
+    runningInBackgroundCheckBox->setChecked(true);
 
     pakFileLineEdit->setText("");
     pakPathLineEdit->setText("");
@@ -4081,6 +4194,7 @@ OthersPage::OthersPage(QWidget *parent)
     mainLayout->addWidget(packPakButton, 3, 10, 1, 2);
     mainLayout->addWidget(targetMapButton, 4, 0, 1, 4);
     mainLayout->addWidget(cannonLauncherButton, 4, 4, 1, 4);
+    mainLayout->addWidget(portalButton, 4, 8, 1, 4);
 
     for (int i = 0; i < mainLayout->rowCount(); i++)
         mainLayout->setRowStretch(i, 1);
@@ -4143,6 +4257,9 @@ OthersPage::OthersPage(QWidget *parent)
     connect(cannonLauncherButton, &QPushButton::clicked,
             this, &OthersPage::ShowCannonLauncherPage);
 
+    connect(portalButton, &QPushButton::clicked,
+            this, &OthersPage::ShowPortalPage);
+
     setAcceptDrops(true);
 }
 
@@ -4168,6 +4285,7 @@ void OthersPage::TranslateUI()
 
     targetMapButton->setText(tr("Target Map Modify"));
     cannonLauncherButton->setText(tr("Cannon Launcher"));
+    portalButton->setText(tr("Portal"));
 }
 
 void OthersPage::GetFileName()
@@ -4440,6 +4558,142 @@ void StatusPage::StopTimer(bool uncheck_it)
         refreshStatusTimer->stop();
 }
 
+// SpawnCount
+
+SpawnCountPage::SpawnCountPage(QWidget *parent)
+    : QWidget(parent)
+{
+    qRegisterMetaType<std::array<uint32_t, 1000>>("std::array<uint32_t, 1000>");
+
+    table = new QTableWidget(this);
+    table->setColumnCount(20 + 1);
+    table->setRowCount(0); // 33
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    table->verticalHeader()->setVisible(true);
+    table->horizontalHeader()->setVisible(true);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    // table->hideColumn(0);
+    table->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    table->resizeColumnsToContents();
+    table->resizeRowsToContents();
+
+    // for (size_t r = 0; r < 33; r++)
+    //     for (size_t c = 0; c < 20 + 1; c++)
+    //         table->setItem(r, c, new QTableWidgetItem("0"));
+
+    QStringList hhl;
+    for (size_t i = 1; i <= 20; i++)
+        hhl << QString::number(i);
+    hhl << QString("(0)");
+    table->setHorizontalHeaderLabels(hhl);
+
+    mainLayout = new QGridLayout(this);
+    mainLayout->addWidget(table, 0, 0, 1, 1);
+
+    for (int i = 0; i < mainLayout->rowCount(); i++)
+        mainLayout->setRowStretch(i, 1);
+    for (int i = 0; i < mainLayout->columnCount(); i++)
+        mainLayout->setColumnStretch(i, 1);
+
+    cornerButton = table->findChild<QAbstractButton *>();
+    if (cornerButton)
+    {
+        cornerButton->disconnect();
+        connect(cornerButton, &QAbstractButton::clicked,
+                this, &SpawnCountPage::GetSpawnList);
+    }
+}
+
+void SpawnCountPage::TranslateUI()
+{
+    setWindowTitle(tr("Spawning Counting"));
+}
+
+void SpawnCountPage::UpdateSpawnCount(std::array<uint32_t, 1000> zombies_list)
+{
+    if (!this->isVisible())
+        return;
+
+    uint32_t data[33][20 + 1];
+    uint32_t total;
+    for (size_t r = 0; r < 33; r++)
+        for (size_t c = 0; c < 20 + 1; c++)
+            data[r][c] = 0;
+    total = 0;
+
+    for (size_t i = 0; i < 20; i++)
+    {
+        for (size_t j = 0; j < 50; j++)
+        {
+            if (zombies_list[i * 50 + j] > 32 || zombies_list[i * 50 + j] < 0)
+                continue;
+            data[zombies_list[i * 50 + j]][i] += 1;
+            data[zombies_list[i * 50 + j]][20 + 1 - 1] += 1;
+            total += 1;
+        }
+    }
+
+    table->clearContents();
+    table->setColumnCount(20 + 1);
+    table->setRowCount(33);
+
+    auto min = [](unsigned int a, unsigned int b) -> unsigned int {
+        return a < b ? a : b;
+    };
+
+    for (size_t r = 0; r < 33; r++)
+    {
+        for (size_t c = 0; c < 20 + 1; c++)
+        {
+            unsigned int value = data[r][c];
+            QColor color;
+            int f = 0;
+            if (c == (20 + 1 - 1))
+            {
+                f = min(value, 300u) * 255 / 500;
+                color = QColor(255 - f, 255 - f, 255 - f);
+            }
+            else if (c == (10 - 1) || c == (20 - 1))
+            {
+                f = min(value, 20u) * 250 / 30;
+                color = QColor(250 - f, 240, 250 - f);
+            }
+            else
+            {
+                f = min(value, 20u) * 255 / 30;
+                color = QColor(255 - f, 255, 255 - f);
+            }
+            table->setItem(r, c, new QTableWidgetItem(QString::number(value)));
+            table->item(r, c)->setBackgroundColor(color);
+        }
+    }
+
+    QStringList hhl;
+    for (size_t i = 1; i <= 20; i++)
+        hhl << QString::number(i);
+    hhl << (QString("(") + QString::number(total) + QString(")"));
+    table->setHorizontalHeaderLabels(hhl);
+
+    QStringList vhl;
+    for (size_t i = 0; i < 33; i++)
+        vhl << (QString("[") + QString::number(i) + QString("]") + QString(" ") + List::Get().zombieList[i]);
+    table->setVerticalHeaderLabels(vhl);
+
+    cornerButton->setText(QString("↻")); // TODO
+
+    for (size_t r = 32; r > 0; r--) // r>=0
+    {
+        if (data[r][20 + 1 - 1] == 0)
+            table->removeRow(r);
+    }
+
+    table->resizeColumnsToContents();
+    table->resizeRowsToContents();
+}
+
 // Target Map
 
 TargetMapPage::TargetMapPage(QWidget *parent)
@@ -4707,6 +4961,126 @@ void CannonLauncherPage::CalculateCoord(int scene)
     yValueLabel->setText(QString::number(y));
 }
 
+// Portal
+
+PortalPage::PortalPage(QWidget *parent)
+    : QWidget(parent)
+{
+    label_black_row = new QLabel(this);
+    label_black_col = new QLabel(this);
+    label_white_row = new QLabel(this);
+    label_white_col = new QLabel(this);
+    label_black_1 = new QLabel(this);
+    label_black_2 = new QLabel(this);
+    label_white_1 = new QLabel(this);
+    label_white_2 = new QLabel(this);
+
+    label_black_1->setAlignment(Qt::AlignCenter);
+    label_black_2->setAlignment(Qt::AlignCenter);
+    label_white_1->setAlignment(Qt::AlignCenter);
+    label_white_2->setAlignment(Qt::AlignCenter);
+
+    line_edit_black_1_row = new QLineEdit(this);
+    line_edit_black_1_row->setValidator(new QIntValidator(1, 6, this));
+    line_edit_black_1_col = new QLineEdit(this);
+    line_edit_black_1_col->setValidator(new QIntValidator(1, 10, this));
+    line_edit_black_2_row = new QLineEdit(this);
+    line_edit_black_2_row->setValidator(new QIntValidator(1, 6, this));
+    line_edit_black_2_col = new QLineEdit(this);
+    line_edit_black_2_col->setValidator(new QIntValidator(1, 10, this));
+    line_edit_white_1_row = new QLineEdit(this);
+    line_edit_white_1_row->setValidator(new QIntValidator(1, 6, this));
+    line_edit_white_1_col = new QLineEdit(this);
+    line_edit_white_1_col->setValidator(new QIntValidator(1, 10, this));
+    line_edit_white_2_row = new QLineEdit(this);
+    line_edit_white_2_row->setValidator(new QIntValidator(1, 6, this));
+    line_edit_white_2_col = new QLineEdit(this);
+    line_edit_white_2_col->setValidator(new QIntValidator(1, 10, this));
+
+    check_box_portal_start = new QCheckBox(this);
+    check_box_portal_lock = new QCheckBox(this);
+    push_button_portal_set = new QPushButton(this);
+
+    line_edit_black_1_row->setText("1");
+    line_edit_black_1_col->setText("6");
+    line_edit_black_2_row->setText("2");
+    line_edit_black_2_col->setText("7");
+    line_edit_white_1_row->setText("3");
+    line_edit_white_1_col->setText("8");
+    line_edit_white_2_row->setText("4");
+    line_edit_white_2_col->setText("9");
+
+    mainLayout = new QGridLayout(this);
+    mainLayout->addWidget(label_black_row, 4, 2, 1, 1);
+    mainLayout->addWidget(label_black_col, 4, 3, 1, 1);
+    mainLayout->addWidget(label_white_row, 4, 6, 1, 1);
+    mainLayout->addWidget(label_white_col, 4, 7, 1, 1);
+    mainLayout->addWidget(label_black_1, 5, 0, 1, 2);
+    mainLayout->addWidget(label_black_2, 6, 0, 1, 2);
+    mainLayout->addWidget(label_white_1, 5, 4, 1, 2);
+    mainLayout->addWidget(label_white_2, 6, 4, 1, 2);
+    mainLayout->addWidget(line_edit_black_1_row, 5, 2, 1, 1);
+    mainLayout->addWidget(line_edit_black_1_col, 5, 3, 1, 1);
+    mainLayout->addWidget(line_edit_black_2_row, 6, 2, 1, 1);
+    mainLayout->addWidget(line_edit_black_2_col, 6, 3, 1, 1);
+    mainLayout->addWidget(line_edit_white_1_row, 5, 6, 1, 1);
+    mainLayout->addWidget(line_edit_white_1_col, 5, 7, 1, 1);
+    mainLayout->addWidget(line_edit_white_2_row, 6, 6, 1, 1);
+    mainLayout->addWidget(line_edit_white_2_col, 6, 7, 1, 1);
+    mainLayout->addWidget(check_box_portal_start, 4, 9, 1, 2);
+    mainLayout->addWidget(check_box_portal_lock, 5, 9, 1, 2);
+    mainLayout->addWidget(push_button_portal_set, 6, 9, 1, 4);
+
+    for (int i = 0; i < mainLayout->rowCount(); i++)
+        mainLayout->setRowStretch(i, 1);
+    for (int i = 0; i < mainLayout->columnCount(); i++)
+        mainLayout->setColumnStretch(i, 1);
+
+    connect(check_box_portal_start, &QCheckBox::stateChanged,
+            this, [=]() {
+                emit StartPortal(check_box_portal_start->isChecked());
+            });
+
+    connect(check_box_portal_lock, &QCheckBox::stateChanged,
+            this, [=]() {
+                emit LockPortal(check_box_portal_lock->isChecked());
+            });
+
+    connect(push_button_portal_set, &QPushButton::clicked,
+            this, [=]() {
+                if (check_box_portal_start->checkState() == Qt::Checked)
+                {
+                    int b1r = line_edit_black_1_row->text().toInt() - 1;
+                    int b1c = line_edit_black_1_col->text().toInt() - 1;
+                    int b2r = line_edit_black_2_row->text().toInt() - 1;
+                    int b2c = line_edit_black_2_col->text().toInt() - 1;
+                    int w1r = line_edit_white_1_row->text().toInt() - 1;
+                    int w1c = line_edit_white_1_col->text().toInt() - 1;
+                    int w2r = line_edit_white_2_row->text().toInt() - 1;
+                    int w2c = line_edit_white_2_col->text().toInt() - 1;
+                    emit SetPortal(b1r, b1c, b2r, b2c, w1r, w1c, w2r, w2c);
+                }
+            });
+}
+
+void PortalPage::TranslateUI()
+{
+    label_black_row->setText(tr("Row"));
+    label_black_col->setText(tr("Column"));
+    label_white_row->setText(tr("Row"));
+    label_white_col->setText(tr("Column"));
+    label_black_1->setText(tr("Black1"));
+    label_black_2->setText(tr("Black2"));
+    label_white_1->setText(tr("White1"));
+    label_white_2->setText(tr("White2"));
+
+    check_box_portal_start->setText(tr("Start"));
+    check_box_portal_lock->setText(tr("Lock"));
+    push_button_portal_set->setText(tr("Set Portal"));
+
+    setWindowTitle(tr("Portal"));
+}
+
 DocumentPage::DocumentPage(QWidget *parent)
     : QWidget(parent)
 {
@@ -4726,20 +5100,20 @@ void DocumentPage::TranslateUI()
 {
     document->setText(tr("<style>a {text-decoration: none; color: blue}</style>"
                          "<h2>About</h2>"
-                         "<p>This software (PvZ Tools) is applicable to Plants vs. Zombies 1.0.0.1051 original English version only (which you can <a href=\"https://pvz.lmintlcx.com/getpvz\">download here</a>), other localization version is theoretically supported but the probability of game crash is very high.</p>"
+                         "<p>This software (PvZ Tools) is applicable to Plants vs. Zombies 1.0.0.1051 original English version only (which you can <a href=\"https://pvz.lmintlcx.com/pvz/\">download here</a>).</p>"
                          "<p>Excessive modification or forced use of non-corresponding game versions can easily cause the game to crash, please back up data file before use. All effects caused by using this software are responsibility of user himself.</p>"
                          "<p>Some behavior of trainer (finding game progress, modifying memory data, remote injection code, etc.) may be considered dangerous by anti-virus software. Please decide whether to trust this software yourself.</p>"
                          "<p>Reasonable uses of trainer include, but not limited to, demonstrations, testing, research, and entertainment. Abuse of modifiers may reduce the fun of game seriously, please use it with caution, especially newbies.</p>"
                          "<p>There may be some bugs with this software, users can summit feedback or feature request to the author. The beta version of this software has a time limit, please download latest version if it prompt expires.</p>"
                          "<p>Configuration information is saved in \"HKEY_CURRENT_USER\\SOFTWARE\\Cube Studio\\PvZ Tools\\v2\". You can export this registry item for back up, or clean it after delete this software.</p>"
                          "<p>Most important data (memory address) comes from existing public information and other open source modifiers. And source code is copy and paste from Stack Overflow.</p>"
-                         "<p>All source code is located at <a href=\"https://github.com/lmintlcx/pvztools\">https://github.com/lmintlcx/pvztools</a>.</p>"
+                         "<p>All source code is located at <a href=\"https://github.com/lmintlcx/pvztools/\">https://github.com/lmintlcx/pvztools/</a>.</p>"
                          "<h2>Spawn</h2>"
                          "<p>This feature is suitable for later period of survival endless. Size of zombie's spawning list is 1000, which is 20 waves per level and 50 zombies per wave.</p>"
                          "<p>The spawn page has two modes: \"brief\" and \"detailed\".</p>"
                          "<p>When switching between different pages, if the number of zombie types selected on target page is 0, selected zombie types on current page will be synchronized to target page (not one-to-one correspondence).</p>"
                          "<p>In brief mode, you can switch layout of the option boxes, in order of zombies in almanac or in same position as the PVZombiesSeed.exe.</p>"
-                         "<p>In brief mode, Conehead Zombie and Newspaper Zombie are mutually exclusive. If \"Limit Spawn Count\" is checked, it will limit the number of selected zombie types, up to 10 types except Bungee Zombie and Zombie Yeti. (Note that this limitation is not exactly same as the game itself.)</p>"
+                         "<p>In brief mode, Conehead Zombie and Newspaper Zombie are mutually exclusive if \"Limit Spawn Count\" is checked, and it will limit the number of selected zombie types, up to 10 types except Bungee Zombie and Zombie Yeti. (Note that this limitation is not same as the game itself.)</p>"
                          "<p>The difference between different spawn mode:<br>Natural spawn changes the zombie types only and calls built-in function of game to generates zombies list.<br>Extreme spawn is to evenly populate the zombies list with seleted zombie types.<br>Simulate natural spawn is randomly fill the zombies list with seleted zombie types according to the ratio which is get by statistical law, meanwhile increase the probability of GigaGargantuar in flag wave.</p>"
                          "<p>Special deal with some zombies:<br>When limit Flag Zombie, Flag Zombie will only appear in each flag wave (huge wave).<br>When limit Zombie Yeti, there will be only one Zombie Yeti.<br>When limit Bungee Zombie, Bungee Zombie will only appear in flag wave (huge wave).<br>When limit GigaGargantuar, GigaGargantuar will only appear in selected wave(s) (20 waves total).</p>"
                          "<p>When using natural spawn in brief mode, there must be Zombie.</p>"
@@ -4747,11 +5121,11 @@ void DocumentPage::TranslateUI()
                          "<p>When using simulate natural spawn in detailed mode, there must be Zombie and Flag Zombie. Flag Zombie, Zombie Yeti and Bungee Zombie is limited.</p>"
                          "<h2>Lineup</h2>"
                          "<p>Checking \"Quick Lineup Mode\" will enable these features: Auto Collect, Cob Cannon No CD, Plant Invincible, Stop Spawning, Ignore Sun, Slots No CD, Purple Seed Unlimited, No Fog.</p>"
-                         "<p>Clicking \"Quick Pass\" will end current level directly, kill all zombies on the field, set the number of sunshine to 8000, and set the number of levels to 1008 (2018 flags completed). You can modify sunshine and level in corresponding page by pause the game immediately after clicking it.</p>"
+                         "<p>Clicking \"Quick Pass\" will end current level directly, kill all zombies on the field, set the number of sunshine to 8000, and set the number of levels to 1009 (2020 flags completed). You can modify sunshine and level in corresponding page by pause the game immediately after clicking it.</p>"
                          "<p>Format of lineup string is compatible with <a href=\"https://pvz.lmintlcx.com/arraydesign/\">Array Design</a>.</p>"
                          "<p>The built-in lineup string includes some well-known build in <a href=\"https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good\">good tab</a> at Baidu Tieba. Players can adjust lineup as needed, don't have to follow the original array completely.</p>"
                          "<p>Clicking \"Update\" will update built-in array list via Internet. Which is collected by me and will be update if I'm happy.</p>"
-                         "<p>Modifying game scene may cause some unknown problems, therefore the \"Allow Switch Scene\" option is not checked by default. It is recommended to enter the hidden scene in a <a href=\"https://pvz.lmintlcx.com/pvztoolsdemo/hidenscene/\">more conventional way</a> and then mix to \"Survival Endless\" mode.</p>"
+                         "<p>Modifying game scene may cause some unknown problems, therefore the \"Allow Switch Scene\" option is not checked by default. It is recommended to enter the hidden scene in a <a href=\"https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/\">more conventional way</a> and then mix to \"Survival Endless\" mode.</p>"
                          "<p>When \"Keep HP Status\" is checked, appearance status of some plants (Wall-nut, Tall-nut, Pumpkin, Garlic, Spikerock) will be preserved when importing or exporting lineup strings.</p>"
                          "<h2>Others</h2>"
                          "<p>The \"Open Data Dir\" feature is temporarily unavailable on XP systems (the data file is located in the \"userdata\" folder in game directory). For Vista and above, it's located in \"C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata\\\" folder.</p>"
@@ -4759,20 +5133,20 @@ void DocumentPage::TranslateUI()
 
     // <style>a {text-decoration: none; color: blue}</style>
     // <h2>关于</h2>
-    // <p>本软件（PvZ Tools）仅适用于植物大战僵尸 1.0.0.1051 英文原版（可从 <a href="https://pvz.lmintlcx.com/getpvz">这里下载</a>），其他语言版本理论上可用但是崩溃概率非常高。</p>
+    // <p>本软件（PvZ Tools）仅适用于植物大战僵尸 1.0.0.1051 英文原版（可从 <a href="https://pvz.lmintlcx.com/pvz/">这里下载</a>）。</p>
     // <p>过度修改或者强行使用不对应的游戏版本很容易造成游戏崩溃，使用前请及时备份存档。对于使用本软件造成的所有影响由用户自己负责。</p>
     // <p>修改器的部分行为（查找游戏进程，修改内存数据，远程注入代码等）可能会被杀毒软件视为危险行为，请自行决定是否信任本软件。</p>
     // <p>修改器的合理用途包括但不限于演示、测试、研究和娱乐。滥用修改器会严重降低游戏乐趣，新手请慎重使用。</p>
     // <p>本软件可能存在一些问题，用户可以向作者提供问题反馈或者功能需求。测试版有使用期限限制，如果提示过期请下载最新版本。</p>
     // <p>配置信息保存在“HKEY_CURRENT_USER\SOFTWARE\Cube Studio\PvZ Tools\v2”。你可以导出这个注册表项目来备份，或者在删除本软件后清理它。</p>
     // <p>大部分核心数据（内存基址）来自于已有公开资料和其他开源修改器。而源代码是从栈溢出（Stack Overflow）复制粘贴的。</p>
-    // <p>所有源代码位于 <a href="https://github.com/lmintlcx/pvztools">https://github.com/lmintlcx/pvztools</a> 。</p>
+    // <p>所有源代码位于 <a href="https://github.com/lmintlcx/pvztools/">https://github.com/lmintlcx/pvztools/</a> 。</p>
     // <h2>出怪</h2>
     // <p>此功能适用于无尽后期调节出怪。出怪列表共用到 1000 只僵尸，其中每一次选卡 20 波，每波 50 只。</p>
     // <p>出怪页面有两种模式：“简略” 和 “详细”。</p>
     // <p>切换不同出怪页面时，如果目标页面所选的僵尸种类数量为 0，则会将当前页面已选的僵尸种类同步到另一页面上（并不是一一对应的）。</p>
     // <p>简略模式下可以切换选项框的排列布局，按僵尸在图鉴的顺序或者和小王子出怪修改器一样的位置。</p>
-    // <p>在简略模式下，路障和读报互斥。勾选“限制出怪种类数”后会限制能够选择的出怪种类数量，除蹦极和雪人外最多 10 种。（注意这个限制和游戏本身的出怪情况并不完全相同）。</p>
+    // <p>在简略模式下勾选“限制出怪种类数”后路障和读报互斥，并且限制能够选择的出怪种类数量为除蹦极和雪人外最多 10 种。（注意这个限制和游戏本身的出怪情况并不相同）。</p>
     // <p>不同出怪模式的区别：<br>自然出怪只改变出怪种类，再由游戏内置的函数生成出怪列表。<br>极限出怪是把所选僵尸种类按顺序均匀地填充到出怪列表。<br>模拟自然出怪则是根据统计规律按一定的比例随机填充出怪列表，在旗帜波会增加红眼的出现概率。</p>
     // <p>一些僵尸的特殊处理：<br>限制旗帜后，旗帜只在每个旗帜波（大波）出现一只。<br>限制雪人后，雪人只出现一只。<br>限制蹦极后，蹦极只在旗帜波（大波）出现。<br>限制红眼后，红眼只在所选的波次出现（总共 20 波）。</p>
     // <p>简略模式下使用自然出怪，普僵必出。</p>
@@ -4780,11 +5154,11 @@ void DocumentPage::TranslateUI()
     // <p>详细模式下使用模拟自然出怪，普僵旗帜必出，限制旗帜雪人蹦极。</p>
     // <h2>布阵</h2>
     // <p>勾选“快捷布阵模式”会开启这些功能：自动收集、玉米炮无冷却、植物无敌、暂停出怪、无视阳光、卡片无冷却、紫卡无限制、浓雾透视。</p>
-    // <p>点击“快速过关”后会直接结束本关卡，秒杀所有场上僵尸，并将阳光数设置为 8000，关卡数设置为 1008（已完成 2018 面旗帜数）。可以在点击后立即暂停游戏并去对应的页面修改阳光和关卡数。</p>
+    // <p>点击“快速过关”后会直接结束本关卡，秒杀所有场上僵尸，并将阳光数设置为 8000，关卡数设置为 1009（已完成 2020 面旗帜数）。可以在点击后立即暂停游戏并去对应的页面修改阳光和关卡数。</p>
     // <p>布阵字符串格式和 <a href="https://pvz.lmintlcx.com/arraydesign/">网页布阵器</a> 互通。</p>
     // <p>内置布阵字符串包括一些贴吧 <a href="https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good">精品区</a> 知名阵型。玩家可根据需要调整阵型，不需要完全遵循原阵。</p>
     // <p>点击“更新”后会联网更新内置的阵型列表。个人整理，随缘更新。</p>
-    // <p>修改游戏场地可能会造成一些不为人知的问题，因此“允许切换场景”选项默认不勾选。建议用 <a href="https://pvz.lmintlcx.com/pvztoolsdemo/hidenscene/">更加常规的方法</a> 进入隐藏场地再混乱到“生存无尽”模式。</p>
+    // <p>修改游戏场地可能会造成一些不为人知的问题，因此“允许切换场景”选项默认不勾选。建议用 <a href="https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/">更加常规的方法</a> 进入隐藏场地再混乱到“生存无尽”模式。</p>
     // <p>勾选“保持血量状态”后，导入或导出字符串时部分植物（坚果、高坚果、南瓜头、大蒜、地刺王）的残血状态会得到保留。</p>
     // <h2>其他</h2>
     // <p>“打开存档目录”功能在 XP 系统上暂时不可用（存档文件位于游戏目录内的“userdata”文件夹）。对于 Vista 以及更高版本的系统，存档文件位于“C:\ProgramData\PopCap Games\PlantsVsZombies\userdata\”文件夹。</p>

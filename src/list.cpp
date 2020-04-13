@@ -67,14 +67,14 @@ void List::Init()
         << tr("Status");
 
     izeArrayList
-        << tr("Peashooter")
-        << tr("Chomper") + " " + tr("Potato Mine")
-        << tr("Spikeweed") + " " + tr("Starfruit")
-        << tr("Fume-shroom") + " " + tr("Magnet-shroom")
-        << tr("Scaredy-shroom")
-        << tr("Hodgepodge") + "1"
-        << tr("Hodgepodge") + "2"
-        << tr("Hodgepodge") + "3";
+        << "输出主题"
+        << "爆炸主题"
+        << "倾斜主题"
+        << "穿刺主题"
+        << "回复主题"
+        << "即死主题"
+        << "控制主题"
+        << "综合主题";
 
     adventureList
         << "1-1"
@@ -266,28 +266,27 @@ void List::Init()
         << tr("Sun")
         << tr("Small Sun")
         << tr("Big Sun")
-        // << "7"
-        // << "8"
-        // << "9"
-        // << "10"
-        // << "11"
-        // << "12"
-        // << "13"
-        // << "14"
-        // << "15"
-        // << "16"
-        // << "17"
-        // << "18"
-        // << "19"
-        // << "20"
-        // << "21"
-        // << "22"
-        // << "23"
-        // << "24"
-        // << "25"
-        // << "26"
-        // << "27"
-        ;
+        << "7"
+        << "8"
+        << "9"
+        << "10"
+        << "11"
+        << "12"
+        << "13"
+        << "14"
+        << "15"
+        << "16"
+        << "17"
+        << "18"
+        << "19"
+        << "20"
+        << "21"
+        << "22"
+        << "23"
+        << "24"
+        << "25"
+        << "26"
+        << "27";
 
     timeList
         << tr("Fog Clear")
@@ -366,39 +365,39 @@ void List::Init()
         << tr("Bigger");
 
     zombieList
-        << tr("Zombie", "Zombie Zombie") // 0
-        << tr("Flag Zombie")             // 1
-        << tr("Conehead Zombie")         // 2
-        << tr("Pole Vaulting Zombie")    // 3
-        << tr("Buckethead Zombie")       // 4
-        << tr("Newspaper Zombie")        // 5
-        << tr("Screen Door Zombie")      // 6
-        << tr("Football Zombie")         // 7
-        << tr("Dancing Zombie")          // 8
-        << tr("Backup Dancer")           // 9
-        << tr("Ducky Tube Zombie")       // 10
-        << tr("Snorkel Zombie")          // 11
-        << tr("Zomboni")                 // 12
-        << tr("Zombie Bobsled Team")     // 13
-        << tr("Dolphin Rider Zombie")    // 14
-        << tr("Jack-in-the-Box Zombie")  // 15
-        << tr("Balloon Zombie")          // 16
-        << tr("Digger Zombie")           // 17
-        << tr("Pogo Zombie")             // 18
-        << tr("Zombie Yeti")             // 19
-        << tr("Bungee Zombie")           // 20
-        << tr("Ladder Zombie")           // 21
-        << tr("Catapult Zombie")         // 22
-        << tr("Gargantuar")              // 23
-        << tr("Imp")                     // 24
-        << tr("Dr. Zomboss")             // 25
-        << tr("Peashooter Zombie")       // 26
-        << tr("Wall-nut Zombie")         // 27
-        << tr("Jalapeno Zombie")         // 28
-        << tr("Gatling Pea Zombie")      // 29
-        << tr("Squash Zombie")           // 30
-        << tr("Tall-nut Zombie")         // 31
-        << tr("GigaGargantuar");         // 32
+        << tr("Zombie", "Zombie")                 // 0
+        << tr("Flag Zombie", "Zombie")            // 1
+        << tr("Conehead Zombie", "Zombie")        // 2
+        << tr("Pole Vaulting Zombie", "Zombie")   // 3
+        << tr("Buckethead Zombie", "Zombie")      // 4
+        << tr("Newspaper Zombie", "Zombie")       // 5
+        << tr("Screen Door Zombie", "Zombie")     // 6
+        << tr("Football Zombie", "Zombie")        // 7
+        << tr("Dancing Zombie", "Zombie")         // 8
+        << tr("Backup Dancer", "Zombie")          // 9
+        << tr("Ducky Tube Zombie", "Zombie")      // 10
+        << tr("Snorkel Zombie", "Zombie")         // 11
+        << tr("Zomboni", "Zombie")                // 12
+        << tr("Zombie Bobsled Team", "Zombie")    // 13
+        << tr("Dolphin Rider Zombie", "Zombie")   // 14
+        << tr("Jack-in-the-Box Zombie", "Zombie") // 15
+        << tr("Balloon Zombie", "Zombie")         // 16
+        << tr("Digger Zombie", "Zombie")          // 17
+        << tr("Pogo Zombie", "Zombie")            // 18
+        << tr("Zombie Yeti", "Zombie")            // 19
+        << tr("Bungee Zombie", "Zombie")          // 20
+        << tr("Ladder Zombie", "Zombie")          // 21
+        << tr("Catapult Zombie", "Zombie")        // 22
+        << tr("Gargantuar", "Zombie")             // 23
+        << tr("Imp", "Zombie")                    // 24
+        << tr("Dr. Zomboss", "Zombie")            // 25
+        << tr("Peashooter Zombie", "Zombie")      // 26
+        << tr("Wall-nut Zombie", "Zombie")        // 27
+        << tr("Jalapeno Zombie", "Zombie")        // 28
+        << tr("Gatling Pea Zombie", "Zombie")     // 29
+        << tr("Squash Zombie", "Zombie")          // 30
+        << tr("Tall-nut Zombie", "Zombie")        // 31
+        << tr("GigaGargantuar", "Zombie");        // 32
 
     slotsIndexList
         << tr("1st slot")

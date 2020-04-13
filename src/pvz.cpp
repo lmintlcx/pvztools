@@ -106,13 +106,15 @@ uintptr_t PvZ::time_addr[] = {
 
 PvZ::PvZ()
 {
+    extra_code_addr = 0;
+
     qRegisterMetaType<Result>("Result");
     qRegisterMetaType<Sun>("Sun");
     qRegisterMetaType<Strength>("Strength");
     qRegisterMetaType<Bullet>("Bullet");
     qRegisterMetaType<Explode>("Explode");
     qRegisterMetaType<Visibility>("Visibility");
-    qRegisterMetaType<std::array<bool, 20>>("std::array<bool,20>");
+    qRegisterMetaType<std::array<uint32_t, 1000>>("std::array<uint32_t, 1000>");
     qRegisterMetaType<std::string>("std::string");
     qRegisterMetaType<std::vector<GardenPlant>>("std::vector<GardenPlant>");
     qRegisterMetaType<std::vector<Vase>>("std::vector<Vase>");
@@ -130,42 +132,68 @@ void PvZ::FindPvZ()
 {
     Result result;
 
-    OpenByWindow(L"MainWindow", L"Plants vs. Zombies");
-
-    if (IsValid())
-    {
-        if (ReadMemory<unsigned int>(0x0042748e) == 0xff563de8)
-            result = Result::OK;
-        else
-            result = Result::WrongVersion;
-    }
-    else
-    {
-        OpenByWindow(L"MainWindow", L"植物大战僵尸中文版");
-
+    if (OpenByWindow(L"MainWindow", L"Plants vs. Zombies"))
         if (IsValid())
-        {
-            if (ReadMemory<unsigned int>(0x0042748e) == 0xff563de8)
+            if (ReadMemory<unsigned int>(0x004140c5) == 0x0019b337)
                 result = Result::OK;
             else
                 result = Result::WrongVersion;
-        }
         else
-        {
-            if (OpenByWindow(L"MainWindow", L"植物大战僵尸汉化版")                       //
-                || OpenByWindow(L"MainWindow", L"Plants vs. Zombies 1.2.0.1073")         //
-                || OpenByWindow(L"MainWindow", L"Plants vs. Zombies 1.2.0.1073 RELEASE") //
-                || OpenByWindow(L"MainWindow", L"Plants vs. Zombies GOTY"))
-                result = Result::WrongVersion;
+            result = Result::OpenError;
+    else if (OpenByWindow(L"MainWindow", nullptr))
+        if (IsValid())
+            if (ReadMemory<unsigned int>(0x004140c5) == 0x0019b337)
+                result = Result::OK;
             else
-                result = Result::NotFound;
+                result = Result::WrongVersion;
+        else
+            result = Result::OpenError;
+    else
+        result = Result::NotFound;
+
+    if (result == Result::OK)
+    {
+        if (extra_code_addr != nullptr && ReadMemory<byte>((unsigned int)extra_code_addr) == 0xcc)
+            VirtualFreeEx(handle, extra_code_addr, 0, MEM_RELEASE);
+
+        void *thread_addr = VirtualAllocEx(handle, nullptr, 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+        if (thread_addr != nullptr)
+        {
+            extra_code_addr = thread_addr;
+            std::wcout << L"申请到内存地址: " << extra_code_addr << std::endl;
+
+            byte extra_code[] = {
+                0xcc,                                     // int 3
+                0xc7, 0x40, 0x10, 0x02, 0x00, 0x00, 0x00, // mov [eax+10],00000002
+                0xc7, 0x40, 0x14, 0x04, 0x00, 0x00, 0x00, // mov [eax+14],00000004
+                0xe9, 0x00, 0x00, 0x00, 0x00,             // jmp xxxxxxxx
+                0xcc,                                     // int 3
+            };
+            (unsigned int &)extra_code[16] = 0x0042706f - ((unsigned int)thread_addr + 15) - 5;
+            WriteProcessMemory(handle, thread_addr, extra_code, 21, nullptr);
+
+            byte portal_fix_code[] = {
+                // 0xc7, 0x40, 0x10, 0x02, 0x00, 0x00, 0x00, // mov [eax+10],00000002
+                // 0x89, 0x58, 0x14,                         // mov [eax+14],ebx
+                0xe9, 0x00, 0x00, 0x00, 0x00, // jmp xxxxxxxx
+                0x90, 0x90, 0x90, 0x90, 0x90, //
+            };
+            (unsigned int &)portal_fix_code[1] = ((unsigned int)thread_addr + 1) - 0x00427065 - 5;
+            WriteProcessMemory(handle, (void *)0x00427065, portal_fix_code, 10, nullptr);
         }
     }
-
-    if (result != Result::OK)
-        hwnd = nullptr, pid = 0, handle = nullptr;
+    else
+    {
+        hwnd = nullptr, pid = 0, handle = nullptr, extra_code_addr = 0;
+    }
 
     emit FindResult(result);
+}
+
+void PvZ::GameWindowTopMost()
+{
+    if (hwnd != nullptr)
+        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 }
 
 bool PvZ::GameOn()
@@ -295,35 +323,37 @@ void PvZ::UnlockAllMode(bool on)
     {
         if (on)
         {
-            WriteMemory<byte>(0x70, 0x00454109);
             WriteMemory<byte>(0x70, 0x0044a514);
             WriteMemory(std::array<byte, 3>{0x31, 0xc0, 0xc3}, 0x0042e440);
+            WriteMemory<byte>(0x70, 0x0044a5af);
+            WriteMemory<byte>(0x70, 0x00454109);
+            WriteMemory<byte>(0xeb, 0x00449e7a);
             WriteMemory<byte>(0xeb, 0x00449e9d);
+            WriteMemory<byte>(0xeb, 0x00453ad1);
+            WriteMemory<int>(0x5beb01b0, 0x00403a10);
+            WriteMemory(std::array<byte, 3>{0xb0, 0x01, 0xc3}, 0x00403b30);
+            WriteMemory<int>(0x00, 0x0069dca0);
             WriteMemory(std::array<byte, 3>{0x30, 0xc0, 0xc3}, 0x0048aad0);
             WriteMemory<byte>(0xeb, 0x0048a54c);
             WriteMemory<byte>(0xeb, 0x0048d32b);
             WriteMemory<byte>(0xeb, 0x0048c491);
-            WriteMemory<byte>(0xeb, 0x00449e7a);
-            WriteMemory<byte>(0xeb, 0x00453ad1);
-            WriteMemory<int>(0x5beb01b0, 0x00403a10);
-            WriteMemory<int>(0x00, 0x0069dca0);
-            WriteMemory(std::array<byte, 3>{0xb0, 0x01, 0xc3}, 0x00403b30);
         }
         else
         {
-            WriteMemory<byte>(0x7e, 0x00454109);
             WriteMemory<byte>(0x7e, 0x0044a514);
             WriteMemory(std::array<byte, 3>{0x51, 0x53, 0x55}, 0x0042e440);
+            WriteMemory<byte>(0x7e, 0x0044a5af);
+            WriteMemory<byte>(0x7e, 0x00454109);
+            WriteMemory<byte>(0x7f, 0x00449e7a);
             WriteMemory<byte>(0x7f, 0x00449e9d);
+            WriteMemory<byte>(0x7f, 0x00453ad1);
+            WriteMemory<int>(0x6c8b5551, 0x00403a10);
+            WriteMemory(std::array<byte, 3>{0x8b, 0x80, 0x6c}, 0x00403b30);
+            WriteMemory<int>(0x28, 0x0069dca0);
             WriteMemory(std::array<byte, 3>{0x53, 0x8b, 0xd9}, 0x0048aad0);
             WriteMemory<byte>(0x7f, 0x0048a54c);
             WriteMemory<byte>(0x7f, 0x0048d32b);
             WriteMemory<byte>(0x7f, 0x0048c491);
-            WriteMemory<byte>(0x7f, 0x00449e7a);
-            WriteMemory<byte>(0x7f, 0x00453ad1);
-            WriteMemory<int>(0x6c8b5551, 0x00403a10);
-            WriteMemory<int>(0x28, 0x0069dca0);
-            WriteMemory(std::array<byte, 3>{0x8b, 0x80, 0x6c}, 0x00403b30);
         }
     }
 }
@@ -354,7 +384,7 @@ void PvZ::MixMode(int mode, int level)
     }
 }
 
-void PvZ::ShowHideGames(bool on)
+void PvZ::ShowHiddenGames(bool on)
 {
     if (GameOn())
     {
@@ -459,29 +489,15 @@ void PvZ::AutoCollect(bool on)
 
 void PvZ::ZombieNoFalling(bool on)
 {
-    if (GameOn()) // [0x53028a, 0x5302ca]
+    if (GameOn())
     {
         if (on)
         {
-            WriteMemory<byte>(0x70, 0x00530275);
-            std::array<byte, 65> arr;
-            arr.fill(0x90);
-            WriteMemory(arr, 0x0053028a);
+            WriteMemory(std::array<byte, 2>{0x90, 0xe9}, 0x0041d025);
         }
         else
         {
-            WriteMemory<byte>(0x75, 0x00530275);
-            std::array<byte, 65> arr;
-            arr = {0x6a, 0x03, 0x6a, 0x03, 0x56, 0x8d, 0x47, 0xec,
-                   0x50, 0xe8, 0x78, 0xc8, 0xed, 0xff, 0x6a, 0x03,
-                   0x6a, 0x03, 0x56, 0x8d, 0x4f, 0xe2, 0x51, 0x8b,
-                   0x4b, 0x04, 0xe8, 0x67, 0xc8, 0xed, 0xff, 0x8b,
-                   0x4b, 0x04, 0x6a, 0x03, 0x6a, 0x03, 0x56, 0x8d,
-                   0x57, 0xd8, 0x52, 0xe8, 0x56, 0xc8, 0xed, 0xff,
-                   0x8b, 0x4b, 0x04, 0x6a, 0x03, 0x6a, 0x03, 0x56,
-                   0x83, 0xc7, 0xce, 0x57, 0xe8, 0x45, 0xc8, 0xed,
-                   0xff};
-            WriteMemory(arr, 0x0053028a);
+            WriteMemory(std::array<byte, 2>{0x0f, 0x8f}, 0x0041d025);
         }
     }
 }
@@ -649,35 +665,38 @@ void PvZ::SetPlantStrength(Strength status)
         if (status == Strength::Invincible)
         {
             WriteMemory(std::array<byte, 3>{0x46, 0x40, 0x00}, 0x0052fcf1);
+            WriteMemory<byte>(0xeb, 0x0041cc2f);
+            WriteMemory<byte>(0xeb, 0x005276ea);
             WriteMemory(std::array<byte, 3>{0x90, 0x90, 0x90}, 0x0046cfeb);
             WriteMemory(std::array<byte, 3>{0x90, 0x90, 0x90}, 0x0046d7a6);
             WriteMemory<byte>(0xeb, 0x0052e93b);
-            WriteMemory<byte>(0xeb, 0x0041cc2f);
-            WriteMemory<byte>(0xeb, 0x005276ea);
             WriteMemory<byte>(0x70, 0x0045ee0a);
             WriteMemory<byte>(0x00, 0x0045ec66);
+            WriteMemory(std::array<byte, 3>{0xc2, 0x04, 0x00}, 0x00462b80);
         }
         else if (status == Strength::Weak)
         {
             WriteMemory(std::array<byte, 3>{0x66, 0x40, 0x00}, 0x0052fcf1);
+            WriteMemory<byte>(0x74, 0x0041cc2f);
+            WriteMemory<byte>(0x75, 0x005276ea);
             WriteMemory(std::array<byte, 3>{0x29, 0x40, 0x40}, 0x0046cfeb);
             WriteMemory(std::array<byte, 3>{0x29, 0x76, 0x40}, 0x0046d7a6);
             WriteMemory<byte>(0x74, 0x0052e93b);
-            WriteMemory<byte>(0x74, 0x0041cc2f);
-            WriteMemory<byte>(0x75, 0x005276ea);
-            WriteMemory<byte>(0x70, 0x0045ee0a);
-            WriteMemory<byte>(0xe0, 0x0045ec66);
+            WriteMemory<byte>(0xeb, 0x0045ee0a);
+            WriteMemory<byte>(0xce, 0x0045ec66);
+            WriteMemory(std::array<byte, 3>{0x53, 0x55, 0x8b}, 0x00462b80);
         }
         else // if (status == Strength::Normal)
         {
             WriteMemory(std::array<byte, 3>{0x46, 0x40, 0xfc}, 0x0052fcf1);
+            WriteMemory<byte>(0x74, 0x0041cc2f);
+            WriteMemory<byte>(0x75, 0x005276ea);
             WriteMemory(std::array<byte, 3>{0x29, 0x50, 0x40}, 0x0046cfeb);
             WriteMemory(std::array<byte, 3>{0x29, 0x4e, 0x40}, 0x0046d7a6);
             WriteMemory<byte>(0x74, 0x0052e93b);
-            WriteMemory<byte>(0x74, 0x0041cc2f);
-            WriteMemory<byte>(0x75, 0x005276ea);
             WriteMemory<byte>(0x75, 0x0045ee0a);
-            WriteMemory<byte>(0xe0, 0x0045ec66);
+            WriteMemory<byte>(0xce, 0x0045ec66);
+            WriteMemory(std::array<byte, 3>{0x53, 0x55, 0x8b}, 0x00462b80);
         }
     }
 }
@@ -687,11 +706,11 @@ void PvZ::LockPult(Bullet bullet)
     if (GameOn())
     {
         if (bullet == Bullet::Kernel)
-            WriteMemory<byte>(0xeb, 0x00464bd6);
+            WriteMemory<byte>(0xeb, 0x0045f1ec);
         else if (bullet == Bullet::Butter)
-            WriteMemory<byte>(0x70, 0x00464bd6);
+            WriteMemory<byte>(0x70, 0x0045f1ec);
         else // if (bullet == Bullet::Normal)
-            WriteMemory<byte>(0x75, 0x00464bd6);
+            WriteMemory<byte>(0x75, 0x0045f1ec);
     }
 }
 
@@ -904,27 +923,36 @@ void PvZ::SetZombieStrength(Strength status)
     {
         if (status == Strength::Weak)
         {
-            WriteMemory<byte>(0xc9, 0x00531045);
             WriteMemory<int>(0x9090ff2b, 0x0053130f);
+            WriteMemory<byte>(0xc9, 0x00531045);
             WriteMemory<int>(0xc28bd08b, 0x00530c9b);
             WriteMemory<byte>(0x80, 0x00532ba1);
             WriteMemory<byte>(0x74, 0x0046144a);
+            WriteMemory<byte>(0x01, 0x0052fa82);
+            WriteMemory(std::array<byte, 2>{0x74, 0x05}, 0x00466601);
+            WriteMemory<byte>(0x74, 0x00458836);
         }
         else if (status == Strength::Invincible)
         {
-            WriteMemory<byte>(0xc0, 0x00531045);
             WriteMemory<int>(0x90909090, 0x0053130f);
+            WriteMemory<byte>(0xc0, 0x00531045);
             WriteMemory<int>(0xd233c033, 0x00530c9b);
             WriteMemory<byte>(0x81, 0x00532ba1);
             WriteMemory<byte>(0xeb, 0x0046144a);
+            WriteMemory<byte>(0x00, 0x0052fa82);
+            WriteMemory(std::array<byte, 2>{0x90, 0x90}, 0x00466601);
+            WriteMemory<byte>(0xeb, 0x00458836);
         }
         else // if (status == Strength::Normal)
         {
-            WriteMemory<byte>(0xc8, 0x00531045);
             WriteMemory<int>(0x20247c2b, 0x0053130f);
+            WriteMemory<byte>(0xc8, 0x00531045);
             WriteMemory<int>(0xc28b027c, 0x00530c9b);
             WriteMemory<byte>(0x8d, 0x00532ba1);
             WriteMemory<byte>(0x74, 0x0046144a);
+            WriteMemory<byte>(0x01, 0x0052fa82);
+            WriteMemory(std::array<byte, 2>{0x74, 0x05}, 0x00466601);
+            WriteMemory<byte>(0x74, 0x00458836);
         }
     }
 }
@@ -1191,6 +1219,54 @@ void PvZ::UpdateZombiesPreview()
     WriteMemory<byte>(0x85, 0x0043a153);
 }
 
+std::array<uint32_t, 1000> PvZ::GetSpawnList()
+{
+    std::array<uint32_t, 1000> zl;
+    zl.fill(-1);
+
+    if (!GameOn())
+        return zl;
+    int ui = GameUI();
+    if (ui != 2 && ui != 3)
+        return zl;
+
+    zl = ReadMemory<uint32_t, 1000>(0x6a9ec0, 0x768, 0x6b4);
+
+#ifdef _DEBUG
+    std::cout << std::dec; // ffffffff -> -1
+    std::cout << std::endl;
+    for (size_t i = 0; i < 20; i++)
+    {
+        for (size_t j = 0; j < 50; j++)
+            std::cout << zl[i * 50 + j] << " ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+#endif
+
+    for (size_t i = 0; i < 20; i++)
+    {
+        // 每一波遇到 -1 之后忽略后面的出怪
+        // 所以就算读到了数据也改成 -1
+        bool ignore_rest = false;
+        for (size_t j = 0; j < 50; j++)
+        {
+            if (zl[i * 50 + j] == -1)
+            {
+                ignore_rest = true;
+                continue;
+            }
+            if (ignore_rest)
+            {
+                zl[i * 50 + j] = -1;
+            }
+        }
+    }
+
+    emit SpawnList(zl);
+    return zl;
+}
+
 void PvZ::InternalSpawn(std::array<bool, 33> zombies, bool original)
 {
     if (original)
@@ -1237,13 +1313,17 @@ void PvZ::InternalSpawn(std::array<bool, 33> zombies, bool original)
                 WriteMemory<bool>(true, zombies_type_offset + 26 * sizeof(bool));
             }
 
+            std::array<uint32_t, 1000> zombies_list;
+            std::fill(zombies_list.begin(), zombies_list.end(), -1);
+            WriteMemory(zombies_list, zombies_list_offset);
+
             UpdateZombiesList();
 
             // change replace zombie back after the zombies list was generated
             if (!has_normal_zombie)
             {
-                auto zombies_list = ReadMemory<uint32_t, 2000>(zombies_list_offset);
-                for (size_t i = 0; i < 2000; i++)
+                auto zombies_list = ReadMemory<uint32_t, 1000>(zombies_list_offset);
+                for (size_t i = 0; i < 1000; i++)
                 {
                     if (zombies_list[i] == 26)
                         WriteMemory<uint32_t>(replace_zombie, zombies_list_offset + i * sizeof(uint32_t));
@@ -1258,24 +1338,15 @@ void PvZ::InternalSpawn(std::array<bool, 33> zombies, bool original)
         }
     }
 
-    auto zombies_list = ReadMemory<uint32_t, 1000>(0x6a9ec0, 0x768, 0x6b4);
-    std::array<bool, 20> giga_waves = {false};
-    for (size_t i = 0; i < 20; i++)
-        for (size_t j = 0; j < 50; j++)
-            if (zombies_list[i * 50 + j] == 32)
-            {
-                giga_waves[i] = true;
-                break;
-            }
-    emit GigaWaves(giga_waves);
+    GetSpawnList();
 }
 
 void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit_flag, bool limit_yeti, bool limit_bungee, bool limit_giga, std::array<bool, 20> giga_waves)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
-        std::array<uint32_t, 2000> *zombies_list = new std::array<uint32_t, 2000>;
-        std::fill((*zombies_list).begin(), (*zombies_list).end(), 0);
+        std::array<uint32_t, 1000> *zombies_list = new std::array<uint32_t, 1000>;
+        std::fill((*zombies_list).begin(), (*zombies_list).end(), -1);
 
         bool has_flag = zombies[1];
         bool has_yeti = zombies[19];
@@ -1297,7 +1368,7 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
             std::mt19937 gen(seed);
 
             uint32_t type = 0;
-            for (size_t i = 0; i < 2000; i++)
+            for (size_t i = 0; i < 1000; i++)
             {
                 do
                 {
@@ -1321,8 +1392,8 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
                 (*zombies_list)[i] = type;
             }
 
-            std::vector<size_t> index_flag = {450, 950, 1450, 1950};
-            std::vector<size_t> index_bungee = {451, 452, 453, 454, 951, 952, 953, 954, 1451, 1452, 1453, 1454, 1951, 1952, 1953, 1954};
+            std::vector<size_t> index_flag = {450, 950};
+            std::vector<size_t> index_bungee = {451, 452, 453, 454, 951, 952, 953, 954};
 
             if (has_flag && limit_flag)
             {
@@ -1375,10 +1446,11 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
         }
 
         delete zombies_list;
+
+        GetSpawnList();
     }
 
 #ifdef _DEBUG
-
     auto zombies_list = ReadMemory<uint32_t, 1000>(0x6a9ec0, 0x768, 0x6b4);
     std::cout << std::dec;
 
@@ -1488,7 +1560,6 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
 
     if (has_yeti && limit_yeti)
         assert(zombies_type_count[19] == 1);
-
 #endif
 }
 
@@ -1722,15 +1793,24 @@ void PvZ::HideMenuButton(bool on)
 {
     if (GameOn())
     {
+        int ui = GameUI();
         if (on)
         {
-            WriteMemory<int>(900, 0x6a9ec0, 0x768, 0x148, 0x8);
-            WriteMemory<int>(-10, 0x6a9ec0, 0x768, 0x148, 0xc);
+            WriteMemory<bool>(true, 0x0043b9e0);
+            WriteMemory<bool>(true, 0x0043c39f);
+            if (ui == 2)
+                WriteMemory<bool>(true, 0x6a9ec0, 0x774, 0x9c, 0xf9);
+            else if (ui == 3)
+                WriteMemory<bool>(true, 0x6a9ec0, 0x768, 0x148, 0xf9);
         }
         else
         {
-            WriteMemory<int>(681, 0x6a9ec0, 0x768, 0x148, 0x8);
-            WriteMemory<int>(-10, 0x6a9ec0, 0x768, 0x148, 0xc);
+            WriteMemory<bool>(false, 0x0043b9e0);
+            WriteMemory<bool>(false, 0x0043c39f);
+            if (ui == 2)
+                WriteMemory<bool>(false, 0x6a9ec0, 0x774, 0x9c, 0xf9);
+            else if (ui == 3)
+                WriteMemory<bool>(false, 0x6a9ec0, 0x768, 0x148, 0xf9);
         }
     }
 }
@@ -1873,7 +1953,29 @@ void PvZ::SetScene(int scene)
         default:
             break;
         }
-        Sleep(10);
+
+        if (scene != 2 && scene != 3) // 泳池和雾夜仍然保留水波光
+        {
+            auto particle_systems_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x0);
+            auto particle_systems_count_max = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x4);
+
+            asm_init();
+            for (size_t i = 0; i < particle_systems_count_max; i++)
+            {
+                auto particle_systems_type = ReadMemory<int>(particle_systems_offset + 0x00 + 0x2c * i);
+                auto particle_systems_dead = ReadMemory<bool>(particle_systems_offset + 0x1c + 0x2c * i);
+                if (!particle_systems_dead && particle_systems_type == 34)
+                {
+                    uintptr_t addr = particle_systems_offset + 0x2c * i;
+                    asm_push(addr);
+                    asm_call(0x005160c0);
+                }
+            }
+            asm_ret();
+            asm_code_inject();
+
+            WriteMemory<int>(0, 0x6a9ec0, 0x768, 0x5620);
+        }
     }
 }
 
@@ -2179,23 +2281,23 @@ void PvZ::AutoLadder(bool imitater_pumpkin_only)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
-        auto grid_item_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x120);
-        auto grid_item_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x11c);
         bool has_ladder[6][9] = {{false}};
+        ClearItems(3); // Ladders
 
-        for (size_t i = 0; i < grid_item_count_max; i++)
-        {
-            auto grid_item_disappeared = ReadMemory<bool>(grid_item_offset + 0x20 + 0xec * i);
-            auto grid_item_type = ReadMemory<int>(grid_item_offset + 0x08 + 0xec * i); // 3 for Ladder
-            auto grid_item_row = ReadMemory<uint32_t>(grid_item_offset + 0x14 + 0xec * i);
-            auto grid_item_col = ReadMemory<uint32_t>(grid_item_offset + 0x10 + 0xec * i);
-            if (!grid_item_disappeared && grid_item_type == 3)
-                has_ladder[grid_item_row][grid_item_col] = true;
-        }
+        // auto grid_item_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x120);
+        // auto grid_item_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x11c);
+        // for (size_t i = 0; i < grid_item_count_max; i++)
+        // {
+        //     auto grid_item_disappeared = ReadMemory<bool>(grid_item_offset + 0x20 + 0xec * i);
+        //     auto grid_item_type = ReadMemory<int>(grid_item_offset + 0x08 + 0xec * i); // 3 for Ladder
+        //     auto grid_item_row = ReadMemory<uint32_t>(grid_item_offset + 0x14 + 0xec * i);
+        //     auto grid_item_col = ReadMemory<uint32_t>(grid_item_offset + 0x10 + 0xec * i);
+        //     if (!grid_item_disappeared && grid_item_type == 3)
+        //         has_ladder[grid_item_row][grid_item_col] = true;
+        // }
 
         auto plant_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0xb0);
         auto plant_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0xac);
-
         asm_init();
         for (size_t i = 0; i < plant_count_max; i++)
         {
@@ -2309,7 +2411,7 @@ void PvZ::ClearItems(int index)
         {
             auto grid_item_disappeared = ReadMemory<bool>(grid_item_offset + 0x20 + 0xec * i);
             auto grid_item_type = ReadMemory<int>(grid_item_offset + 0x8 + 0xec * i);
-            if (!grid_item_disappeared && (grid_item_type == index))
+            if (!grid_item_disappeared && grid_item_type == index)
             {
                 int addr = grid_item_offset + 0xec * i;
                 asm_mov_exx(Reg::ESI, addr);
@@ -2401,13 +2503,14 @@ void PvZ::SetQuickLineupMode(bool on)
             WriteMemory<byte>(0x80, 0x0046103b);
             // Plant Invincible
             WriteMemory(std::array<byte, 3>{0x46, 0x40, 0x00}, 0x0052fcf1);
+            WriteMemory<byte>(0xeb, 0x0041cc2f);
+            WriteMemory<byte>(0xeb, 0x005276ea);
             WriteMemory(std::array<byte, 3>{0x90, 0x90, 0x90}, 0x0046cfeb);
             WriteMemory(std::array<byte, 3>{0x90, 0x90, 0x90}, 0x0046d7a6);
             WriteMemory<byte>(0xeb, 0x0052e93b);
-            WriteMemory<byte>(0xeb, 0x0041cc2f);
-            WriteMemory<byte>(0xeb, 0x005276ea);
             WriteMemory<byte>(0x70, 0x0045ee0a);
             WriteMemory<byte>(0x00, 0x0045ec66);
+            WriteMemory(std::array<byte, 3>{0xc2, 0x04, 0x00}, 0x00462b80);
             // Stop Spawning
             WriteMemory<byte>(0xeb, 0x004265dc);
             // Ignore Sun
@@ -2434,13 +2537,14 @@ void PvZ::SetQuickLineupMode(bool on)
             WriteMemory<byte>(0x85, 0x0046103b);
             // Plant Invincible
             WriteMemory(std::array<byte, 3>{0x46, 0x40, 0xfc}, 0x0052fcf1);
+            WriteMemory<byte>(0x74, 0x0041cc2f);
+            WriteMemory<byte>(0x75, 0x005276ea);
             WriteMemory(std::array<byte, 3>{0x29, 0x50, 0x40}, 0x0046cfeb);
             WriteMemory(std::array<byte, 3>{0x29, 0x4e, 0x40}, 0x0046d7a6);
             WriteMemory<byte>(0x74, 0x0052e93b);
-            WriteMemory<byte>(0x74, 0x0041cc2f);
-            WriteMemory<byte>(0x75, 0x005276ea);
             WriteMemory<byte>(0x75, 0x0045ee0a);
-            WriteMemory<byte>(0xe0, 0x0045ec66);
+            WriteMemory<byte>(0xce, 0x0045ec66);
+            WriteMemory(std::array<byte, 3>{0x53, 0x55, 0x8b}, 0x00462b80);
             // Stop Spawning
             WriteMemory<byte>(0x74, 0x004265dc);
             // Ignore Sun
@@ -2464,53 +2568,85 @@ void PvZ::SetQuickLineupMode(bool on)
 
 void PvZ::QuickPass()
 {
-    if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    if (!GameOn())
+        return;
+    if (GameUI() != 3)
+        return;
+
+    Bot bot(this->hwnd);
+
+    if (true)
     {
-        if (GameUI() == 3)
+        int game_clock = ReadMemory<int>(0x6a9ec0, 0x768, 0x5568);
+        int time_to_wait = 75 - ((game_clock + 500) % 75);
+        if (ReadMemory<bool>(0x6a9ec0, 0x768, 0x164))
         {
-            asm_init();
-            asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
-            asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x768);
-            asm_call(0x0040c3e0);
-            asm_ret();
-            asm_code_inject();
+            if (time_to_wait != 0)
+            {
+                bot.PressSpace(); // 解除暂停
+                Sleep(time_to_wait * 10);
+                bot.PressSpace(); // 暂停
+            }
         }
+        else
+        {
+            Sleep(time_to_wait * 10);
+            bot.PressSpace(); // 暂停
+        }
+    }
 
-        auto zombie_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x94);
-        auto zombie_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x90);
-        for (size_t i = 0; i < zombie_count_max; i++)
-            if (!ReadMemory<bool>(zombie_offset + 0xec + i * 0x15c))   // not disappear
-                WriteMemory<int>(3, zombie_offset + 0x28 + i * 0x15c); // kill
+    Sleep(10);
+    asm_init();
+    asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
+    asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x768);
+    asm_call(0x0040c3e0);
+    asm_ret();
+    asm_code_inject();
 
+    Sleep(10);
+    auto zombie_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x94);
+    auto zombie_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x90);
+    for (size_t i = 0; i < zombie_count_max; i++)
+        if (!ReadMemory<bool>(zombie_offset + 0xec + i * 0x15c))   // not disappear
+            WriteMemory<int>(3, zombie_offset + 0x28 + i * 0x15c); // kill
+
+    if (true)
+    {
         Sleep(10);
-        WriteMemory<int>(8000, 0x6a9ec0, 0x768, 0x5560);
-        WriteMemory<int>(1008, 0x6a9ec0, 0x768, 0x160, 0x6c);
+        bot.PressSpace(); // 解除暂停
     }
+
+    Sleep(100);
+    WriteMemory<int>(8000, 0x6a9ec0, 0x768, 0x5560);
+    WriteMemory<int>(1009, 0x6a9ec0, 0x768, 0x160, 0x6c);
 }
 
-void PvZ::EatAllGraves()
+void PvZ::ClearAllGraves()
 {
-    if (GameOn() && (GameUI() == 2 || GameUI() == 3))
-    {
-        auto grid_item_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x120);
-        auto grid_item_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x11c);
+    // if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    // {
+    //     auto grid_item_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x120);
+    //     auto grid_item_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x11c);
 
-        asm_init();
-        for (size_t i = 0; i < grid_item_count_max; i++)
-        {
-            auto grid_item_disappeared = ReadMemory<bool>(grid_item_offset + 0x20 + 0xec * i);
-            auto grid_item_type = ReadMemory<int>(grid_item_offset + 0x08 + 0xec * i); // 1 for Grave
-            auto grid_item_row = ReadMemory<uint32_t>(grid_item_offset + 0x14 + 0xec * i);
-            auto grid_item_col = ReadMemory<uint32_t>(grid_item_offset + 0x10 + 0xec * i);
-            if (!grid_item_disappeared && grid_item_type == 1)
-                asm_plant(grid_item_row, grid_item_col, 11, false, false); // 11 for Grave Buster
-        }
-        asm_ret();
-        asm_code_inject();
-    }
+    //     asm_init();
+    //     for (size_t i = 0; i < grid_item_count_max; i++)
+    //     {
+    //         auto grid_item_disappeared = ReadMemory<bool>(grid_item_offset + 0x20 + 0xec * i);
+    //         auto grid_item_type = ReadMemory<int>(grid_item_offset + 0x08 + 0xec * i); // 1 for Grave
+    //         auto grid_item_row = ReadMemory<uint32_t>(grid_item_offset + 0x14 + 0xec * i);
+    //         auto grid_item_col = ReadMemory<uint32_t>(grid_item_offset + 0x10 + 0xec * i);
+    //         if (!grid_item_disappeared && grid_item_type == 1)
+    //             asm_plant(grid_item_row, grid_item_col, 11, false, false); // 11 for Grave Buster
+    //     }
+    //     asm_ret();
+    //     asm_code_inject();
+    // }
+
+    if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+        ClearItems(1);
 }
 
-void PvZ::LilyPadOnPool()
+void PvZ::LilyPadOnPool(int to_col)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
@@ -2529,14 +2665,14 @@ void PvZ::LilyPadOnPool()
         }
 
         asm_init();
-        uint32_t rows = GetRowCount();
-        for (size_t r = 0; r < rows; r++)
+        int rows = GetRowCount();
+        for (int r = 0; r < rows; r++)
         {
-            for (size_t c = 0; c < 9; c++)
+            for (int c = 0; c < 9; c++)
             {
                 auto block_type = ReadMemory<int>(0x6a9ec0, 0x768, 0x168 + 0x04 * r + 0x18 * c);
-                if (block_type == 3 && !has_plant[r][c]) // 3 for pool
-                    asm_plant(r, c, 16, false, false);   // 16 for Lily Pad
+                if (block_type == 3 && !has_plant[r][c] && c <= to_col - 1) // 3 for pool
+                    asm_plant(r, c, 16, false, false);                      // 16 for Lily Pad
             }
         }
         asm_ret();
@@ -2544,7 +2680,7 @@ void PvZ::LilyPadOnPool()
     }
 }
 
-void PvZ::FlowerPotOnRoof()
+void PvZ::FlowerPotOnRoof(int to_col)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
@@ -2568,7 +2704,7 @@ void PvZ::FlowerPotOnRoof()
             asm_init();
             for (int r = 0; r < 5; r++)
                 for (int c = 0; c < 9; c++)
-                    if (!has_plant[r][c])
+                    if (!has_plant[r][c] && c <= to_col - 1)
                         asm_plant(r, c, 33, false, false);
             asm_ret();
             asm_code_inject();
@@ -3576,10 +3712,8 @@ void PvZ::RunningInBackground(bool on)
     if (GameOn())
     {
         if (on)
-            // WriteMemory<byte>(0xc3, 0x0054ebef);
             WriteMemory<short>(0x00eb, 0x0054eba8);
         else
-            // WriteMemory<byte>(0x57, 0x0054ebef);
             WriteMemory<short>(0x2e74, 0x0054eba8);
     }
 }
@@ -3602,7 +3736,7 @@ void PvZ::OpenDataDir()
 
     if (dwMajorVersion >= 6)
     {
-        system("explorer.exe C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata");
+        ShellExecuteW(nullptr, L"open", L"C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata", nullptr, nullptr, SW_SHOWNORMAL);
     }
     else
     {
@@ -3614,39 +3748,6 @@ void PvZ::DebugMode(int mode)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
         WriteMemory<int>(mode, 0x6a9ec0, 0x768, 0x55f8);
-}
-
-void PvZ::UnpackPAK(QString src, QString dst)
-{
-    std::wstring src_file = src.toStdWString();
-    std::wstring dst_dir = dst.toStdWString();
-    bool success = Unpack(src_file, dst_dir);
-    if (success)
-    {
-        emit ShowMessageStatusBar(tr("Unpack pak Succeeded!"));
-    }
-    else
-    {
-        emit ShowMessageStatusBar(tr("Unpack pak Failed!"));
-    }
-    emit UnpackFinished();
-}
-
-void PvZ::PackPAK(QString src)
-{
-    std::wstring src_dir = src.toStdWString();
-    std::wstring dst_file_name = L"main_" + std::to_wstring(std::time(nullptr)) + L".pak";
-    std::wstring dst_file = src_dir + L"\\" + L".." + L"\\" + dst_file_name;
-    bool success = Pack(src_dir, dst_file);
-    if (success)
-    {
-        emit ShowMessageStatusBar(tr("Pack pak Succeeded! File name: \"%1\".").arg(QString::fromWCharArray(dst_file_name.c_str())));
-    }
-    else
-    {
-        emit ShowMessageStatusBar(tr("Pack pak Failed!"));
-    }
-    emit PackFinished();
 }
 
 // Status
@@ -3788,6 +3889,129 @@ void PvZ::LaunchAllCannon(bool random_fall, int x, int y)
         }
         asm_ret();
         asm_code_inject();
+    }
+}
+
+// Portal
+
+void PvZ::StartPortal(bool b)
+{
+    if (GameOn())
+    {
+        if (b)
+        {
+            if (GameUI() == 3)
+            {
+                bool has_portal = false;
+                int grid_item_offset = ReadMemory<int>(0x6a9ec0, 0x768, 0x11c);
+                int grid_item_count_max = ReadMemory<int>(0x6a9ec0, 0x768, 0x120);
+                for (int i = 0; i < grid_item_count_max; i++)
+                {
+                    bool grid_item_disappeared = ReadMemory<bool>(grid_item_offset + 0x20 + 0xec * i);
+                    int grid_item_type = ReadMemory<int>(grid_item_offset + 0x8 + 0xec * i);
+                    if (!grid_item_disappeared && (grid_item_type == 4 || grid_item_type == 5))
+                    {
+                        has_portal = true;
+                        break;
+                    }
+                }
+                if (!has_portal)
+                    SetPortal(0, 2, 1, 9, 3, 9, 4, 2);
+            }
+
+            WriteMemory<byte>(0x70, 0x00467665);
+            WriteMemory<byte>(0x70, 0x004248ce);
+            WriteMemory<byte>(0x70, 0x0041ffb4);
+        }
+        else
+        {
+            WriteMemory<byte>(0x75, 0x00467665);
+            WriteMemory<byte>(0x75, 0x004248ce);
+            WriteMemory<byte>(0x75, 0x0041ffb4);
+
+            if (GameUI() == 3)
+            {
+                asm_init();
+                int grid_item_offset = ReadMemory<int>(0x6a9ec0, 0x768, 0x11c);
+                int grid_item_count_max = ReadMemory<int>(0x6a9ec0, 0x768, 0x120);
+                for (int i = 0; i < grid_item_count_max; i++)
+                {
+                    bool grid_item_disappeared = ReadMemory<bool>(grid_item_offset + 0x20 + 0xec * i);
+                    int grid_item_type = ReadMemory<int>(grid_item_offset + 0x8 + 0xec * i);
+                    if (!grid_item_disappeared && (grid_item_type == 4 || grid_item_type == 5))
+                    {
+                        int addr = grid_item_offset + 0xec * i;
+                        asm_mov_exx(Reg::ESI, addr);
+                        asm_call(0x0044d000);
+                    }
+                }
+                asm_ret();
+                asm_code_inject();
+            }
+        }
+    }
+}
+
+void PvZ::LockPortal(bool b)
+{
+    if (GameOn())
+    {
+        if (b)
+            WriteMemory<byte>(0x00, 0x004276dd);
+        else
+            WriteMemory<byte>(0xff, 0x004276dd);
+    }
+}
+
+void PvZ::SetPortal(int b1r, int b1c, int b2r, int b2c, int w1r, int w1c, int w2r, int w2c)
+{
+    if (GameOn() && GameUI() == 3)
+    {
+        asm_init();
+        int grid_item_offset = ReadMemory<int>(0x6a9ec0, 0x768, 0x11c);
+        int grid_item_count_max = ReadMemory<int>(0x6a9ec0, 0x768, 0x120);
+        for (int i = 0; i < grid_item_count_max; i++)
+        {
+            bool grid_item_disappeared = ReadMemory<bool>(grid_item_offset + 0x20 + 0xec * i);
+            int grid_item_type = ReadMemory<int>(grid_item_offset + 0x8 + 0xec * i);
+            if (!grid_item_disappeared && (grid_item_type == 4 || grid_item_type == 5))
+            {
+                int addr = grid_item_offset + 0xec * i;
+                asm_mov_exx(Reg::ESI, addr);
+                asm_call(0x0044d000);
+            }
+        }
+        asm_ret();
+        asm_code_inject();
+
+        Sleep(10);
+        WriteMemory<int>(b1r, 0x00426fe9);
+        WriteMemory<int>(b1c, 0x00426fe2);
+        WriteMemory<int>(b2r, 0x00427014);
+        WriteMemory<int>(b2c, 0x0042700d);
+        WriteMemory<int>(w1r, 0x00427044);
+        WriteMemory<int>(w1c, 0x0042703d);
+        WriteMemory<int>(w2r, (unsigned int)extra_code_addr + 11);
+        WriteMemory<int>(w2c, (unsigned int)extra_code_addr + 4);
+
+        Sleep(10);
+        asm_init();
+        asm_mov_exx_dword_ptr(Reg::EDI, 0x6a9ec0);
+        asm_mov_exx_dword_ptr_exx_add(Reg::EDI, 0x768);
+        asm_mov_exx_dword_ptr_exx_add(Reg::EDI, 0x160);
+        asm_call(0x00426fc0);
+        asm_ret();
+        asm_code_inject();
+
+        Sleep(10);
+        WriteMemory<int>(0, 0x00426fe9);
+        WriteMemory<int>(2, 0x00426fe2);
+        WriteMemory<int>(1, 0x00427014);
+        WriteMemory<int>(9, 0x0042700d);
+        WriteMemory<int>(3, 0x00427044);
+        WriteMemory<int>(9, 0x0042703d);
+        WriteMemory<int>(4, (unsigned int)extra_code_addr + 11);
+        WriteMemory<int>(2, (unsigned int)extra_code_addr + 4);
     }
 }
 

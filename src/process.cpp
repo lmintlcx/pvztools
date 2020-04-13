@@ -33,6 +33,10 @@ bool Process::OpenByWindow(const wchar_t *class_name, const wchar_t *window_name
         handle = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
 
 #ifdef _DEBUG
+    // assert(PROCESS_ALL_ACCESS == 0x001F0FFF);
+#endif
+
+#ifdef _DEBUG
     std::cout << "OpenByWindow: ";
     std::wcout << (class_name == nullptr ? L"nullptr" : class_name) << L"  "
                << (window_name == nullptr ? L"nullptr" : window_name);

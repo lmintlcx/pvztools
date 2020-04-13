@@ -5,19 +5,25 @@ Plants vs. Zombies toolset.
 
 ## Screenshots
 
-![PvZ Tools](https://github.com/lmintlcx/PvZTools/raw/master/screenshots/preview.gif)
+![PvZ Tools](https://github.com/lmintlcx/pvztools/raw/master/screenshots/preview.gif)
 
 ## Download
 
-[Download](https://pvz.lmintlcx.com/getpvztools/)
+[Download](https://pvz.lmintlcx.com/tools/)
 
 Supported operating systems:
 
-- Windows XP / Vista / 7 / 8.1 / 10
+- Windows 7 SP1
+
+- Windows 8.1
+
+- Windows 10 v1507+
 
 Supported game version:
 
-- [1.0.0.1051](https://pvz.lmintlcx.com/getpvz/)
+- [1.0.0.1051](https://pvz.lmintlcx.com/pvz/)
+
+([PvZ Toolkit](https://github.com/lmintlcx/pvztoolkit/) is recommended if you're not using this particular version of game.)
 
 ## Build
 
@@ -27,9 +33,8 @@ Already tested and confirmed works with:
 
 | OpenSSL Library | Qt Framework | Windows SDK | Code Compiler | Executable Packer |
 | ------ | ------ | ------ | ------ | ------ |
-| 1.0.2t (MSVC 2015.3) | 5.6.3 (MSVC 2015.3) | v7.1A | MSVC 2017 15.9.16 | UPX 3.95w |
-| 1.1.1d (MSVC 2017 15.9.16) | 5.12.5 (MSVC 2017 15.9.16) | 10.0.17763.0 | Clang-LLVM 8.0.1 | - |
+| 1.1.1f | 5.14.2 | 10.0.17763.0 | MSVC 2017 15.9.21 | UPX 3.96w |
 
 ## Credit
 
-This project was originally based on PVZ Helper 1.8.7 by a4l8569882 and got a lot of help from kmtohoem.
+This project was originally based on [zhumxiang/PVZ_Helper](https://github.com/zhumxiang/PVZ_Helper) and got a lot of help from [Lazuplis-Mei](https://github.com/Lazuplis-Mei).

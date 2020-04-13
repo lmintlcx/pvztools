@@ -9,6 +9,7 @@
 #include <QMainWindow>
 
 #include "src/pvz.h"
+#include "src/pak.h"
 #include "src/pages.h"
 
 class QAction;
@@ -50,8 +51,10 @@ private:
   void SetScreenSize();
   void TranslateUI();
   void FindResult(Result);
+  void ShowSpawnCountPage();
   void ShowTargetMapPage();
   void ShowCannonLauncherPage();
+  void ShowPortalPage();
   void ShowDocumentPage();
 
 private:
@@ -61,6 +64,7 @@ private:
   QAction *exitAction;
 
   QAction *findGameAction;
+  QAction *gameTopMostAction;
   QAction *keepSelectedAction;
 
   QAction *levelPageAction;
@@ -77,7 +81,9 @@ private:
   QAction *othersPageAction;
   QAction *statusPageAction;
   QAction *targetMapPageAction;
+  QAction *spawnCountPageAction;
   QAction *cannonLauncherPageAction;
+  QAction *portalPageAction;
   QActionGroup *pageGroup;
 
   QAction *showSidebarAction;
@@ -116,7 +122,9 @@ private:
   //
 
   PvZ *pvz;
-  QThread *thread;
+  QThread *pvz_thread;
+  PAK *pak;
+  QThread *pak_thread;
 
   QWidget *mainWidget;
   QListWidget *listWidget;
@@ -135,8 +143,10 @@ private:
   EffectPage *effectPage;
   OthersPage *othersPage;
   StatusPage *statusPage;
+  SpawnCountPage *spawnCountPage;
   TargetMapPage *targetMapPage;
   CannonLauncherPage *cannonLauncherPage;
+  PortalPage *portalPage;
   DocumentPage *documentPage;
 
   QHBoxLayout *mainLayout;

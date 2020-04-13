@@ -51,7 +51,9 @@ MainWindow::MainWindow(QWidget *parent)
     // Worker Thread
 
     pvz = new PvZ();
-    thread = new QThread(this);
+    pvz_thread = new QThread(this);
+    pak = new PAK();
+    pak_thread = new QThread(this);
 
     // Central Widget
 
@@ -73,8 +75,10 @@ MainWindow::MainWindow(QWidget *parent)
     effectPage = new EffectPage(stackedWidget);
     othersPage = new OthersPage(stackedWidget);
     statusPage = new StatusPage(stackedWidget);
+    spawnCountPage = new SpawnCountPage;
     targetMapPage = new TargetMapPage;
     cannonLauncherPage = new CannonLauncherPage;
+    portalPage = new PortalPage;
     documentPage = new DocumentPage;
 
     stackedWidget->addWidget(levelPage);
@@ -123,7 +127,10 @@ MainWindow::MainWindow(QWidget *parent)
     pvztools_zh_CN->load(":/translations/pvztools_zh_CN.qm");
 
     SetLanguage();
-    setWindowTitle(PRODUCT_NAME " " VERSION_NAME);
+    if (TEST_VERSION)
+        setWindowTitle(PRODUCT_NAME " " VERSION_NAME " beta");
+    else
+        setWindowTitle(PRODUCT_NAME);
 
     // Default Page
 
@@ -170,8 +177,17 @@ MainWindow::MainWindow(QWidget *parent)
     connect(pvz, &PvZ::ShowMessageStatusBar,
             this, &MainWindow::ShowMessageStatusBar);
 
-    connect(thread, &QThread::finished,
+    connect(pak, &PAK::ShowMessageBox,
+            this, &MainWindow::ShowMessageBox);
+
+    connect(pak, &PAK::ShowMessageStatusBar,
+            this, &MainWindow::ShowMessageStatusBar);
+
+    connect(pvz_thread, &QThread::finished,
             pvz, &QObject::deleteLater);
+
+    connect(pak_thread, &QThread::finished,
+            pak, &QObject::deleteLater);
 
     connect(stackedWidget, &QStackedWidget::currentChanged,
             this, [=](int row) {
@@ -211,14 +227,18 @@ MainWindow::MainWindow(QWidget *parent)
         // TODO
     }
 
-    pvz->moveToThread(thread);
-    thread->start();
+    pvz->moveToThread(pvz_thread);
+    pvz_thread->start();
+    pak->moveToThread(pak_thread);
+    pak_thread->start();
 }
 
 MainWindow::~MainWindow()
 {
-    thread->quit();
-    thread->wait();
+    pvz_thread->quit();
+    pvz_thread->wait();
+    pak_thread->quit();
+    pak_thread->wait();
 
     WriteSettings();
 }
@@ -279,10 +299,14 @@ void MainWindow::CreateActions()
             });
 
     findGameAction = new QAction(this);
+    gameTopMostAction = new QAction(this);
     keepSelectedAction = new QAction(this);
 
     connect(findGameAction, &QAction::triggered,
             pvz, &PvZ::FindPvZ);
+
+    connect(gameTopMostAction, &QAction::triggered,
+            pvz, &PvZ::GameWindowTopMost);
 
     keepSelectedAction->setCheckable(true);
 
@@ -301,14 +325,22 @@ void MainWindow::CreateActions()
     effectPageAction = new QAction(this);
     othersPageAction = new QAction(this);
     statusPageAction = new QAction(this);
+    spawnCountPageAction = new QAction(this);
     targetMapPageAction = new QAction(this);
     cannonLauncherPageAction = new QAction(this);
+    portalPageAction = new QAction(this);
+
+    connect(spawnCountPageAction, &QAction::triggered,
+            this, &MainWindow::ShowSpawnCountPage);
 
     connect(targetMapPageAction, &QAction::triggered,
             this, &MainWindow::ShowTargetMapPage);
 
     connect(cannonLauncherPageAction, &QAction::triggered,
             this, &MainWindow::ShowCannonLauncherPage);
+
+    connect(portalPageAction, &QAction::triggered,
+            this, &MainWindow::ShowPortalPage);
 
     levelPageAction->setCheckable(true);
     resourcePageAction->setCheckable(true);
@@ -571,14 +603,17 @@ void MainWindow::CreateMenus()
 
     gameMenu = new QMenu(this);
     gameMenu->addAction(findGameAction);
+    gameMenu->addAction(gameTopMostAction);
     gameMenu->addSeparator();
     gameMenu->addAction(keepSelectedAction);
 
     pageMenu = new QMenu(this);
     pageMenu->addActions(pageGroup->actions());
     pageMenu->addSeparator();
+    pageMenu->addAction(spawnCountPageAction);
     pageMenu->addAction(targetMapPageAction);
     pageMenu->addAction(cannonLauncherPageAction);
+    pageMenu->addAction(portalPageAction);
 
     settingMenu = new QMenu(this);
     settingMenu->addAction(showSidebarAction);
@@ -657,8 +692,8 @@ void MainWindow::ConnectPages()
     connect(levelPage, &LevelPage::MixMode,
             pvz, &PvZ::MixMode);
 
-    connect(levelPage, &LevelPage::ShowHideGames,
-            pvz, &PvZ::ShowHideGames);
+    connect(levelPage, &LevelPage::ShowHiddenGames,
+            pvz, &PvZ::ShowHiddenGames);
 
     connect(levelPage, &LevelPage::LockIZE,
             pvz, &PvZ::LockIZE);
@@ -845,8 +880,11 @@ void MainWindow::ConnectPages()
     connect(pvz, &PvZ::RandomSeed,
             spawnPage, &SpawnPage::ShowRandomSeed);
 
-    connect(pvz, &PvZ::GigaWaves,
+    connect(pvz, &PvZ::SpawnList,
             spawnPage, &SpawnPage::ShowGigaWaves);
+
+    connect(spawnPage, &SpawnPage::ShowSpawnCountPage,
+            this, &MainWindow::ShowSpawnCountPage);
 
     // Slots
 
@@ -1025,8 +1063,8 @@ void MainWindow::ConnectPages()
     connect(lineupPage, &LineupPage::MixMode,
             pvz, &PvZ::MixMode);
 
-    connect(lineupPage, &LineupPage::EatAllGraves,
-            pvz, &PvZ::EatAllGraves);
+    connect(lineupPage, &LineupPage::ClearAllGraves,
+            pvz, &PvZ::ClearAllGraves);
 
     connect(lineupPage, &LineupPage::LilyPadOnPool,
             pvz, &PvZ::LilyPadOnPool);
@@ -1160,15 +1198,15 @@ void MainWindow::ConnectPages()
             pvz, &PvZ::DebugMode);
 
     connect(othersPage, &OthersPage::UnpackPAK,
-            pvz, &PvZ::UnpackPAK);
+            pak, &PAK::UnpackPAK);
 
     connect(othersPage, &OthersPage::PackPAK,
-            pvz, &PvZ::PackPAK);
+            pak, &PAK::PackPAK);
 
-    connect(pvz, &PvZ::UnpackFinished,
+    connect(pak, &PAK::UnpackFinished,
             othersPage, &OthersPage::UnpackFinished);
 
-    connect(pvz, &PvZ::PackFinished,
+    connect(pak, &PAK::PackFinished,
             othersPage, &OthersPage::PackFinished);
 
     connect(othersPage, &OthersPage::ShowTargetMapPage,
@@ -1177,6 +1215,9 @@ void MainWindow::ConnectPages()
     connect(othersPage, &OthersPage::ShowCannonLauncherPage,
             this, &MainWindow::ShowCannonLauncherPage);
 
+    connect(othersPage, &OthersPage::ShowPortalPage,
+            this, &MainWindow::ShowPortalPage);
+
     // Status
 
     connect(statusPage, &StatusPage::GetStatus,
@@ -1184,6 +1225,14 @@ void MainWindow::ConnectPages()
 
     connect(pvz, &PvZ::GameStatus,
             statusPage, &StatusPage::ShowStatus);
+
+    // SpawnCount
+
+    connect(spawnCountPage, &SpawnCountPage::GetSpawnList,
+            pvz, &PvZ::GetSpawnList);
+
+    connect(pvz, &PvZ::SpawnList,
+            spawnCountPage, &SpawnCountPage::UpdateSpawnCount);
 
     // Target Map
 
@@ -1215,6 +1264,17 @@ void MainWindow::ConnectPages()
 
     connect(pvz, &PvZ::Scene,
             cannonLauncherPage, &CannonLauncherPage::CalculateCoord);
+
+    // Portal
+
+    connect(portalPage, &PortalPage::StartPortal,
+            pvz, &PvZ::StartPortal);
+
+    connect(portalPage, &PortalPage::LockPortal,
+            pvz, &PvZ::LockPortal);
+
+    connect(portalPage, &PortalPage::SetPortal,
+            pvz, &PvZ::SetPortal);
 }
 
 void MainWindow::ReadSettings()
@@ -1397,8 +1457,10 @@ void MainWindow::SetLanguage()
     effectPage->TranslateUI();
     othersPage->TranslateUI();
     statusPage->TranslateUI();
+    spawnCountPage->TranslateUI();
     targetMapPage->TranslateUI();
     cannonLauncherPage->TranslateUI();
+    portalPage->TranslateUI();
     documentPage->TranslateUI();
 
     // Hack 2/2
@@ -1419,12 +1481,19 @@ void MainWindow::SetScreenSize()
         x = (580 + (sidebar_visible ? 80 : 0)) * scale_x * font_scale;
         y = (360 + (sidebar_visible ? -25 : 0)) * scale_y * font_scale;
         this->setFixedSize(x, y);
+        x = 660 * scale_x * font_scale;
+        y = 400 * scale_y * font_scale;
+        spawnCountPage->setFixedWidth(x);
+        spawnCountPage->setMinimumHeight(y);
         x = 925 * scale_x * font_scale;
         y = 240 * scale_y * font_scale;
         targetMapPage->setFixedSize(x, y);
         x = 365 * scale_x * font_scale;
         y = 150 * scale_y * font_scale;
         cannonLauncherPage->setFixedSize(x, y);
+        x = 360 * scale_x * font_scale;
+        y = 110 * scale_y * font_scale;
+        portalPage->setFixedSize(x, y);
         x = 525 * scale_x * font_scale;
         y = 420 * scale_y * font_scale;
         documentPage->setFixedSize(x, y);
@@ -1434,12 +1503,19 @@ void MainWindow::SetScreenSize()
         x = (840 + (sidebar_visible ? 90 : 0)) * scale_x * font_scale;
         y = (350 + (sidebar_visible ? -25 : 0)) * scale_y * font_scale;
         this->setFixedSize(x, y);
+        x = 780 * scale_x * font_scale;
+        y = 400 * scale_y * font_scale;
+        spawnCountPage->setFixedWidth(x);
+        spawnCountPage->setMinimumHeight(y);
         x = 1250 * scale_x * font_scale;
         y = 240 * scale_y * font_scale;
         targetMapPage->setFixedSize(x, y);
         x = 400 * scale_x * font_scale;
         y = 150 * scale_y * font_scale;
         cannonLauncherPage->setFixedSize(x, y);
+        x = 460 * scale_x * font_scale;
+        y = 110 * scale_y * font_scale;
+        portalPage->setFixedSize(x, y);
         x = 640 * scale_x * font_scale;
         y = 490 * scale_y * font_scale;
         documentPage->setFixedSize(x, y);
@@ -1460,6 +1536,7 @@ void MainWindow::TranslateUI()
     exitAction->setText(tr("Exit"));
 
     findGameAction->setText(tr("Find Game Again"));
+    gameTopMostAction->setText(tr("Game Window Top Most"));
     keepSelectedAction->setText(tr("Keep Selected Features"));
 
     levelPageAction->setText(List::Get().pageList[0]);
@@ -1475,13 +1552,15 @@ void MainWindow::TranslateUI()
     effectPageAction->setText(List::Get().pageList[10]);
     othersPageAction->setText(List::Get().pageList[11]);
     statusPageAction->setText(List::Get().pageList[12]);
+    spawnCountPageAction->setText(tr("Spawning Counting"));
     targetMapPageAction->setText(tr("Target Map Modify"));
     cannonLauncherPageAction->setText(tr("Cannon Launcher"));
+    portalPageAction->setText(tr("Portal"));
 
     showSidebarAction->setText(tr("Show Sidebar"));
     switchSpawnLayoutAction->setText(tr("Switch Spawn Layout"));
-    limitSpawnCountAction->setText(tr("Limit Spawn Count"));
-    saveSpawnAction->setText(tr("Save Selected Spawn"));
+    limitSpawnCountAction->setText(tr("Limit Spawn Species"));
+    saveSpawnAction->setText(tr("Save Selected Species"));
     muteAction->setText(tr("Mute"));
     fontAction->setText(tr("Font") + "...");
     restoreDefaultAction->setText(tr("Restore Default Setting"));
@@ -1512,7 +1591,7 @@ void MainWindow::FindResult(Result result)
 {
     if (result == Result::OK)
     {
-        ShowMessageStatusBar(tr("Game Found"));
+        ShowMessageStatusBar(tr("Game Found."));
 
         resourcePage->UpdateGameData();
         slotsPage->UpdateGameData();
@@ -1532,29 +1611,81 @@ void MainWindow::FindResult(Result result)
     }
     else if (result == Result::WrongVersion)
     {
-        ShowMessageStatusBar(tr("Unsupported Version"));
+        ShowMessageStatusBar(tr("Unsupported game version."));
         statusPage->StopTimer(true);
     }
     else if (result == Result::NotFound)
     {
-        ShowMessageStatusBar(tr("Game Not Found"));
+        ShowMessageStatusBar(tr("Game window not found."));
         statusPage->StopTimer(true);
+    }
+    else if (result == Result::OpenError)
+    {
+        ShowMessageStatusBar(tr("Open game process error."));
+        statusPage->StopTimer(true);
+    }
+}
+
+void MainWindow::ShowSpawnCountPage()
+{
+    if (spawnCountPage->isVisible())
+    {
+        spawnCountPage->hide();
+    }
+    else
+    {
+        spawnCountPage->show();
+        Sleep(20);
+        emit spawnCountPage->GetSpawnList();
     }
 }
 
 void MainWindow::ShowTargetMapPage()
 {
-    targetMapPage->show();
+    if (targetMapPage->isVisible())
+    {
+        targetMapPage->hide();
+    }
+    else
+    {
+        targetMapPage->show();
+    }
 }
 
 void MainWindow::ShowCannonLauncherPage()
 {
-    cannonLauncherPage->show();
+    if (cannonLauncherPage->isVisible())
+    {
+        cannonLauncherPage->hide();
+    }
+    else
+    {
+        cannonLauncherPage->show();
+    }
+}
+
+void MainWindow::ShowPortalPage()
+{
+    if (portalPage->isVisible())
+    {
+        portalPage->hide();
+    }
+    else
+    {
+        portalPage->show();
+    }
 }
 
 void MainWindow::ShowDocumentPage()
 {
-    documentPage->show();
+    if (documentPage->isVisible())
+    {
+        documentPage->hide();
+    }
+    else
+    {
+        documentPage->show();
+    }
 }
 
 void MainWindow::ActivateWindow()
