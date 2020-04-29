@@ -132,7 +132,7 @@ void Code::asm_code_inject(HANDLE handle)
         return;
     }
 
-    DWORD wait_status = WaitForSingleObject(thread, INFINITE);
+    [[maybe_unused]] DWORD wait_status = WaitForSingleObject(thread, INFINITE);
     CloseHandle(thread);
     VirtualFreeEx(handle, addr, 0, MEM_RELEASE);
 

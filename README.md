@@ -33,7 +33,7 @@ Already tested and confirmed works with:
 
 | OpenSSL Library | Qt Framework | Windows SDK | Code Compiler | Executable Packer |
 | ------ | ------ | ------ | ------ | ------ |
-| 1.1.1f | 5.14.2 | 10.0.17763.0 | MSVC 2017 15.9.21 | UPX 3.96w |
+| 1.1.1g | 5.14.2 | 10.0.17763.0 | MSVC 2017 15.9.22 | UPX 3.96w |
 
 ## Credit
 
