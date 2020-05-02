@@ -390,11 +390,13 @@ void PvZ::ShowHiddenGames(bool on)
     {
         if (on)
         {
-            WriteMemory<byte>(0x38, 0x0042df5d);
+            WriteMemory(std::array<byte, 3>{0x38, 0x59, 0x54}, 0x0042df5d);
+            // WriteMemory<byte>(0x38, 0x0042df5d);
         }
         else
         {
-            WriteMemory<byte>(0x88, 0x0042df5d);
+            WriteMemory(std::array<byte, 3>{0x88, 0x59, 0x54}, 0x0042df5d);
+            // WriteMemory<byte>(0x88, 0x0042df5d);
         }
     }
 }
