@@ -8,8 +8,8 @@ set UPX_DIR=C:\tools\UPX
 if not exist %QT_DIR% exit
 if not exist %SRC_DIR% exit
 
-if exist %BUILD_DIR%\.. cd /d %BUILD_DIR%\..
-if exist %BUILD_DIR% rd /q /s %BUILD_DIR%
+REM if exist %BUILD_DIR%\.. cd /d %BUILD_DIR%\..
+REM if exist %BUILD_DIR% rd /q /s %BUILD_DIR%
 if not exist %BUILD_DIR% md %BUILD_DIR%
 cd /d %BUILD_DIR%
 

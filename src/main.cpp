@@ -49,16 +49,7 @@ static_assert(__clang_major__ >= 6);
 using Pt::Application;
 using Pt::MainWindow;
 
-// // Qt 5.6
-// #ifdef QT_STATIC
-// #include <QtPlugin>
-// Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin) // 必须
-// Q_IMPORT_PLUGIN(QICOPlugin)                // 非必须
-// Q_IMPORT_PLUGIN(QGenericEnginePlugin)      // 非必须
-// Q_IMPORT_PLUGIN(QNativeWifiEnginePlugin)   // 非必须
-// #endif
 
-// Qt 5.14
 #ifdef QT_STATIC
 #include <QtPlugin>
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin) // 必须

@@ -554,17 +554,21 @@ void MainWindow::CreateActions()
                     msvc_version = "2019";
                 else
                     ; // TODO
-                compiler = QString("MSVC") + " " + msvc_version + " " + QString::number(_MSC_VER);
+                compiler = QString("Visual Studio") + " " + msvc_version + " " + QString::number(_MSC_VER);
 #endif
 #ifdef __MINGW32__
-                compiler = QString("GCC") + " " + QString::number(__GNUC__) + "." + QString::number(__GNUC_MINOR__) + "." + QString::number(__GNUC_PATCHLEVEL__);
+                compiler = QString("MinGW-w64/GCC") + " " + QString::number(__GNUC__) + "." + QString::number(__GNUC_MINOR__) + "." + QString::number(__GNUC_PATCHLEVEL__);
 #endif
 #ifdef __clang__
-                compiler = QString("Clang") + " " + QString::number(__clang_major__) + "." + QString::number(__clang_minor__) + "." + QString::number(__clang_patchlevel__);
+                compiler = QString("LLVM/Clang") + " " + QString::number(__clang_major__) + "." + QString::number(__clang_minor__) + "." + QString::number(__clang_patchlevel__);
 #endif
 
                 QString qt_version = QString("Qt") + " " + QT_VERSION_STR;
-                QString openssl_version = QString("OpenSSL") + " " + QSslSocket::sslLibraryBuildVersionString().split(" ")[1];
+                QString ssl_version;
+                if (QSslSocket::sslLibraryBuildVersionString().contains("OpenSSL"))
+                    ssl_version = QString("OpenSSL") + " " + QSslSocket::sslLibraryBuildVersionString().split(" ")[1];
+                else
+                    ssl_version = QString("Schannel") + " " + QSslSocket::sslLibraryBuildVersionString();
 
                 QString copyright = QString("") + "©" + " " + (build_date.left(4) == QString("2018") ? QString("2018") : QString("2018") + "-" + build_date.left(4)) + " " + "lmintlcx";
 
@@ -572,7 +576,7 @@ void MainWindow::CreateActions()
                                + tr("Version") + ":" + "  " + VERSION_NAME_FULL + "<br>"                         //
                                + tr("Date") + ":" + "  " + build_date + "  " + build_time + "<br>"               //
                                + tr("Toolchain") + ":" + "  " + compiler + "<br>"                                //
-                               + qt_version + " / " + openssl_version + "<br>"                                   //
+                               + qt_version + " + " + ssl_version + "<br>"                                       //
                                + tr("Copyright") + ":" + "  " + copyright + "<br>"                               //
                                + tr("Credit") + ":" + "  " + "a418569882" + "  " + "kmtohoem" + "<br>" + "</p>"; //
 

@@ -33,7 +33,7 @@ bool Process::OpenByWindow(const wchar_t *class_name, const wchar_t *window_name
         handle = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
 
 #ifdef _DEBUG
-    // assert(PROCESS_ALL_ACCESS == 0x001F0FFF);
+    assert(PROCESS_ALL_ACCESS == 0x001FFFFF);
 #endif
 
 #ifdef _DEBUG

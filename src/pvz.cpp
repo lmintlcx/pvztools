@@ -12,8 +12,6 @@
 #include <chrono>
 #include <cassert>
 
-#include <Windows.h>
-
 #include "src/pvz.h"
 #include "src/bot.h"
 
@@ -1253,7 +1251,7 @@ std::array<uint32_t, 1000> PvZ::GetSpawnList()
         bool ignore_rest = false;
         for (size_t j = 0; j < 50; j++)
         {
-            if (zl[i * 50 + j] == -1)
+            if (zl[i * 50 + j] == 0xFFFFFFFF)  // -1
             {
                 ignore_rest = true;
                 continue;
@@ -3733,17 +3731,7 @@ void PvZ::DisablePause(bool on)
 
 void PvZ::OpenDataDir()
 {
-    DWORD dwVersion = GetVersion();
-    DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-
-    if (dwMajorVersion >= 6)
-    {
-        ShellExecuteW(nullptr, L"open", L"C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata", nullptr, nullptr, SW_SHOWNORMAL);
-    }
-    else
-    {
-        emit ShowMessageBox(tr("The user data file of XP system is located in the \"userdata\" folder with game executable."));
-    }
+    ShellExecuteW(nullptr, L"open", L"C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata", nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 void PvZ::DebugMode(int mode)

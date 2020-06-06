@@ -29,6 +29,7 @@ class QSlider;
 class QHBoxLayout;
 class QGridLayout;
 class QTableWidget;
+class QMenu;
 
 namespace Pt
 {

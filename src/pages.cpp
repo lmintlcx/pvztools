@@ -2929,7 +2929,7 @@ void LineupPage::RefreshLineupString()
         };
         return GetWeight(s1) < GetWeight(s2);
     };
-    qSort(lineup_stringlist.begin(), lineup_stringlist.end(), LessThan);
+    std::sort(lineup_stringlist.begin(), lineup_stringlist.end(), LessThan);
     // qDebug() << lineup_stringlist;
 
     endlessBuildGroupList.clear();
@@ -4667,7 +4667,7 @@ void SpawnCountPage::UpdateSpawnCount(std::array<uint32_t, 1000> zombies_list)
                 color = QColor(255 - f, 255, 255 - f);
             }
             table->setItem(r, c, new QTableWidgetItem(QString::number(value)));
-            table->item(r, c)->setBackgroundColor(color);
+            table->item(r, c)->setBackground(color);
         }
     }
 

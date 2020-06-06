@@ -169,7 +169,7 @@ public:
   void UpdateZombiesType();
   void UpdateZombiesList();
   void UpdateZombiesPreview();
-  std::array<uint32_t, 1000> PvZ::GetSpawnList();
+  std::array<uint32_t, 1000> GetSpawnList();
   void InternalSpawn(std::array<bool, 33>, bool);
   void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>);
   int GetRandomSeed();

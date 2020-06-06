@@ -2161,227 +2161,227 @@
         <translation>连接到更新服务器时出错。</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="572"/>
+        <location filename="../src/window.cpp" line="576"/>
         <source>Version</source>
         <translation>版本号</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="573"/>
+        <location filename="../src/window.cpp" line="577"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="574"/>
+        <location filename="../src/window.cpp" line="578"/>
         <source>Toolchain</source>
         <translation>工具链</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="576"/>
+        <location filename="../src/window.cpp" line="580"/>
         <source>Copyright</source>
         <translation>版权所有</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="577"/>
+        <location filename="../src/window.cpp" line="581"/>
         <source>Credit</source>
         <translation>鸣谢</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="580"/>
+        <location filename="../src/window.cpp" line="584"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="582"/>
+        <location filename="../src/window.cpp" line="586"/>
         <source>&lt;h1&gt;PvZ Tools&lt;/h1&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1533"/>
+        <location filename="../src/window.cpp" line="1537"/>
         <source>Open File</source>
         <translation>打开文件</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1534"/>
+        <location filename="../src/window.cpp" line="1538"/>
         <source>Open Folder</source>
         <translation>打开目录</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1535"/>
+        <location filename="../src/window.cpp" line="1539"/>
         <source>Restart</source>
         <translation>重启</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1536"/>
+        <location filename="../src/window.cpp" line="1540"/>
         <source>Exit</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1538"/>
+        <location filename="../src/window.cpp" line="1542"/>
         <source>Find Game Again</source>
         <translation>重新查找游戏</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1539"/>
+        <location filename="../src/window.cpp" line="1543"/>
         <source>Game Window Top Most</source>
         <translation>游戏窗口置顶</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1540"/>
+        <location filename="../src/window.cpp" line="1544"/>
         <source>Keep Selected Features</source>
         <translation>维持已选功能</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1555"/>
+        <location filename="../src/window.cpp" line="1559"/>
         <source>Spawning Counting</source>
         <translation>出怪数量统计</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1556"/>
+        <location filename="../src/window.cpp" line="1560"/>
         <source>Target Map Modify</source>
         <translation>目标地图修改</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1557"/>
+        <location filename="../src/window.cpp" line="1561"/>
         <source>Cannon Launcher</source>
         <translation>加农炮发射器</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1558"/>
+        <location filename="../src/window.cpp" line="1562"/>
         <source>Portal</source>
         <translation>传送门</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1560"/>
+        <location filename="../src/window.cpp" line="1564"/>
         <source>Show Sidebar</source>
         <translation>显示侧边栏</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1561"/>
+        <location filename="../src/window.cpp" line="1565"/>
         <source>Switch Spawn Layout</source>
         <translation>小王子出怪器布局</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1562"/>
+        <location filename="../src/window.cpp" line="1566"/>
         <source>Limit Spawn Species</source>
         <translation>限制出怪种类数</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1563"/>
+        <location filename="../src/window.cpp" line="1567"/>
         <source>Save Selected Species</source>
         <translation>保存已选出怪</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1564"/>
+        <location filename="../src/window.cpp" line="1568"/>
         <source>Mute</source>
         <translation>静音</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1565"/>
+        <location filename="../src/window.cpp" line="1569"/>
         <source>Font</source>
         <translation>字体</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1566"/>
+        <location filename="../src/window.cpp" line="1570"/>
         <source>Restore Default Setting</source>
         <translation>恢复默认设置</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1571"/>
+        <location filename="../src/window.cpp" line="1575"/>
         <source>Help Document</source>
         <translation>帮助文档</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1572"/>
+        <location filename="../src/window.cpp" line="1576"/>
         <source>Video Demo</source>
         <translation>视频演示</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1573"/>
+        <location filename="../src/window.cpp" line="1577"/>
         <source>Visit Website</source>
         <translation>访问网站</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1574"/>
+        <location filename="../src/window.cpp" line="1578"/>
         <source>Send Feedback</source>
         <translation>发送反馈</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1575"/>
+        <location filename="../src/window.cpp" line="1579"/>
         <source>Change Log</source>
         <translation>更新日志</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1576"/>
+        <location filename="../src/window.cpp" line="1580"/>
         <source>Check Update</source>
         <translation>检查更新</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1577"/>
+        <location filename="../src/window.cpp" line="1581"/>
         <source>About PvZ Tools</source>
         <translation>关于 PvZ Tools</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1578"/>
+        <location filename="../src/window.cpp" line="1582"/>
         <source>About Qt</source>
         <translation>关于 Qt</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1580"/>
+        <location filename="../src/window.cpp" line="1584"/>
         <source>&amp;File</source>
         <translation>文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1581"/>
+        <location filename="../src/window.cpp" line="1585"/>
         <source>&amp;Game</source>
         <translation>游戏(&amp;G)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1582"/>
+        <location filename="../src/window.cpp" line="1586"/>
         <source>&amp;Page</source>
         <translation>页面(&amp;P)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1583"/>
+        <location filename="../src/window.cpp" line="1587"/>
         <source>&amp;Setting</source>
         <translation>设置(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1584"/>
+        <location filename="../src/window.cpp" line="1588"/>
         <source>&amp;Language</source>
         <translation>语言(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1585"/>
+        <location filename="../src/window.cpp" line="1589"/>
         <source>&amp;Help</source>
         <translation>帮助(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1587"/>
+        <location filename="../src/window.cpp" line="1591"/>
         <source>Page</source>
         <translation>页面</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1594"/>
+        <location filename="../src/window.cpp" line="1598"/>
         <source>Game Found.</source>
         <translation>已找到游戏。</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1614"/>
+        <location filename="../src/window.cpp" line="1618"/>
         <source>Unsupported game version.</source>
         <translation>不支持的游戏版本。</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1619"/>
+        <location filename="../src/window.cpp" line="1623"/>
         <source>Game window not found.</source>
         <translation>未找到游戏窗口。</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1624"/>
+        <location filename="../src/window.cpp" line="1628"/>
         <source>Open game process error.</source>
         <translation>打开游戏进程出错。</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1700"/>
+        <location filename="../src/window.cpp" line="1704"/>
         <source>Message</source>
         <translation>信息</translation>
     </message>
@@ -2650,12 +2650,12 @@
 <context>
     <name>Pt::PvZ</name>
     <message>
-        <location filename="../src/pvz.cpp" line="270"/>
+        <location filename="../src/pvz.cpp" line="268"/>
         <source>Already unlocked golden sunflower trophy.</source>
         <translation>已经解锁金向日葵奖杯。</translation>
     </message>
     <message>
-        <location filename="../src/pvz.cpp" line="316"/>
+        <location filename="../src/pvz.cpp" line="314"/>
         <source>Already get all shop items.</source>
         <translation>已经得到所有商店物品。</translation>
     </message>
@@ -2663,11 +2663,6 @@
         <location filename="../src/pvz.cpp" line="2784"/>
         <source>The target lineup scene is inconsistent with the current scene.</source>
         <translation>目标阵型场地和当前场地不一致。</translation>
-    </message>
-    <message>
-        <location filename="../src/pvz.cpp" line="3743"/>
-        <source>The user data file of XP system is located in the &quot;userdata&quot; folder with game executable.</source>
-        <translation>XP 系统上的存档文件位于游戏可执行文件同目录下的“userdata”文件夹。</translation>
     </message>
 </context>
 <context>
