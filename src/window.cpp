@@ -251,22 +251,22 @@ MainWindow::~MainWindow()
 //         QWidget::changeEvent(event);
 // }
 
-std::tuple<double, double> MainWindow::GetDpiScale()
-{
-    double scale_x = 1.0;
-    double scale_y = 1.0;
-    HDC screen = GetDC(nullptr);
-    if (screen != nullptr)
-    {
-        int dpi_x = GetDeviceCaps(screen, LOGPIXELSX);
-        int dpi_y = GetDeviceCaps(screen, LOGPIXELSY);
-        ReleaseDC(nullptr, screen);
-        const double default_dpi = 96.0;
-        scale_x = dpi_x / default_dpi;
-        scale_y = dpi_y / default_dpi;
-    }
-    return {scale_x, scale_y};
-}
+// std::tuple<double, double> MainWindow::GetDpiScale()
+// {
+//     double scale_x = 1.0;
+//     double scale_y = 1.0;
+//     HDC screen = GetDC(nullptr);
+//     if (screen != nullptr)
+//     {
+//         int dpi_x = GetDeviceCaps(screen, LOGPIXELSX);
+//         int dpi_y = GetDeviceCaps(screen, LOGPIXELSY);
+//         ReleaseDC(nullptr, screen);
+//         const double default_dpi = 96.0;
+//         scale_x = dpi_x / default_dpi;
+//         scale_y = dpi_y / default_dpi;
+//     }
+//     return {scale_x, scale_y};
+// }
 
 void MainWindow::CreateActions()
 {
@@ -1476,7 +1476,8 @@ void MainWindow::SetLanguage()
 void MainWindow::SetScreenSize()
 {
     int x, y;
-    auto [scale_x, scale_y] = GetDpiScale();
+    // auto [scale_x, scale_y] = GetDpiScale();
+    auto [scale_x, scale_y] = std::tuple<double, double>{1.0, 1.0};
     double font_scale = qApp->font().pointSize() / 9.0;
     bool sidebar_visible = showSidebarAction->isChecked();
 

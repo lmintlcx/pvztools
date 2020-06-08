@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
     // 开启高 DPI 缩放支持
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 
     Application app(argc, argv);
     if (app.isRunning())
