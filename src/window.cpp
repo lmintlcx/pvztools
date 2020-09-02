@@ -127,10 +127,10 @@ MainWindow::MainWindow(QWidget *parent)
     pvztools_zh_CN->load(":/translations/pvztools_zh_CN.qm");
 
     SetLanguage();
-    if (TEST_VERSION)
-        setWindowTitle(PRODUCT_NAME " " VERSION_NAME " beta");
+    if (TEST_VERSION)  // TODO
+        setWindowTitle(tr("PvZ Tools") + " " + VERSION_NAME + " " + "beta");
     else
-        setWindowTitle(PRODUCT_NAME);
+        setWindowTitle(tr("PvZ Tools"));
 
     // Default Page
 

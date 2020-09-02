@@ -140,5 +140,5 @@
         "qjsonarray": "cpp",
         "qtplugin": "cpp"
     },
-    "python.pythonPath": "C:\\Python37\\python.exe"
+    "python.pythonPath": "C:\\Python37-32\\python.exe"
 }

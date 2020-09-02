@@ -28,137 +28,137 @@ namespace Pt
 
 class MainWindow : public QMainWindow
 {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  MainWindow(QWidget *parent = nullptr);
-  ~MainWindow();
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
-  // protected:
-  //   void changeEvent(QEvent *);
-
-private:
-  std::tuple<double, double> GetDpiScale();
-  void CreateActions();
-  void CreateMenus();
-  void CreateToolBars();
-  void CreateStatusBar();
-  void ConnectPages();
-  void ReadSettings();
-  void WriteSettings();
-  void SetNavBar(bool);
-  void SetLanguage();
-  void SetScreenSize();
-  void TranslateUI();
-  void FindResult(Result);
-  void ShowSpawnCountPage();
-  void ShowTargetMapPage();
-  void ShowCannonLauncherPage();
-  void ShowPortalPage();
-  void ShowDocumentPage();
+    // protected:
+    //   void changeEvent(QEvent *);
 
 private:
-  QAction *openFileAction;
-  QAction *openFolderAction;
-  QAction *restartAction;
-  QAction *exitAction;
+    std::tuple<double, double> GetDpiScale();
+    void CreateActions();
+    void CreateMenus();
+    void CreateToolBars();
+    void CreateStatusBar();
+    void ConnectPages();
+    void ReadSettings();
+    void WriteSettings();
+    void SetNavBar(bool);
+    void SetLanguage();
+    void SetScreenSize();
+    void TranslateUI();
+    void FindResult(Result);
+    void ShowSpawnCountPage();
+    void ShowTargetMapPage();
+    void ShowCannonLauncherPage();
+    void ShowPortalPage();
+    void ShowDocumentPage();
 
-  QAction *findGameAction;
-  QAction *gameTopMostAction;
-  QAction *keepSelectedAction;
+private:
+    QAction *openFileAction;
+    QAction *openFolderAction;
+    QAction *restartAction;
+    QAction *exitAction;
 
-  QAction *levelPageAction;
-  QAction *resourcePageAction;
-  QAction *plantsPageAction;
-  QAction *zombiesPageAction;
-  QAction *spawnPageAction;
-  QAction *slotsPageAction;
-  QAction *scenePageAction;
-  QAction *lineupPageAction;
-  QAction *gardenPageAction;
-  QAction *vasePageAction;
-  QAction *effectPageAction;
-  QAction *othersPageAction;
-  QAction *statusPageAction;
-  QAction *targetMapPageAction;
-  QAction *spawnCountPageAction;
-  QAction *cannonLauncherPageAction;
-  QAction *portalPageAction;
-  QActionGroup *pageGroup;
+    QAction *findGameAction;
+    QAction *gameTopMostAction;
+    QAction *keepSelectedAction;
 
-  QAction *showSidebarAction;
-  QAction *switchSpawnLayoutAction;
-  QAction *limitSpawnCountAction;
-  QAction *saveSpawnAction;
-  QAction *muteAction;
-  QAction *fontAction;
-  QAction *restoreDefaultAction;
+    QAction *levelPageAction;
+    QAction *resourcePageAction;
+    QAction *plantsPageAction;
+    QAction *zombiesPageAction;
+    QAction *spawnPageAction;
+    QAction *slotsPageAction;
+    QAction *scenePageAction;
+    QAction *lineupPageAction;
+    QAction *gardenPageAction;
+    QAction *vasePageAction;
+    QAction *effectPageAction;
+    QAction *othersPageAction;
+    QAction *statusPageAction;
+    QAction *targetMapPageAction;
+    QAction *spawnCountPageAction;
+    QAction *cannonLauncherPageAction;
+    QAction *portalPageAction;
+    QActionGroup *pageGroup;
 
-  QAction *languageChineseAction;
-  QAction *languageEnglishAction;
-  QActionGroup *languageGroup;
+    QAction *showSidebarAction;
+    QAction *switchSpawnLayoutAction;
+    QAction *limitSpawnCountAction;
+    QAction *saveSpawnAction;
+    QAction *muteAction;
+    QAction *fontAction;
+    QAction *restoreDefaultAction;
 
-  QAction *helpDocumentAction;
-  QAction *videoDemoAction;
-  QAction *visitWebsiteAction;
-  QAction *sendFeedbackAction;
-  QAction *changeLogAction;
-  QAction *checkUpdateAction;
-  QAction *aboutAction;
-  QAction *aboutQtAction;
+    QAction *languageChineseAction;
+    QAction *languageEnglishAction;
+    QActionGroup *languageGroup;
 
-  QMenu *fileMenu;
-  QMenu *gameMenu;
-  QMenu *pageMenu;
-  QMenu *settingMenu;
-  QMenu *languageMenu;
-  QMenu *helpMenu;
+    QAction *helpDocumentAction;
+    QAction *videoDemoAction;
+    QAction *visitWebsiteAction;
+    QAction *sendFeedbackAction;
+    QAction *changeLogAction;
+    QAction *checkUpdateAction;
+    QAction *aboutAction;
+    QAction *aboutQtAction;
 
-  QToolBar *pageToolBar;
+    QMenu *fileMenu;
+    QMenu *gameMenu;
+    QMenu *pageMenu;
+    QMenu *settingMenu;
+    QMenu *languageMenu;
+    QMenu *helpMenu;
 
-  QStatusBar *theStatuBar;
-  QLabel *permanentMessage;
+    QToolBar *pageToolBar;
 
-  //
+    QStatusBar *theStatuBar;
+    QLabel *permanentMessage;
 
-  PvZ *pvz;
-  QThread *pvz_thread;
-  PAK *pak;
-  QThread *pak_thread;
+    //
 
-  QWidget *mainWidget;
-  QListWidget *listWidget;
-  QStackedWidget *stackedWidget;
+    PvZ *pvz;
+    QThread *pvz_thread;
+    PAK *pak;
+    QThread *pak_thread;
 
-  LevelPage *levelPage;
-  ResourcePage *resourcePage;
-  PlantsPage *plantsPage;
-  ZombiesPage *zombiesPage;
-  SpawnPage *spawnPage;
-  SlotsPage *slotsPage;
-  ScenePage *scenePage;
-  LineupPage *lineupPage;
-  GardenPage *gardenPage;
-  VasePage *vasePage;
-  EffectPage *effectPage;
-  OthersPage *othersPage;
-  StatusPage *statusPage;
-  SpawnCountPage *spawnCountPage;
-  TargetMapPage *targetMapPage;
-  CannonLauncherPage *cannonLauncherPage;
-  PortalPage *portalPage;
-  DocumentPage *documentPage;
+    QWidget *mainWidget;
+    QListWidget *listWidget;
+    QStackedWidget *stackedWidget;
 
-  QHBoxLayout *mainLayout;
+    LevelPage *levelPage;
+    ResourcePage *resourcePage;
+    PlantsPage *plantsPage;
+    ZombiesPage *zombiesPage;
+    SpawnPage *spawnPage;
+    SlotsPage *slotsPage;
+    ScenePage *scenePage;
+    LineupPage *lineupPage;
+    GardenPage *gardenPage;
+    VasePage *vasePage;
+    EffectPage *effectPage;
+    OthersPage *othersPage;
+    StatusPage *statusPage;
+    SpawnCountPage *spawnCountPage;
+    TargetMapPage *targetMapPage;
+    CannonLauncherPage *cannonLauncherPage;
+    PortalPage *portalPage;
+    DocumentPage *documentPage;
 
-  QTranslator *qt_zh_CN;
-  QTranslator *widgets_zh_CN;
-  QTranslator *pvztools_zh_CN;
+    QHBoxLayout *mainLayout;
+
+    QTranslator *qt_zh_CN;
+    QTranslator *widgets_zh_CN;
+    QTranslator *pvztools_zh_CN;
 
 public slots:
-  void ActivateWindow();
-  void ShowMessageBox(QString);
-  void ShowMessageStatusBar(QString);
+    void ActivateWindow();
+    void ShowMessageBox(QString);
+    void ShowMessageStatusBar(QString);
 };
 
 } // namespace Pt

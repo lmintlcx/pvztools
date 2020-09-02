@@ -49,7 +49,6 @@ static_assert(__clang_major__ >= 6);
 using Pt::Application;
 using Pt::MainWindow;
 
-
 #ifdef QT_STATIC
 #include <QtPlugin>
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin) // 必须

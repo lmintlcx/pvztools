@@ -1251,7 +1251,7 @@ std::array<uint32_t, 1000> PvZ::GetSpawnList()
         bool ignore_rest = false;
         for (size_t j = 0; j < 50; j++)
         {
-            if (zl[i * 50 + j] == 0xFFFFFFFF)  // -1
+            if (zl[i * 50 + j] == 0xFFFFFFFF) // -1
             {
                 ignore_rest = true;
                 continue;
@@ -1341,7 +1341,7 @@ void PvZ::InternalSpawn(std::array<bool, 33> zombies, bool original)
     GetSpawnList();
 }
 
-void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit_flag, bool limit_yeti, bool limit_bungee, bool limit_giga, std::array<bool, 20> giga_waves)
+void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit_flag, bool limit_yeti, bool limit_bungee, bool limit_giga, std::array<bool, 20> giga_waves, int giga_weight)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
@@ -1360,10 +1360,14 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
 
         if (count > 0)
         {
-            std::vector<double> weights = {20, 0, 37, 67, 95, 37, 108, 67, 37, 0, 0, 67, 67, 67, 52, 37, 67, 37, 37, 17, 0, 37, 52, 52, 0, 0, 120, 94, 37, 67, 67, 67, 36};
-            std::vector<double> weights_flag = {84, 10, 29, 50, 71, 29, 80, 50, 28, 0, 0, 50, 50, 49, 39, 29, 50, 29, 29, 10, 28, 29, 39, 39, 0, 0, 89, 70, 28, 50, 50, 50, 122};
-            std::discrete_distribution<unsigned int> dist(weights.begin(), weights.end());
+            std::vector<double> weights = {4000, 0, 4000, 2000, 3000, 1000, 3500, 2000, 1000, 0, 0, 2000, 2000, 2000, 1500, 1000, 2000, 1000, 1000, 1, 1000, 1000, 1500, 1500, 0, 0, 4000, 3000, 1000, 2000, 2000, 2000, 6000};
+            weights[0] = 400;
+            weights[2] = 1000;
+            std::vector<double> weights_flag = weights;
+            weights[32] = giga_weight;
+            std::vector<double> weights_normal = weights;
             std::discrete_distribution<unsigned int> dist_flag(weights_flag.begin(), weights_flag.end());
+            std::discrete_distribution<unsigned int> dist_normal(weights_normal.begin(), weights_normal.end());
             auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
             std::mt19937 gen(seed);
 
@@ -1377,7 +1381,7 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
                         if (((i / 50) % 10) == 9) // flag wave
                             type = dist_flag(gen);
                         else
-                            type = dist(gen);
+                            type = dist_normal(gen);
                     }
                     else
                     {
@@ -1392,13 +1396,23 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
                 (*zombies_list)[i] = type;
             }
 
-            std::vector<size_t> index_flag = {450, 950};
-            std::vector<size_t> index_bungee = {451, 452, 453, 454, 951, 952, 953, 954};
+            std::vector<size_t> index_flag = {450,                                       //
+                                              950};                                      //
+            std::vector<size_t> index_zombie = {451, 452, 453, 454, 455, 456, 457, 458,  //
+                                                951, 952, 953, 954, 955, 956, 957, 958}; //
+            std::vector<size_t> index_bungee = {459, 460, 461, 462,                      //
+                                                959, 960, 961, 962};                     //
 
-            if (has_flag && limit_flag)
+            if ((has_flag && limit_flag) || simulate)
             {
                 for (auto i : index_flag)
                     (*zombies_list)[i] = 1;
+            }
+
+            if (simulate)
+            {
+                for (auto i : index_zombie)
+                    (*zombies_list)[i] = 0;
             }
 
             if (has_bungee && limit_bungee)
@@ -1442,7 +1456,7 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
                 }
             }
             if (!ok)
-                CustomizeSpawn(zombies, simulate, limit_flag, limit_yeti, limit_bungee, limit_giga, giga_waves);
+                CustomizeSpawn(zombies, simulate, limit_flag, limit_yeti, limit_bungee, limit_giga, giga_waves, giga_weight);
         }
 
         delete zombies_list;

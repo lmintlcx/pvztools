@@ -15,22 +15,22 @@ namespace Pt
 
 class Application : public QApplication
 {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  Application(int, char **);
-  ~Application();
-  bool isRunning();
+    Application(int, char **);
+    ~Application();
+    bool isRunning();
 
 signals:
-  void ActivateWindow();
+    void ActivateWindow();
 
 private slots:
-  void NewLocalConnection();
+    void NewLocalConnection();
 
 private:
-  QLocalServer *server;
-  bool _isRunning;
+    QLocalServer *server;
+    bool _isRunning;
 };
 
 } // namespace Pt

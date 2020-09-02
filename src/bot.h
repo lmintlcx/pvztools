@@ -14,34 +14,34 @@ namespace Pt
 class Bot : public Process
 {
 public:
-  Bot(HWND hwnd = nullptr);
-  ~Bot();
+    Bot(HWND hwnd = nullptr);
+    ~Bot();
 
-  void LeftDown(int, int);
-  void LeftUp(int, int);
-  void LeftClick(int, int);
-  void Click(int, int);
-  void RightDown(int, int);
-  void RightUp(int, int);
-  void RightClick(int, int);
-  void SafeClick();
+    void LeftDown(int, int);
+    void LeftUp(int, int);
+    void LeftClick(int, int);
+    void Click(int, int);
+    void RightDown(int, int);
+    void RightUp(int, int);
+    void RightClick(int, int);
+    void SafeClick();
 
-  void PressESC();
-  void PressSpace();
-  void PressUp();
-  void PressDown();
-  void PressLeft();
-  void PressRight();
-  void PressKey(char);
+    void PressESC();
+    void PressSpace();
+    void PressUp();
+    void PressDown();
+    void PressLeft();
+    void PressRight();
+    void PressKey(char);
 
-  void ClickSeed(int);
-  void ClickShovel();
-  void ClickGrid(double, double);
+    void ClickSeed(int);
+    void ClickShovel();
+    void ClickGrid(double, double);
 
 private:
-  void OpenProcess();
-  int GetSlotsCount();
-  int GetGameScene();
+    void OpenProcess();
+    int GetSlotsCount();
+    int GetGameScene();
 };
 
 } // namespace Pt

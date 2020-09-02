@@ -14,46 +14,46 @@ namespace Pt
 
 class List : public QObject
 {
-  Q_OBJECT
+    Q_OBJECT
 
 private:
-  List();
-  ~List();
+    List();
+    ~List();
 
 public:
-  static List &Get();
-  void Init();
+    static List &Get();
+    void Init();
 
 public:
-  QStringList pageList;
-  QStringList izeArrayList;
-  QStringList adventureList;
-  QStringList miniGamesList;
-  QStringList puzzleList;
-  QStringList survivalList;
-  QStringList damageList;
-  QStringList hpList;
-  QStringList coinList;
-  QStringList timeList;
-  QStringList blockTypeList;
-  QStringList rowTypeList;
-  QStringList sceneList;
-  QStringList musicList;
-  QStringList itemList;
-  QStringList zombieStatusList;
-  QStringList zombieList;
-  QStringList slotsIndexList;
-  QStringList seedList;
-  QStringList rowList;
-  QStringList gardenHeadersList;
-  QStringList gardenSceneList;
-  QStringList directionList;
-  QStringList colorList;
-  QStringList plantStatusList;
-  QStringList vaseHeadersList;
-  QStringList vaseSkinList;
-  QStringList vaseTypeList;
-  QStringList debugModeList;
+    QStringList pageList;
+    QStringList izeArrayList;
+    QStringList adventureList;
+    QStringList miniGamesList;
+    QStringList puzzleList;
+    QStringList survivalList;
+    QStringList damageList;
+    QStringList hpList;
+    QStringList coinList;
+    QStringList timeList;
+    QStringList blockTypeList;
+    QStringList rowTypeList;
+    QStringList sceneList;
+    QStringList musicList;
+    QStringList itemList;
+    QStringList zombieStatusList;
+    QStringList zombieList;
+    QStringList slotsIndexList;
+    QStringList seedList;
+    QStringList rowList;
+    QStringList gardenHeadersList;
+    QStringList gardenSceneList;
+    QStringList directionList;
+    QStringList colorList;
+    QStringList plantStatusList;
+    QStringList vaseHeadersList;
+    QStringList vaseSkinList;
+    QStringList vaseTypeList;
+    QStringList debugModeList;
 };
 
 } // namespace Pt

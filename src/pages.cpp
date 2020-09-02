@@ -1325,7 +1325,7 @@ SpawnBriefPage::SpawnBriefPage(QWidget *parent)
                 zombies[1] = true;
                 std::array<bool, 20> giga_waves; // useless
                 giga_waves.fill(true);
-                emit CustomizeSpawn(zombies, false, true, true, true, false, giga_waves);
+                emit CustomizeSpawn(zombies, false, true, true, true, false, giga_waves, 1000);
             });
 }
 
@@ -1438,14 +1438,22 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
     limitYetiCheckBox = new QCheckBox(spawnLimitWidget);
     limitBungeeCheckBox = new QCheckBox(spawnLimitWidget);
     limitGigaCheckBox = new QCheckBox(spawnLimitWidget);
+    weightGigaLabel = new QLabel(spawnLimitWidget);
+    weightGigaSpinBox = new QSpinBox(spawnLimitWidget);
 
-    spawnLimitLayout = new QHBoxLayout(spawnLimitWidget);
-    spawnLimitLayout->addWidget(limitFlagCheckBox);
-    spawnLimitLayout->addWidget(limitYetiCheckBox);
-    spawnLimitLayout->addWidget(limitBungeeCheckBox);
-    spawnLimitLayout->addWidget(limitGigaCheckBox);
+    spawnLimitLayout = new QGridLayout(spawnLimitWidget);
+    spawnLimitLayout->addWidget(limitFlagCheckBox, 0, 0, 1, 2);
+    spawnLimitLayout->addWidget(limitYetiCheckBox, 0, 2, 1, 2);
+    spawnLimitLayout->addWidget(limitBungeeCheckBox, 0, 4, 1, 2);
+    spawnLimitLayout->addWidget(limitGigaCheckBox, 0, 6, 1, 2);
+    spawnLimitLayout->addWidget(weightGigaLabel, 0, 0, 1, 3);
+    spawnLimitLayout->addWidget(weightGigaSpinBox, 0, 3, 1, 2);
     spawnLimitLayout->setMargin(0);
-    spawnLimitLayout->setSpacing(4);
+
+    for (int i = 0; i < spawnLimitLayout->rowCount(); i++)
+        spawnLimitLayout->setRowStretch(i, 1);
+    for (int i = 0; i < spawnLimitLayout->columnCount(); i++)
+        spawnLimitLayout->setColumnStretch(i, 1);
 
     gigaWavesWidget = new QWidget(this);
 
@@ -1474,11 +1482,11 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
     spawnSetButton = new QPushButton(this);
     briefModeButton = new QPushButton(this);
 
-    spawnSpacer1 = new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    spawnSpacer3 = new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    spawnSpacer5 = new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    spawnSpacer7 = new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    spawnSpacer9 = new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    spawnSpacer1 = new QSpacerItem(10, 100, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    spawnSpacer3 = new QSpacerItem(10, 100, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    spawnSpacer5 = new QSpacerItem(10, 100, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    spawnSpacer7 = new QSpacerItem(10, 100, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    spawnSpacer9 = new QSpacerItem(10, 100, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     // Set default states, Checked/Enabled/Visible.
 
@@ -1488,10 +1496,17 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
     limitYetiCheckBox->setChecked(true);
     limitBungeeCheckBox->setChecked(true);
 
+    weightGigaLabel->setVisible(false);
+    weightGigaSpinBox->setVisible(false);
+
     spawnLimitWidget->setEnabled(false);
     gigaWavesWidget->setEnabled(false);
 
     randomSeedLineEdit->setText("00000000");
+
+    weightGigaSpinBox->setRange(1000, 6000);
+    weightGigaSpinBox->setSingleStep(100);
+    weightGigaSpinBox->setValue(1000);
 
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(randomSeedLineEdit, 0, 0, 1, 1);
@@ -1525,9 +1540,6 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
                 if (checked)
                 {
                     spawnLimitWidget->setEnabled(false);
-                    limitFlagCheckBox->setEnabled(false);
-                    limitYetiCheckBox->setEnabled(false);
-                    limitBungeeCheckBox->setEnabled(false);
                     gigaWavesWidget->setEnabled(false);
                 }
             });
@@ -1537,9 +1549,11 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
                 if (checked)
                 {
                     spawnLimitWidget->setEnabled(true);
-                    limitFlagCheckBox->setEnabled(true);
-                    limitYetiCheckBox->setEnabled(true);
-                    limitBungeeCheckBox->setEnabled(true);
+                    weightGigaLabel->setVisible(false);
+                    weightGigaSpinBox->setVisible(false);
+                    limitFlagCheckBox->setVisible(true);
+                    limitYetiCheckBox->setVisible(true);
+                    limitBungeeCheckBox->setVisible(true);
                     if (limitGigaCheckBox->isChecked())
                         gigaWavesWidget->setEnabled(true);
                 }
@@ -1550,9 +1564,11 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
                 if (checked)
                 {
                     spawnLimitWidget->setEnabled(true);
-                    limitFlagCheckBox->setEnabled(false);
-                    limitYetiCheckBox->setEnabled(false);
-                    limitBungeeCheckBox->setEnabled(false);
+                    limitFlagCheckBox->setVisible(false);
+                    limitYetiCheckBox->setVisible(false);
+                    limitBungeeCheckBox->setVisible(false);
+                    weightGigaLabel->setVisible(true);
+                    weightGigaSpinBox->setVisible(true);
                     if (limitGigaCheckBox->isChecked())
                         gigaWavesWidget->setEnabled(true);
                 }
@@ -1653,6 +1669,8 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
                     bool limit_yeti = limitYetiCheckBox->isChecked();
                     bool limit_bungee = limitBungeeCheckBox->isChecked();
                     bool limit_giga = limitGigaCheckBox->isChecked();
+                    std::array<bool, 20> giga_waves = GetGigaWaves();
+                    int giga_weight = weightGigaSpinBox->value();
                     if (simulate)
                     {
                         zombies[0] = true;
@@ -1661,8 +1679,7 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
                         limit_yeti = true;
                         limit_bungee = true;
                     }
-                    std::array<bool, 20> giga_waves = GetGigaWaves();
-                    emit CustomizeSpawn(zombies, simulate, limit_flag, limit_yeti, limit_bungee, limit_giga, giga_waves);
+                    emit CustomizeSpawn(zombies, simulate, limit_flag, limit_yeti, limit_bungee, limit_giga, giga_waves, giga_weight);
                 }
             });
 }
@@ -1696,6 +1713,8 @@ void SpawnDetailedPage::TranslateUI()
     limitYetiCheckBox->setText(tr("Limit Yeti"));
     limitBungeeCheckBox->setText(tr("Limit Bungee"));
     limitGigaCheckBox->setText(tr("Limit Giga"));
+
+    weightGigaLabel->setText(tr("Weight of GigaGargantuar in non huge wave:"));
 
     limitFlagCheckBox->setStatusTip(tr("Flag Zombie will only appear in each flag wave (huge wave)."));
     limitYetiCheckBox->setStatusTip(tr("There will be only one Zombie Yeti."));
