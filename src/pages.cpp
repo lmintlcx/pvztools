@@ -1744,7 +1744,7 @@ void SpawnDetailedPage::SetZombies(std::array<bool, 33> zombies)
     {
         if (zombies[i])
         {
-            QString spawn_item = List::Get().zombieList[i];
+            QString spawn_item = QString("[") + QString::number(i) + "]" + " " + List::Get().zombieList[i];
             spawnListWidget->addItem(spawn_item);
         }
     }
@@ -2680,7 +2680,7 @@ LineupPage::LineupPage(QWidget *parent)
 
     connect(openLinkButton, &QPushButton::clicked,
             this, [=]() {
-                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/arraydesign/"));
+                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/lineup/"));
             });
 
     connect(updateCheckButton, &QPushButton::clicked,
@@ -3089,12 +3089,13 @@ void LineupPage::UpdateLineupString()
             QJsonObject json_object = document.object();
             QString author = json_object["author"].toString();
             int version = json_object["version"].toInt();
+            int counts = json_object["counts"].toInt();
             // qDebug() << author << version;
             if (author == "lmintlcx")
             {
                 InitLineupString(lineup_string);
                 RefreshLineupString();
-                emit ShowMessageStatusBar(tr("Lineup string update succeeded, current version: %1.").arg(version));
+                emit ShowMessageStatusBar(tr("Lineup string updated, version %1, total %2.").arg(version).arg(counts));
             }
             else
             {
@@ -4698,7 +4699,7 @@ void SpawnCountPage::UpdateSpawnCount(std::array<uint32_t, 1000> zombies_list)
 
     QStringList vhl;
     for (size_t i = 0; i < 33; i++)
-        vhl << (QString("[") + QString::number(i) + QString("]") + QString(" ") + List::Get().zombieList[i]);
+        vhl << (QString("[") + QString::number(i) + "]" + " " + List::Get().zombieList[i]);
     table->setVerticalHeaderLabels(vhl);
 
     cornerButton->setText(QString("↻")); // TODO
@@ -5119,7 +5120,7 @@ void DocumentPage::TranslateUI()
 {
     document->setText(tr("<style>a {text-decoration: none; color: blue}</style>"
                          "<h2>About</h2>"
-                         "<p>This software (PvZ Tools) is applicable to Plants vs. Zombies 1.0.0.1051 original English version only (which you can <a href=\"https://pvz.lmintlcx.com/pvz/\">download here</a>).</p>"
+                         "<p>This software (PvZ Tools) is applicable to Plants vs. Zombies 1.0.0.1051 original English version only (which you can <a href=\"https://pvz.lmintlcx.com/download/\">download here</a>).</p>"
                          "<p>Excessive modification or forced use of non-corresponding game versions can easily cause the game to crash, please back up data file before use. All effects caused by using this software are responsibility of user himself.</p>"
                          "<p>Some behavior of trainer (finding game progress, modifying memory data, remote injection code, etc.) may be considered dangerous by anti-virus software. Please decide whether to trust this software yourself.</p>"
                          "<p>Reasonable uses of trainer include, but not limited to, demonstrations, testing, research, and entertainment. Abuse of modifiers may reduce the fun of game seriously, please use it with caution, especially newbies.</p>"
@@ -5133,7 +5134,7 @@ void DocumentPage::TranslateUI()
                          "<p>When switching between different pages, if the number of zombie types selected on target page is 0, selected zombie types on current page will be synchronized to target page (not one-to-one correspondence).</p>"
                          "<p>In brief mode, you can switch layout of the option boxes, in order of zombies in almanac or in same position as the PVZombiesSeed.exe.</p>"
                          "<p>In brief mode, Conehead Zombie and Newspaper Zombie are mutually exclusive if \"Limit Spawn Count\" is checked, and it will limit the number of selected zombie types, up to 10 types except Bungee Zombie and Zombie Yeti. (Note that this limitation is not same as the game itself.)</p>"
-                         "<p>The difference between different spawn mode:<br>Natural spawn changes the zombie types only and calls built-in function of game to generates zombies list.<br>Extreme spawn is to evenly populate the zombies list with seleted zombie types.<br>Simulate natural spawn is randomly fill the zombies list with seleted zombie types according to the ratio which is get by statistical law, meanwhile increase the probability of GigaGargantuar in flag wave.</p>"
+                         "<p>The difference between different spawn mode:<br>Natural spawn changes the zombie types only and calls built-in function of game to generates zombies list.<br>Extreme spawn is to evenly populate the zombies list with seleted zombie types.<br>Simulate natural spawn is randomly fill the zombies list with seleted zombie types according to certern ratio, meanwhile decrease the probability of GigaGargantuar in non flag wave.</p>"
                          "<p>Special deal with some zombies:<br>When limit Flag Zombie, Flag Zombie will only appear in each flag wave (huge wave).<br>When limit Zombie Yeti, there will be only one Zombie Yeti.<br>When limit Bungee Zombie, Bungee Zombie will only appear in flag wave (huge wave).<br>When limit GigaGargantuar, GigaGargantuar will only appear in selected wave(s) (20 waves total).</p>"
                          "<p>When using natural spawn in brief mode, there must be Zombie.</p>"
                          "<p>When using extreme spawn in brief mode, there must be Zombie and Flag Zombie. Flag Zombie, Zombie Yeti and Bungee Zombie is limited, and GigaGargantuar has no limit.</p>"
@@ -5141,7 +5142,7 @@ void DocumentPage::TranslateUI()
                          "<h2>Lineup</h2>"
                          "<p>Checking \"Quick Lineup Mode\" will enable these features: Auto Collect, Cob Cannon No CD, Plant Invincible, Stop Spawning, Ignore Sun, Slots No CD, Purple Seed Unlimited, No Fog.</p>"
                          "<p>Clicking \"Quick Pass\" will end current level directly, kill all zombies on the field, set the number of sunshine to 8000, and set the number of levels to 1009 (2020 flags completed). You can modify sunshine and level in corresponding page by pause the game immediately after clicking it.</p>"
-                         "<p>Format of lineup string is compatible with <a href=\"https://pvz.lmintlcx.com/arraydesign/\">Array Design</a>.</p>"
+                         "<p>Format of lineup string is compatible with <a href=\"https://pvz.lmintlcx.com/lineup/\">Array Design</a>.</p>"
                          "<p>The built-in lineup string includes some well-known build in <a href=\"https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good\">good tab</a> at Baidu Tieba. Players can adjust lineup as needed, don't have to follow the original array completely.</p>"
                          "<p>Clicking \"Update\" will update built-in array list via Internet. Which is collected by me and will be update if I'm happy.</p>"
                          "<p>Modifying game scene may cause some unknown problems, therefore the \"Allow Switch Scene\" option is not checked by default. It is recommended to enter the hidden scene in a <a href=\"https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/\">more conventional way</a> and then mix to \"Survival Endless\" mode.</p>"
@@ -5150,40 +5151,40 @@ void DocumentPage::TranslateUI()
                          "<p>The \"Open Data Dir\" feature is temporarily unavailable on XP systems (the data file is located in the \"userdata\" folder in game directory). For Vista and above, it's located in \"C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata\\\" folder.</p>"
                          "<p>The unpacked file is located in the specified folder. But the packaged file will be named with \"main_&lt;number&gt;.pak\", please rename it to \"main.pak\" and replace the original game file (remember to backup first).</p>"));
 
-    // <style>a {text-decoration: none; color: blue}</style>
-    // <h2>关于</h2>
-    // <p>本软件（PvZ Tools）仅适用于植物大战僵尸 1.0.0.1051 英文原版（可从 <a href="https://pvz.lmintlcx.com/pvz/">这里下载</a>）。</p>
-    // <p>过度修改或者强行使用不对应的游戏版本很容易造成游戏崩溃，使用前请及时备份存档。对于使用本软件造成的所有影响由用户自己负责。</p>
-    // <p>修改器的部分行为（查找游戏进程，修改内存数据，远程注入代码等）可能会被杀毒软件视为危险行为，请自行决定是否信任本软件。</p>
-    // <p>修改器的合理用途包括但不限于演示、测试、研究和娱乐。滥用修改器会严重降低游戏乐趣，新手请慎重使用。</p>
-    // <p>本软件可能存在一些问题，用户可以向作者提供问题反馈或者功能需求。测试版有使用期限限制，如果提示过期请下载最新版本。</p>
-    // <p>配置信息保存在“HKEY_CURRENT_USER\SOFTWARE\Cube Studio\PvZ Tools\v2”。你可以导出这个注册表项目来备份，或者在删除本软件后清理它。</p>
-    // <p>大部分核心数据（内存基址）来自于已有公开资料和其他开源修改器。而源代码是从栈溢出（Stack Overflow）复制粘贴的。</p>
-    // <p>所有源代码位于 <a href="https://github.com/lmintlcx/pvztools/">https://github.com/lmintlcx/pvztools/</a> 。</p>
-    // <h2>出怪</h2>
-    // <p>此功能适用于无尽后期调节出怪。出怪列表共用到 1000 只僵尸，其中每一次选卡 20 波，每波 50 只。</p>
-    // <p>出怪页面有两种模式：“简略” 和 “详细”。</p>
-    // <p>切换不同出怪页面时，如果目标页面所选的僵尸种类数量为 0，则会将当前页面已选的僵尸种类同步到另一页面上（并不是一一对应的）。</p>
-    // <p>简略模式下可以切换选项框的排列布局，按僵尸在图鉴的顺序或者和小王子出怪修改器一样的位置。</p>
-    // <p>在简略模式下勾选“限制出怪种类数”后路障和读报互斥，并且限制能够选择的出怪种类数量为除蹦极和雪人外最多 10 种。（注意这个限制和游戏本身的出怪情况并不相同）。</p>
-    // <p>不同出怪模式的区别：<br>自然出怪只改变出怪种类，再由游戏内置的函数生成出怪列表。<br>极限出怪是把所选僵尸种类按顺序均匀地填充到出怪列表。<br>模拟自然出怪则是根据统计规律按一定的比例随机填充出怪列表，在旗帜波会增加红眼的出现概率。</p>
-    // <p>一些僵尸的特殊处理：<br>限制旗帜后，旗帜只在每个旗帜波（大波）出现一只。<br>限制雪人后，雪人只出现一只。<br>限制蹦极后，蹦极只在旗帜波（大波）出现。<br>限制红眼后，红眼只在所选的波次出现（总共 20 波）。</p>
-    // <p>简略模式下使用自然出怪，普僵必出。</p>
-    // <p>简略模式下使用极限出怪，普僵旗帜必出，限制旗帜雪人蹦极，不限制红眼。</p>
-    // <p>详细模式下使用模拟自然出怪，普僵旗帜必出，限制旗帜雪人蹦极。</p>
-    // <h2>布阵</h2>
-    // <p>勾选“快捷布阵模式”会开启这些功能：自动收集、玉米炮无冷却、植物无敌、暂停出怪、无视阳光、卡片无冷却、紫卡无限制、浓雾透视。</p>
-    // <p>点击“快速过关”后会直接结束本关卡，秒杀所有场上僵尸，并将阳光数设置为 8000，关卡数设置为 1009（已完成 2020 面旗帜数）。可以在点击后立即暂停游戏并去对应的页面修改阳光和关卡数。</p>
-    // <p>布阵字符串格式和 <a href="https://pvz.lmintlcx.com/arraydesign/">网页布阵器</a> 互通。</p>
-    // <p>内置布阵字符串包括一些贴吧 <a href="https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good">精品区</a> 知名阵型。玩家可根据需要调整阵型，不需要完全遵循原阵。</p>
-    // <p>点击“更新”后会联网更新内置的阵型列表。个人整理，随缘更新。</p>
-    // <p>修改游戏场地可能会造成一些不为人知的问题，因此“允许切换场景”选项默认不勾选。建议用 <a href="https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/">更加常规的方法</a> 进入隐藏场地再混乱到“生存无尽”模式。</p>
-    // <p>勾选“保持血量状态”后，导入或导出字符串时部分植物（坚果、高坚果、南瓜头、大蒜、地刺王）的残血状态会得到保留。</p>
-    // <h2>其他</h2>
-    // <p>“打开存档目录”功能在 XP 系统上暂时不可用（存档文件位于游戏目录内的“userdata”文件夹）。对于 Vista 以及更高版本的系统，存档文件位于“C:\ProgramData\PopCap Games\PlantsVsZombies\userdata\”文件夹。</p>
-    // <p>解包文件位于指定的文件夹内。而打包文件会以“main_&lt;数字&gt;.pak”的格式命名，请将其改名为“main.pak”并且替换掉原来的游戏文件（记得先备份）。</p>
-
     setWindowTitle(tr("Document"));
 }
+
+// <style>a {text-decoration: none; color: blue}</style>
+// <h2>关于</h2>
+// <p>本软件（PvZ Tools）仅适用于植物大战僵尸 1.0.0.1051 英文原版（可从 <a href="https://pvz.lmintlcx.com/download/">这里下载</a>）。</p>
+// <p>过度修改或者强行使用不对应的游戏版本很容易造成游戏崩溃，使用前请及时备份存档。对于使用本软件造成的所有影响由用户自己负责。</p>
+// <p>修改器的部分行为（查找游戏进程，修改内存数据，远程注入代码等）可能会被杀毒软件视为危险行为，请自行决定是否信任本软件。</p>
+// <p>修改器的合理用途包括但不限于演示、测试、研究和娱乐。滥用修改器会严重降低游戏乐趣，新手请慎重使用。</p>
+// <p>本软件可能存在一些问题，用户可以向作者提供问题反馈或者功能需求。测试版有使用期限限制，如果提示过期请下载最新版本。</p>
+// <p>配置信息保存在“HKEY_CURRENT_USER\SOFTWARE\Cube Studio\PvZ Tools\v2”。你可以导出这个注册表项目来备份，或者在删除本软件后清理它。</p>
+// <p>大部分核心数据（内存基址）来自于已有公开资料和其他开源修改器。而源代码是从栈溢出（Stack Overflow）复制粘贴的。</p>
+// <p>所有源代码位于 <a href="https://github.com/lmintlcx/pvztools/">https://github.com/lmintlcx/pvztools/</a> 。</p>
+// <h2>出怪</h2>
+// <p>此功能适用于无尽后期调节出怪。出怪列表共用到 1000 只僵尸，其中每一次选卡 20 波，每波 50 只。</p>
+// <p>出怪页面有两种模式：“简略” 和 “详细”。</p>
+// <p>切换不同出怪页面时，如果目标页面所选的僵尸种类数量为 0，则会将当前页面已选的僵尸种类同步到另一页面上（并不是一一对应的）。</p>
+// <p>简略模式下可以切换选项框的排列布局，按僵尸在图鉴的顺序或者和小王子出怪修改器一样的位置。</p>
+// <p>在简略模式下勾选“限制出怪种类数”后路障和读报互斥，并且限制能够选择的出怪种类数量为除蹦极和雪人外最多 10 种。（注意这个限制和游戏本身的出怪情况并不相同）。</p>
+// <p>不同出怪模式的区别：<br>自然出怪只改变出怪种类，再由游戏内置的函数生成出怪列表。<br>极限出怪是把所选僵尸种类按顺序均匀地填充到出怪列表。<br>模拟自然出怪则是按一定的比例随机填充出怪列表，在非旗帜波会降低红眼的出现概率。</p>
+// <p>一些僵尸的特殊处理：<br>限制旗帜后，旗帜只在每个旗帜波（大波）出现一只。<br>限制雪人后，雪人只出现一只。<br>限制蹦极后，蹦极只在旗帜波（大波）出现。<br>限制红眼后，红眼只在所选的波次出现（总共 20 波）。</p>
+// <p>简略模式下使用自然出怪，普僵必出。</p>
+// <p>简略模式下使用极限出怪，普僵旗帜必出，限制旗帜雪人蹦极，不限制红眼。</p>
+// <p>详细模式下使用模拟自然出怪，普僵旗帜必出，限制旗帜雪人蹦极。</p>
+// <h2>布阵</h2>
+// <p>勾选“快捷布阵模式”会开启这些功能：自动收集、玉米炮无冷却、植物无敌、暂停出怪、无视阳光、卡片无冷却、紫卡无限制、浓雾透视。</p>
+// <p>点击“快速过关”后会直接结束本关卡，秒杀所有场上僵尸，并将阳光数设置为 8000，关卡数设置为 1009（已完成 2020 面旗帜数）。可以在点击后立即暂停游戏并去对应的页面修改阳光和关卡数。</p>
+// <p>布阵字符串格式和 <a href="https://pvz.lmintlcx.com/lineup/">网页布阵器</a> 互通。</p>
+// <p>内置布阵字符串包括一些贴吧 <a href="https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good">精品区</a> 知名阵型。玩家可根据需要调整阵型，不需要完全遵循原阵。</p>
+// <p>点击“更新”后会联网更新内置的阵型列表。个人整理，随缘更新。</p>
+// <p>修改游戏场地可能会造成一些不为人知的问题，因此“允许切换场景”选项默认不勾选。建议用 <a href="https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/">更加常规的方法</a> 进入隐藏场地再混乱到“生存无尽”模式。</p>
+// <p>勾选“保持血量状态”后，导入或导出字符串时部分植物（坚果、高坚果、南瓜头、大蒜、地刺王）的残血状态会得到保留。</p>
+// <h2>其他</h2>
+// <p>“打开存档目录”功能在 XP 系统上暂时不可用（存档文件位于游戏目录内的“userdata”文件夹）。对于 Vista 以及更高版本的系统，存档文件位于“C:\ProgramData\PopCap Games\PlantsVsZombies\userdata\”文件夹。</p>
+// <p>解包文件位于指定的文件夹内。而打包文件会以“main_&lt;数字&gt;.pak”的格式命名，请将其改名为“main.pak”并且替换掉原来的游戏文件（记得先备份）。</p>
 
 } // namespace Pt

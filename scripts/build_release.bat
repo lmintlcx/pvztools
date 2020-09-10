@@ -1,6 +1,6 @@
 @echo off
 
-set QT_DIR=C:\Qt\Qt_5.14.2\msvc2017_x86\static
+set QT_DIR=C:\Qt\Qt_5.15.1\msvc2017_x86\static
 set SRC_DIR=D:\work\pvztools
 set BUILD_DIR=D:\tmp\pvztools_build
 set UPX_DIR=C:\tools\UPX

@@ -5,7 +5,7 @@ Plants vs. Zombies Toolset.
 
 ## Screenshots
 
-![](https://github.com/lmintlcx/pvztools/raw/master/screenshots/preview.gif)
+![](https://github.com/lmintlcx/pvztools/raw/master/screenshots/pvztools_preview.webp)
 
 ## Download
 
@@ -21,7 +21,7 @@ Supported operating systems:
 
 Supported game version:
 
-- [1.0.0.1051](https://pvz.lmintlcx.com/pvz/)
+- [1.0.0.1051](https://pvz.lmintlcx.com/download/)
 
 [PvZ Toolkit](https://github.com/lmintlcx/pvztoolkit/) is recommended if you're not using this particular version of game.
 
@@ -33,7 +33,7 @@ Already tested and confirmed works with:
 
 | OpenSSL Library | Qt Framework | Windows SDK | Code Compiler | Executable Packer |
 | ------ | ------ | ------ | ------ | ------ |
-| 1.1.1g | 5.14.2 | 10.0.17763.0 | MSVC 2017 15.9.26 | UPX 3.96w |
+| 1.1.1g | 5.15.1 | 10.0.17763.0 | MSVC 2017 15.9.27 | UPX 3.96w |
 
 ## Credit
 

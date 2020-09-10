@@ -30,8 +30,8 @@ Application::Application(int argc, char *argv[])
                             "这是很旧很旧的测试版哦, 去 <a href='https://pvz.lmintlcx.com/tools/'>这里</a> 下载最新版吧.");
             msg_box.exec();
 
-            qApp->quit();
-            return;
+            // qApp->quit();
+            // return;
         }
     }
 

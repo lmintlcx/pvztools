@@ -2851,6 +2851,8 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
         }
 
         // create plants/ladder/rake/grave
+        int mode = ReadMemory<int>(0x6a9ec0, 0x7f8);
+        bool is_iz = (mode >= 61 && mode <= 70);
         asm_init();
         for (size_t i = 0; i < count; i++)
         {
@@ -2862,7 +2864,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
             bool item_imitater = (items[i][5] == 0) ? false : true;
 
             if ((item_type >= 0) && (item_type <= 0x2f)) // plants
-                asm_plant(item_row, item_col, item_type, item_imitater, false);
+                asm_plant(item_row, item_col, item_type, item_imitater, is_iz);
             else if (item_type == 0x30) // ladder
                 asm_put_ladder(item_row, item_col);
             else if (item_type == 0x31) // rake
@@ -2940,14 +2942,18 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                     }
 
                     // Potato Mine and Sun-shroom grow up
-                    // 0 should be ok, here reserved 1s for wake up call to excecute first
+                    // 0 should be ok, reserved for wake up call to excecute first
+                    uint32_t grow_up_delay = 10;
+#ifdef _DEBUG
+                    grow_up_delay = 100;
+#endif
                     if ((plant_type == 4) || (plant_type == 9 && item_state_row == 1 && (item_state_col == 2 || item_state_col == 3)))
-                        WriteMemory<uint32_t>(100, plant_offset + 0x54 + 0x14c * plant_index);
+                        WriteMemory<uint32_t>(grow_up_delay, plant_offset + 0x54 + 0x14c * plant_index);
 
                     // set hp status
                     if (keep_hp_status)
                     {
-                        // Pumpkin HP status
+                        // Pumpkin
                         if (item_type == 30)
                         {
                             auto plant_hp_max = ReadMemory<uint32_t>(plant_offset + 0x44 + 0x14c * plant_index);
@@ -2956,15 +2962,30 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                             else if (item_state_row == 2) // damage piont 2
                                 WriteMemory<uint32_t>(plant_hp_max * 1 / 3 - 1, plant_offset + 0x40 + 0x14c * plant_index);
                         }
-                        // Wall-nut / Tall-nut / Pumpkin / Garlic / Spikerock HP status
-                        else if (plant_type == 3 || plant_type == 23 || plant_type == 36 || plant_type == 46)
+                        // Wall-nut / Tall-nut / Garlic
+                        else if (plant_type == 3 || plant_type == 23 || plant_type == 36)
                         {
-                            // FIXME Spikerock issue
                             auto plant_hp_max = ReadMemory<uint32_t>(plant_offset + 0x44 + 0x14c * plant_index);
                             if (item_state_col == 1) // damage piont 1
                                 WriteMemory<uint32_t>(plant_hp_max * 2 / 3 - 1, plant_offset + 0x40 + 0x14c * plant_index);
                             else if (item_state_col == 2) // damage piont 2
                                 WriteMemory<uint32_t>(plant_hp_max * 1 / 3 - 1, plant_offset + 0x40 + 0x14c * plant_index);
+                        }
+                        // Spikerock
+                        else if (plant_type == 46)
+                        {
+                            if (item_state_col == 1) // damage piont 1
+                                WriteMemory<uint32_t>(ReadMemory<uint32_t>(0x0045ec6b) - ReadMemory<signed char>(0x0045ec66),
+                                                      plant_offset + 0x40 + 0x14c * plant_index);
+                            else if (item_state_col == 2) // damage piont 2
+                                WriteMemory<uint32_t>(ReadMemory<uint32_t>(0x0045ec80) - ReadMemory<signed char>(0x0045ec66),
+                                                      plant_offset + 0x40 + 0x14c * plant_index);
+                            if (item_state_col == 1 || item_state_col == 2)
+                            {
+                                uint32_t addr = plant_offset + 0x14c * plant_index;
+                                asm_mov_exx(Reg::ESI, addr);
+                                asm_call(0x0045ec00); // attack hp -50
+                            }
                         }
                     }
 
@@ -3074,13 +3095,24 @@ std::string PvZ::GetLineup(bool keep_hp_status)
                 else
                     item[3] = 0;
                 // [4]
-                if ((plant_type == 3 || plant_type == 23 || plant_type == 36 || plant_type == 46) && keep_hp_status)
+                if ((plant_type == 3 || plant_type == 23 || plant_type == 36) && keep_hp_status)
                 {
                     uint32_t damage_piont_2 = plant_hp_max * 1 / 3;
                     uint32_t damage_piont_1 = plant_hp_max * 2 / 3;
                     if (0 <= plant_hp && plant_hp < damage_piont_2)
                         item[4] = 2;
                     else if (damage_piont_2 <= plant_hp && plant_hp < damage_piont_1)
+                        item[4] = 1;
+                    else
+                        item[4] = 0;
+                }
+                else if ((plant_type == 46) && keep_hp_status)
+                {
+                    uint32_t damage_piont_2 = ReadMemory<uint32_t>(0x0045ec80);
+                    uint32_t damage_piont_1 = ReadMemory<uint32_t>(0x0045ec6b);
+                    if (0 <= plant_hp && plant_hp <= damage_piont_2)
+                        item[4] = 2;
+                    else if (damage_piont_2 < plant_hp && plant_hp <= damage_piont_1)
                         item[4] = 1;
                     else
                         item[4] = 0;

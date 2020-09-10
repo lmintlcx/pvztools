@@ -127,7 +127,7 @@ MainWindow::MainWindow(QWidget *parent)
     pvztools_zh_CN->load(":/translations/pvztools_zh_CN.qm");
 
     SetLanguage();
-    if (TEST_VERSION)  // TODO
+    if (TEST_VERSION) // TODO
         setWindowTitle(tr("PvZ Tools") + " " + VERSION_NAME + " " + "beta");
     else
         setWindowTitle(tr("PvZ Tools"));
@@ -429,7 +429,7 @@ void MainWindow::CreateActions()
 
                 QFont font;
                 font.setFamily("Microsoft YaHei");
-                font.setPointSize(9);
+                font.setPointSize(10);
                 font.setBold(false);
                 font.setItalic(false);
                 QApplication::setFont(font);
@@ -473,7 +473,7 @@ void MainWindow::CreateActions()
 
     connect(visitWebsiteAction, &QAction::triggered,
             this, [=]() {
-                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/"));
+                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/tools/"));
             });
 
     connect(sendFeedbackAction, &QAction::triggered,
@@ -525,7 +525,7 @@ void MainWindow::CreateActions()
                                                          tr("New version detected, download it now?"), //
                                                          QMessageBox::Yes | QMessageBox::No);          //
                         if (ret == QMessageBox::Yes)
-                            QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/"));
+                            QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/tools/"));
                     }
                     else
                     {
@@ -582,7 +582,10 @@ void MainWindow::CreateActions()
 
                 QMessageBox msgBox;
                 msgBox.setWindowTitle(tr("About"));
-                msgBox.setIconPixmap(QPixmap::fromImage(QImage(":/res/logo_about.png")));
+                if (TEST_VERSION)
+                    msgBox.setIconPixmap(QPixmap::fromImage(QImage(":/res/logo_about.png").convertToFormat(QImage::Format_Grayscale8)));
+                else
+                    msgBox.setIconPixmap(QPixmap::fromImage(QImage(":/res/logo_about.png")));
                 msgBox.setText(tr("<h1>PvZ Tools</h1>"));
                 msgBox.setInformativeText(info);
                 msgBox.setStandardButtons(QMessageBox::Ok);
@@ -1330,7 +1333,7 @@ void MainWindow::ReadSettings()
     // emit muteAction->triggered(mute);
 
     QString font_family = settings.value("FontFamily", QString("Microsoft YaHei")).toString();
-    int font_size = settings.value("FontSize", 9).toInt();
+    int font_size = settings.value("FontSize", 10).toInt();
     bool font_bold = settings.value("FontBold", false).toBool();
     bool font_italic = settings.value("FontItalic", false).toBool();
 
@@ -1478,51 +1481,51 @@ void MainWindow::SetScreenSize()
     int x, y;
     // auto [scale_x, scale_y] = GetDpiScale();
     auto [scale_x, scale_y] = std::tuple<double, double>{1.0, 1.0};
-    double font_scale = qApp->font().pointSize() / 9.0;
+    double font_scale = qApp->font().pointSize() / 10.0;
     bool sidebar_visible = showSidebarAction->isChecked();
 
     if (languageChineseAction->isChecked())
     {
-        x = (580 + (sidebar_visible ? 80 : 0)) * scale_x * font_scale;
-        y = (360 + (sidebar_visible ? -25 : 0)) * scale_y * font_scale;
+        x = (610 + (sidebar_visible ? 80 : 0)) * scale_x * font_scale;
+        y = (380 + (sidebar_visible ? -25 : 0)) * scale_y * font_scale;
         this->setFixedSize(x, y);
-        x = 660 * scale_x * font_scale;
-        y = 400 * scale_y * font_scale;
+        x = 720 * scale_x * font_scale;
+        y = 430 * scale_y * font_scale;
         spawnCountPage->setFixedWidth(x);
         spawnCountPage->setMinimumHeight(y);
-        x = 925 * scale_x * font_scale;
-        y = 240 * scale_y * font_scale;
+        x = 940 * scale_x * font_scale;
+        y = 250 * scale_y * font_scale;
         targetMapPage->setFixedSize(x, y);
-        x = 365 * scale_x * font_scale;
+        x = 380 * scale_x * font_scale;
         y = 150 * scale_y * font_scale;
         cannonLauncherPage->setFixedSize(x, y);
-        x = 360 * scale_x * font_scale;
-        y = 110 * scale_y * font_scale;
+        x = 400 * scale_x * font_scale;
+        y = 120 * scale_y * font_scale;
         portalPage->setFixedSize(x, y);
-        x = 525 * scale_x * font_scale;
+        x = 600 * scale_x * font_scale;
         y = 420 * scale_y * font_scale;
         documentPage->setFixedSize(x, y);
     }
     else if (languageEnglishAction->isChecked())
     {
-        x = (840 + (sidebar_visible ? 90 : 0)) * scale_x * font_scale;
-        y = (350 + (sidebar_visible ? -25 : 0)) * scale_y * font_scale;
+        x = (900 + (sidebar_visible ? 100 : 0)) * scale_x * font_scale;
+        y = (380 + (sidebar_visible ? -25 : 0)) * scale_y * font_scale;
         this->setFixedSize(x, y);
-        x = 780 * scale_x * font_scale;
-        y = 400 * scale_y * font_scale;
+        x = 820 * scale_x * font_scale;
+        y = 430 * scale_y * font_scale;
         spawnCountPage->setFixedWidth(x);
         spawnCountPage->setMinimumHeight(y);
-        x = 1250 * scale_x * font_scale;
-        y = 240 * scale_y * font_scale;
+        x = 1280 * scale_x * font_scale;
+        y = 250 * scale_y * font_scale;
         targetMapPage->setFixedSize(x, y);
         x = 400 * scale_x * font_scale;
         y = 150 * scale_y * font_scale;
         cannonLauncherPage->setFixedSize(x, y);
-        x = 460 * scale_x * font_scale;
-        y = 110 * scale_y * font_scale;
+        x = 450 * scale_x * font_scale;
+        y = 120 * scale_y * font_scale;
         portalPage->setFixedSize(x, y);
-        x = 640 * scale_x * font_scale;
-        y = 490 * scale_y * font_scale;
+        x = 600 * scale_x * font_scale;
+        y = 420 * scale_y * font_scale;
         documentPage->setFixedSize(x, y);
     }
 }

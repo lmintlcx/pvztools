@@ -28,6 +28,7 @@
 
 #include "src/application.h"
 #include "src/window.h"
+#include "src/version.h"
 
 // 编译器目标平台限制为 x86
 // 因为目标应用 (植物大战僵尸1 PC版) 本身是 x86 的
@@ -75,7 +76,10 @@ int main(int argc, char *argv[])
     if (app.isRunning())
         return -1;
 
-    QPixmap pixmap(":/res/splash.jpg");
+    QImage image = QImage(":/res/splash.jpg");
+    if (TEST_VERSION)
+        image = image.convertToFormat(QImage::Format_Grayscale8);
+    QPixmap pixmap = QPixmap::fromImage(image);
     QSplashScreen splash(pixmap);
     splash.show();
     // splash.showMessage("Loading...");
