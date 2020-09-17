@@ -11,7 +11,7 @@ namespace Pt
 
 Code::Code()
 {
-    unsigned int page = 16; // 1 or 2 would be enough for most occasions
+    unsigned int page = 256; // 1MB
     code = new unsigned char[4096 * page];
     length = 0;
 }
@@ -42,6 +42,12 @@ void Code::asm_add_dword(unsigned int value)
 {
     (unsigned int &)code[length] = value;
     length += 4;
+}
+
+void Code::asm_add_list(std::initializer_list<unsigned char> value)
+{
+    for (auto it = value.begin(); it != value.end(); it++)
+        asm_add_byte(*it);
 }
 
 void Code::asm_push(int value)
@@ -106,6 +112,7 @@ void Code::asm_call(int addr)
     asm_push(addr);
     asm_ret();
 }
+
 void Code::asm_ret()
 {
     asm_add_byte((unsigned char)(0xc3));
@@ -138,12 +145,11 @@ void Code::asm_code_inject(HANDLE handle)
 
 #ifdef _DEBUG
     std::wcout << L"Wait Status: " << wait_status << std::endl;
-    assert(this->length > 0);
-    assert(this->length < 4096 * 16);
     std::wcout << L"Asm Code: ";
     for (size_t i = 0; i < this->length; i++)
         std::cout << std::hex << int(code[i]) << " ";
     std::cout << std::endl;
+    std::wcout << L"Code Length: " << std::dec << this->length << std::endl;
 #endif
 }
 

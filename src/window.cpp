@@ -32,6 +32,9 @@
 #include <QTranslator>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 #include <string>
 #include <array>
@@ -206,15 +209,19 @@ MainWindow::MainWindow(QWidget *parent)
 
     QSettings settings;
     bool first_open = settings.value("v2/FirstOpen", true).toBool();
+    int lineup_version = settings.value("v2/LineupVersion", 0).toInt();
+
     if (first_open)
-    {
         QTimer::singleShot(1618, documentPage, &QWidget::show);
-    }
-    settings.beginGroup("v2");
-    QStringList groups = settings.childGroups();
-    bool has_lineup = groups.contains("Lineup");
-    settings.endGroup();
-    if (!has_lineup)
+
+    QFile file(":/res/lineup_string.json");
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString content = file.readAll();
+    file.close();
+    QJsonDocument document = QJsonDocument::fromJson(content.toUtf8());
+    QJsonObject json_object = document.object();
+    int version = json_object["version"].toInt();
+    if (version > lineup_version)
     {
         lineupPage->InitLineupString();
         lineupPage->RefreshLineupString(); // page create before string for first time
@@ -1502,7 +1509,7 @@ void MainWindow::SetScreenSize()
         x = 400 * scale_x * font_scale;
         y = 120 * scale_y * font_scale;
         portalPage->setFixedSize(x, y);
-        x = 600 * scale_x * font_scale;
+        x = 610 * scale_x * font_scale;
         y = 420 * scale_y * font_scale;
         documentPage->setFixedSize(x, y);
     }

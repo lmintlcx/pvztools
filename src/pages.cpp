@@ -2846,6 +2846,7 @@ void LineupPage::InitLineupString(QString str)
     QJsonArray array = array_value.toArray();
 
     QSettings settings;
+    settings.setValue("v2/LineupVersion", json_object["version"].toInt());
     settings.remove("v2/Lineup/Official");
     settings.beginGroup("v2/Lineup/Official");
     for (int i = 0; i < array.size(); i++)
@@ -3090,8 +3091,14 @@ void LineupPage::UpdateLineupString()
             QString author = json_object["author"].toString();
             int version = json_object["version"].toInt();
             int counts = json_object["counts"].toInt();
-            // qDebug() << author << version;
-            if (author == "lmintlcx")
+            // qDebug() << author << version << counts;
+            QSettings settings;
+            int lineup_version = settings.value("v2/LineupVersion", 0).toInt();
+            settings.beginGroup("v2/Lineup/Official");
+            QStringList groups = settings.childGroups();
+            int lineup_counts = groups.size();
+            settings.endGroup();
+            if (author == "lmintlcx" && (version > lineup_version || counts != lineup_counts))
             {
                 InitLineupString(lineup_string);
                 RefreshLineupString();
@@ -3099,7 +3106,7 @@ void LineupPage::UpdateLineupString()
             }
             else
             {
-                //
+                emit ShowMessageStatusBar(tr("Lineup already up to date, version %1, total %2.").arg(lineup_version).arg(lineup_counts));
             }
         }
     }

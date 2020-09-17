@@ -2001,40 +2001,49 @@ int PvZ::GetRowCount()
 
 void PvZ::asm_plant(int row, int col, int type, bool imitater, bool iz_style)
 {
-    if (imitater && !iz_style) // imitater
+    if (imitater)
     {
         asm_push(type);
         asm_push(48);
-        asm_mov_exx(Reg::EAX, row);
-        asm_push(col);
-        asm_mov_exx_dword_ptr(Reg::EBP, 0x6a9ec0);
-        asm_mov_exx_dword_ptr_exx_add(Reg::EBP, 0x768);
-        asm_push_exx(Reg::EBP);
-        asm_call(0x0040d120);
-        asm_add_word(0xf08b); // mov esi, eax
-        asm_push_exx(Reg::EAX);
-        asm_call(0x00466b80);
-        asm_add_byte(0x58); // pop eax
     }
     else
     {
         asm_push(-1);
         asm_push(type);
-        asm_mov_exx(Reg::EAX, row);
-        asm_push(col);
-        asm_mov_exx_dword_ptr(Reg::EBP, 0x6a9ec0);
-        asm_mov_exx_dword_ptr_exx_add(Reg::EBP, 0x768);
-        asm_push_exx(Reg::EBP);
-        asm_call(0x0040d120);
+    }
+    asm_mov_exx(Reg::EAX, row);
+    asm_push(col);
+    asm_mov_exx_dword_ptr(Reg::EBP, 0x6a9ec0);
+    asm_mov_exx_dword_ptr_exx_add(Reg::EBP, 0x768);
+    asm_push_exx(Reg::EBP);
+    asm_call(0x0040d120);
+
+    if (imitater)
+    {
+        asm_add_list(0x8b, 0xf0); // mov esi,eax
+        asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
+        asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
+        asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0xac);
+        asm_mov_exx_dword_ptr(Reg::EBX, 0x6a9ec0);
+        asm_mov_exx_dword_ptr_exx_add(Reg::EBX, 0x768);
+        asm_mov_exx_dword_ptr_exx_add(Reg::EBX, 0xb8);
+        asm_add_list(0x69, 0xdb); // imul ebx,ebx,0000014C
+        asm_add_dword(0x0000014c);
+        asm_add_list(0x01, 0xd8); // add eax,ebx
+        asm_push_exx(Reg::EAX);
+        asm_call(0x00466b80);
+        asm_pop_exx(Reg::EAX);
     }
 
-    if (iz_style) // I, Zombie style
+    if (iz_style)
     {
+        asm_add_list(0x8b, 0xf0); // mov esi,eax
         asm_push_exx(Reg::EAX);
         asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
         asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
         asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x160);
         asm_call(0x0042a530);
+        asm_add_list(0x8b, 0xc6); // mov eax,esi
     }
 }
 
@@ -2737,8 +2746,7 @@ void PvZ::ClearAllPlants()
         for (size_t i = 0; i < plant_count_max; i++)
         {
             auto plant_disappeared = ReadMemory<bool>(plant_offset + 0x141 + 0x14c * i);
-            auto plant_crushed = ReadMemory<bool>(plant_offset + 0x142 + 0x14c * i);
-            if (!plant_disappeared && !plant_crushed)
+            if (!plant_disappeared)
             {
                 uint32_t addr = plant_offset + 0x14c * i;
                 asm_push(addr);
@@ -2747,6 +2755,10 @@ void PvZ::ClearAllPlants()
         }
         asm_ret();
         asm_code_inject();
+
+        // TODO
+        // WriteMemory<int>(0, 0x6a9ec0, 0x768, 0xb8); // 下一个编号
+        // WriteMemory<int>(0, 0x6a9ec0, 0x768, 0xb0); // 最大植物数
     }
 }
 
@@ -2781,6 +2793,15 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
 
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
+        int mode = GameMode();
+        bool is_el = mode >= 11 && mode <= 15;
+        bool is_iz = mode >= 61 && mode <= 70;
+        if (!is_el && !is_iz)
+        {
+            emit ShowMessageStatusBar(tr("The current mode is not 'Survival: Endless' or 'I, Zombie'."));
+            return;
+        }
+
         std::vector<std::string> str_list = split(str, ',');
         size_t count = str_list.size() - 1;
 
@@ -2827,14 +2848,17 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
         ClearItems(3);  // Ladder
         ClearItems(11); // Rake
         ClearAllPlants();
-        SetScene(game_scene);
-
         auto has_lawn_mower = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x110) > 0;
         if (has_lawn_mower)
-        {
             ClearLawnMowers();
+
+        SetScene(game_scene);
+        int music_id = game_scene + 1;
+        if (music_id == 6)
+            music_id = 2;
+        SetMusic(music_id);
+        if (has_lawn_mower)
             ResetLawnMowers();
-        }
 
         std::vector<std::array<int, 6>> items;
         for (size_t i = 0; i < count; i++)
@@ -2851,150 +2875,124 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
         }
 
         // create plants/ladder/rake/grave
-        int mode = ReadMemory<int>(0x6a9ec0, 0x7f8);
-        bool is_iz = (mode >= 61 && mode <= 70);
+        int rake_count = 0;
+
         asm_init();
         for (size_t i = 0; i < count; i++)
         {
             int item_type = items[i][0];
             int item_row = items[i][1];
             int item_col = items[i][2];
-            [[maybe_unused]] int item_state_row = items[i][3];
-            [[maybe_unused]] int item_state_col = items[i][4];
-            bool item_imitater = (items[i][5] == 0) ? false : true;
+            int item_state_row = items[i][3];
+            int item_state_col = items[i][4];
+            bool item_imitater = items[i][5] != 0;
 
-            if ((item_type >= 0) && (item_type <= 0x2f)) // plants
+            if (item_type >= 0 && item_type <= 0x2f) // plants
+            {
                 asm_plant(item_row, item_col, item_type, item_imitater, is_iz);
-            else if (item_type == 0x30) // ladder
-                asm_put_ladder(item_row, item_col);
-            else if (item_type == 0x31) // rake
-                asm_put_rake(item_row, item_col);
-            else if (item_type == 0x32) // grave
-                asm_put_grave(item_row, item_col);
-        }
-        asm_ret();
-        WriteMemory<int>(0x0000a681, 0x0040b9e3);
-        WriteMemory<byte>(0x00, 0x0040bb2b);
-        WriteMemory<int>(0x900c4d8b, 0x0040bb3b);
-        WriteMemory<int>(0x9010458b, 0x0040bb41);
-        asm_code_inject();
-        WriteMemory<int>(0x00027984, 0x0040b9e3);
-        WriteMemory<byte>(0xff, 0x0040bb2b);
-        WriteMemory<int>(0x10244c8b, 0x0040bb3b);
-        WriteMemory<int>(0x1424448b, 0x0040bb41);
 
-        std::vector<std::array<int, 5>> plants;
-        auto plant_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0xb0);
-        auto plant_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0xac);
-        for (size_t i = 0; i < plant_count_max; i++)
-        {
-            auto plant_disappeared = ReadMemory<bool>(plant_offset + 0x141 + 0x14c * i);
-            auto plant_crushed = ReadMemory<bool>(plant_offset + 0x142 + 0x14c * i);
-            if (!plant_disappeared && !plant_crushed)
-            {
-                auto plant_type = ReadMemory<uint32_t>(plant_offset + 0x24 + 0x14c * i);
-                auto plant_row = ReadMemory<uint32_t>(plant_offset + 0x1c + 0x14c * i);
-                auto plant_col = ReadMemory<uint32_t>(plant_offset + 0x28 + 0x14c * i);
-                auto is_imitater = ReadMemory<int>(plant_offset + 0x138 + 0x14c * i) == 48;
-                std::array<int, 5> plant;
-                plant[0] = i;
-                plant[1] = plant_type;
-                plant[2] = plant_row;
-                plant[3] = plant_col;
-                plant[4] = is_imitater ? 1 : 0;
-                plants.push_back(plant);
-            }
-        }
-
-        size_t plant_count = plants.size();
-
-        asm_init();
-        for (size_t i = 0; i < plant_count; i++)
-        {
-            int plant_index = plants[i][0];
-            int plant_type = plants[i][1];
-            int plant_row = plants[i][2];
-            int plant_col = plants[i][3];
-            bool is_imitater = (plants[i][4] == 0) ? false : true;
-            for (size_t j = 0; j < count; j++)
-            {
-                int item_type = items[j][0];
-                int item_row = items[j][1];
-                int item_col = items[j][2];
-                int item_state_row = items[j][3];
-                int item_state_col = items[j][4];
-                bool item_imitater = (items[j][5] == 0) ? false : true;
-                // which means this plant is the same one in string
-                if (item_type == plant_type && item_row == plant_row && item_col == plant_col && item_imitater == is_imitater)
+                // wake up mushrooms
+                if ((game_scene == 0 || game_scene == 2 || game_scene == 4) && may_sleep[item_type] && item_state_row == 1)
                 {
+                    asm_push_exx(Reg::EAX);
+                    asm_push(0);
+                    asm_call(0x0045e860);
+                    asm_pop_exx(Reg::EAX);
+                }
 
-                    // wake up mushrooms
-                    if ((game_scene == 0 || game_scene == 2 || game_scene == 4) && may_sleep[plant_type] && item_state_row == 1)
+                // Potato Mine and Sun-shroom grow up
+                if ((item_type == 4) || //
+                    (item_type == 9 && item_state_row == 1 && (item_state_col == 2 || item_state_col == 3)))
+                {
+                    asm_add_list(0xc7, 0x40, 0x54); // mov [eax+54],00000001
+                    asm_add_dword(0x00000001);
+                }
+
+                // set hp status
+                if (keep_hp_status)
+                {
+                    // Pumpkin / Wall-nut / Tall-nut / Garlic // 0046479A
+                    if ((item_type == 30 && (item_state_row == 1 || item_state_row == 2)) //
+                        || ((item_type == 3 || item_type == 23 || item_type == 36) && (item_state_col == 1 || item_state_col == 2)))
                     {
-                        auto plant_sleeping = ReadMemory<bool>(plant_offset + 0x143 + 0x14c * plant_index);
-                        if (plant_sleeping)
+                        asm_add_list(0x8b, 0xf0);       // mov esi,eax
+                        asm_add_list(0x8b, 0x4e, 0x44); // mov ecx,[esi+44]
+                        // damage piont 1, plant_hp_max * 2 / 3
+                        if ((item_type == 30 && item_state_row == 1) //
+                            || ((item_type == 3 || item_type == 23 || item_type == 36) && item_state_col == 1))
+                            asm_add_list(0x03, 0xc9);               // add ecx,ecx
+                        asm_add_list(0xb8, 0x56, 0x55, 0x55, 0x55); // mov eax,55555556
+                        asm_add_list(0xf7, 0xe9);                   // imul ecx
+                        asm_add_list(0x8b, 0xc2);                   // mov eax,edx
+                        asm_add_list(0xc1, 0xe8, 0x1f);             // shr eax,1F
+                        asm_add_list(0x03, 0xc2);                   // add eax,edx
+                        asm_add_list(0x83, 0xe8, 0x01);             // sub eax,01
+                        asm_add_list(0x89, 0x46, 0x40);             // mov [esi+40],eax
+                    }
+                    // Spikerock // 0045EC00
+                    else if ((item_type == 46) && (item_state_col == 1 || item_state_col == 2))
+                    {
+                        asm_add_list(0x8b, 0xf0); // mov esi,eax
+                        asm_add_list(
+                            0x8b, 0x06,                         // mov eax,[esi]
+                            0x8b, 0x88, 0x20, 0x08, 0x00, 0x00, // mov ecx,[eax+00000820]
+                            0x8b, 0x86, 0x94, 0x00, 0x00, 0x00, // mov eax,[esi+00000094]
+                            0x8b, 0x51, 0x08,                   // mov edx,[ecx+08]
+                            0x25, 0xff, 0xff, 0x00, 0x00,       // and eax,0000FFFF
+                            0x8d, 0x1c, 0x80,                   // lea ebx,[eax+eax*4]
+                            0xc1, 0xe3, 0x05,                   // shl ebx,05
+                            0x03, 0x1a                          // add ebx,[edx]
+                        );
+                        if (item_state_col == 1) // damage piont 1 : 300
                         {
-                            uint32_t addr = plant_offset + 0x14c * plant_index;
-                            asm_mov_exx(Reg::EAX, addr);
-                            asm_push(0);
-                            asm_call(0x0045e860);
+                            asm_add_list(0xa1, 0x6b, 0xec, 0x45, 0x00); // mov eax,[0045EC6B]
+                            asm_add_list(0x89, 0x46, 0x40);             // mov [esi+40],eax
+                            asm_add_list(0x6a, 0xff);                   // push -01
+                            asm_push(0x00668ce0);                       // push 00668CE0
+                            asm_call(0x004739e0);                       // call 004739E0
+                        }
+                        else // if (item_state_col == 2) // damage piont 2 : 150
+                        {
+                            asm_add_list(0xa1, 0x80, 0xec, 0x45, 0x00); // mov eax,[0045EC80]
+                            asm_add_list(0x89, 0x46, 0x40);             // mov [esi+40],eax
+                            asm_add_list(0x6a, 0xff);                   // push -01
+                            asm_push(0x00668cec);                       // push 00668CEC
+                            asm_call(0x004739e0);                       // call 004739E0
                         }
                     }
-
-                    // Potato Mine and Sun-shroom grow up
-                    // 0 should be ok, reserved for wake up call to excecute first
-                    uint32_t grow_up_delay = 10;
-#ifdef _DEBUG
-                    grow_up_delay = 100;
-#endif
-                    if ((plant_type == 4) || (plant_type == 9 && item_state_row == 1 && (item_state_col == 2 || item_state_col == 3)))
-                        WriteMemory<uint32_t>(grow_up_delay, plant_offset + 0x54 + 0x14c * plant_index);
-
-                    // set hp status
-                    if (keep_hp_status)
-                    {
-                        // Pumpkin
-                        if (item_type == 30)
-                        {
-                            auto plant_hp_max = ReadMemory<uint32_t>(plant_offset + 0x44 + 0x14c * plant_index);
-                            if (item_state_row == 1) // damage piont 1
-                                WriteMemory<uint32_t>(plant_hp_max * 2 / 3 - 1, plant_offset + 0x40 + 0x14c * plant_index);
-                            else if (item_state_row == 2) // damage piont 2
-                                WriteMemory<uint32_t>(plant_hp_max * 1 / 3 - 1, plant_offset + 0x40 + 0x14c * plant_index);
-                        }
-                        // Wall-nut / Tall-nut / Garlic
-                        else if (plant_type == 3 || plant_type == 23 || plant_type == 36)
-                        {
-                            auto plant_hp_max = ReadMemory<uint32_t>(plant_offset + 0x44 + 0x14c * plant_index);
-                            if (item_state_col == 1) // damage piont 1
-                                WriteMemory<uint32_t>(plant_hp_max * 2 / 3 - 1, plant_offset + 0x40 + 0x14c * plant_index);
-                            else if (item_state_col == 2) // damage piont 2
-                                WriteMemory<uint32_t>(plant_hp_max * 1 / 3 - 1, plant_offset + 0x40 + 0x14c * plant_index);
-                        }
-                        // Spikerock
-                        else if (plant_type == 46)
-                        {
-                            if (item_state_col == 1) // damage piont 1
-                                WriteMemory<uint32_t>(ReadMemory<uint32_t>(0x0045ec6b) - ReadMemory<signed char>(0x0045ec66),
-                                                      plant_offset + 0x40 + 0x14c * plant_index);
-                            else if (item_state_col == 2) // damage piont 2
-                                WriteMemory<uint32_t>(ReadMemory<uint32_t>(0x0045ec80) - ReadMemory<signed char>(0x0045ec66),
-                                                      plant_offset + 0x40 + 0x14c * plant_index);
-                            if (item_state_col == 1 || item_state_col == 2)
-                            {
-                                uint32_t addr = plant_offset + 0x14c * plant_index;
-                                asm_mov_exx(Reg::ESI, addr);
-                                asm_call(0x0045ec00); // attack hp -50
-                            }
-                        }
-                    }
-
-                    break; // theoretically there can be only one and same plant on each grid
                 }
             }
+
+            else if (item_type == 0x30) // ladder
+            {
+                asm_put_ladder(item_row, item_col);
+            }
+            else if (item_type == 0x31) // rake
+            {
+                asm_put_rake(item_row, item_col);
+                rake_count++;
+            }
+            else if (item_type == 0x32) // grave
+            {
+                asm_put_grave(item_row, item_col);
+            }
         }
         asm_ret();
+        if (rake_count > 0)
+        {
+            WriteMemory<int>(0x0000a681, 0x0040b9e3);
+            WriteMemory<byte>(0x00, 0x0040bb2b);
+            WriteMemory<int>(0x900c4d8b, 0x0040bb3b);
+            WriteMemory<int>(0x9010458b, 0x0040bb41);
+        }
         asm_code_inject();
+        if (rake_count > 0)
+        {
+            WriteMemory<int>(0x00027984, 0x0040b9e3);
+            WriteMemory<byte>(0xff, 0x0040bb2b);
+            WriteMemory<int>(0x10244c8b, 0x0040bb3b);
+            WriteMemory<int>(0x1424448b, 0x0040bb41);
+        }
     }
     Sleep(10);
 }
@@ -3879,7 +3877,7 @@ void PvZ::asm_launch_cannon(int index, int x, int y)
     asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
     asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
     asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0xac);
-    asm_add_byte((unsigned char)(0x05)); // add eax
+    asm_add_byte(0x05); // add eax,
     asm_add_dword(0x14c * index);
     asm_push(y);
     asm_push(x);

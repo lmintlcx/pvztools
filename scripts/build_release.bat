@@ -7,9 +7,6 @@ set UPX_DIR=C:\tools\UPX
 
 if not exist %QT_DIR% exit
 if not exist %SRC_DIR% exit
-
-REM if exist %BUILD_DIR%\.. cd /d %BUILD_DIR%\..
-REM if exist %BUILD_DIR% rd /q /s %BUILD_DIR%
 if not exist %BUILD_DIR% md %BUILD_DIR%
 cd /d %BUILD_DIR%
 
@@ -21,8 +18,3 @@ nmake Release
 start pythonw %SRC_DIR%\scripts\+1s.py
 
 %UPX_DIR%\upx.exe --lzma --ultra-brute %BUILD_DIR%\release\pvztools.exe
-
-REM del %SRC_DIR%\binaries\pvztools.exe
-REM copy /y %BUILD_DIR%\release\pvztools.exe %SRC_DIR%\binaries\pvztools.exe
-
-REM if exist %BUILD_DIR%\.. cd /d %BUILD_DIR%\.. && rd /q /s %BUILD_DIR%
