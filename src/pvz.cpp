@@ -1369,7 +1369,7 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
             std::discrete_distribution<unsigned int> dist_flag(weights_flag.begin(), weights_flag.end());
             std::discrete_distribution<unsigned int> dist_normal(weights_normal.begin(), weights_normal.end());
             auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-            std::mt19937 gen(seed);
+            std::mt19937 gen(static_cast<unsigned int>(seed));
 
             uint32_t type = 0;
             for (size_t i = 0; i < 1000; i++)
@@ -1637,12 +1637,23 @@ void PvZ::LockShovel(bool on)
     if (GameOn())
     {
         if (on)
-        {
             WriteMemory<byte>(0x39, 0x004123a3);
-            WriteMemory<int>(6, 0x6a9ec0, 0x768, 0x138, 0x30);
-        }
         else
             WriteMemory<byte>(0x89, 0x004123a3);
+
+        if (GameUI() == 2 || GameUI() == 3)
+        {
+            auto cursor_offset = ReadMemory<int>(0x6a9ec0, 0x768, 0x138);
+            if (on)
+            {
+                WriteMemory<int>(6, cursor_offset + 0x30);
+            }
+            else
+            {
+                if (ReadMemory<int>(cursor_offset + 0x30) == 6)
+                    WriteMemory<int>(0, cursor_offset + 0x30);
+            }
+        }
     }
 }
 
@@ -2020,19 +2031,19 @@ void PvZ::asm_plant(int row, int col, int type, bool imitater, bool iz_style)
 
     if (imitater)
     {
-        asm_add_list(0x8b, 0xf0); // mov esi,eax
-        asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
-        asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
-        asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0xac);
+        asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
+        asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x768);
+        asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0xac);
         asm_mov_exx_dword_ptr(Reg::EBX, 0x6a9ec0);
         asm_mov_exx_dword_ptr_exx_add(Reg::EBX, 0x768);
         asm_mov_exx_dword_ptr_exx_add(Reg::EBX, 0xb8);
-        asm_add_list(0x69, 0xdb); // imul ebx,ebx,0000014C
-        asm_add_dword(0x0000014c);
-        asm_add_list(0x01, 0xd8); // add eax,ebx
-        asm_push_exx(Reg::EAX);
+        asm_add_list(0x69, 0xdb, 0x4c, 0x01, 0x00, 0x00); // imul ebx,ebx,0000014C
+        asm_add_list(0x01, 0xd9);                         // add ecx,ebx
+        asm_push_exx(Reg::ECX);
+        asm_add_list(0x8b, 0xf0); // mov esi,eax
         asm_call(0x00466b80);
-        asm_pop_exx(Reg::EAX);
+        asm_pop_exx(Reg::ECX);
+        asm_add_list(0x8b, 0xc1); // mov eax,ecx
     }
 
     if (iz_style)
@@ -2446,6 +2457,29 @@ void PvZ::ClearItems(int index)
     }
 }
 
+void PvZ::ClearItems(std::vector<int> indexs)
+{
+    if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    {
+        asm_init();
+        auto grid_item_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x120);
+        auto grid_item_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x11c);
+        for (size_t i = 0; i < grid_item_count_max; i++)
+        {
+            auto grid_item_disappeared = ReadMemory<bool>(grid_item_offset + 0x20 + 0xec * i);
+            auto grid_item_type = ReadMemory<int>(grid_item_offset + 0x8 + 0xec * i);
+            if (!grid_item_disappeared && std::find(indexs.begin(), indexs.end(), grid_item_type) != indexs.end())
+            {
+                int addr = grid_item_offset + 0xec * i;
+                asm_mov_exx(Reg::ESI, addr);
+                asm_call(0x0044d000);
+            }
+        }
+        asm_ret();
+        asm_code_inject();
+    }
+}
+
 void PvZ::StartLawnMowers()
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
@@ -2513,81 +2547,6 @@ void PvZ::ResetLawnMowers()
 }
 
 // Lineup
-
-void PvZ::SetQuickLineupMode(bool on)
-{
-    if (GameOn())
-    {
-        if (on)
-        {
-            // Auto Collect
-            WriteMemory<byte>(0xeb, 0x0043158f);
-            // Cob Cannon No CD
-            WriteMemory<byte>(0x80, 0x0046103b);
-            // Plant Invincible
-            WriteMemory(std::array<byte, 3>{0x46, 0x40, 0x00}, 0x0052fcf1);
-            WriteMemory<byte>(0xeb, 0x0041cc2f);
-            WriteMemory<byte>(0xeb, 0x005276ea);
-            WriteMemory(std::array<byte, 3>{0x90, 0x90, 0x90}, 0x0046cfeb);
-            WriteMemory(std::array<byte, 3>{0x90, 0x90, 0x90}, 0x0046d7a6);
-            WriteMemory<byte>(0xeb, 0x0052e93b);
-            WriteMemory<byte>(0x70, 0x0045ee0a);
-            WriteMemory<byte>(0x00, 0x0045ec66);
-            WriteMemory(std::array<byte, 3>{0xc2, 0x04, 0x00}, 0x00462b80);
-            // Stop Spawning
-            WriteMemory<byte>(0xeb, 0x004265dc);
-            // Ignore Sun
-            WriteMemory<byte>(0x70, 0x0041ba72);
-            WriteMemory<byte>(0x3b, 0x0041ba74);
-            WriteMemory<byte>(0x91, 0x0041bac0);
-            WriteMemory<byte>(0x80, 0x00427a92);
-            WriteMemory<byte>(0x80, 0x00427dfd);
-            WriteMemory<byte>(0xeb, 0x0042487f);
-            // Slots No CD
-            WriteMemory<byte>(0x70, 0x00487296);
-            WriteMemory<byte>(0xeb, 0x00488250);
-            // Purple Seed Unlimited
-            WriteMemory(std::array<byte, 3>{0xb0, 0x01, 0xc3}, 0x0041d7d0);
-            WriteMemory<byte>(0xeb, 0x0040e477);
-            // No Fog
-            WriteMemory<unsigned short>(0xd231, 0x0041a68d);
-        }
-        else
-        {
-            // Auto Collect
-            WriteMemory<byte>(0x75, 0x0043158f);
-            // Cob Cannon No CD
-            WriteMemory<byte>(0x85, 0x0046103b);
-            // Plant Invincible
-            WriteMemory(std::array<byte, 3>{0x46, 0x40, 0xfc}, 0x0052fcf1);
-            WriteMemory<byte>(0x74, 0x0041cc2f);
-            WriteMemory<byte>(0x75, 0x005276ea);
-            WriteMemory(std::array<byte, 3>{0x29, 0x50, 0x40}, 0x0046cfeb);
-            WriteMemory(std::array<byte, 3>{0x29, 0x4e, 0x40}, 0x0046d7a6);
-            WriteMemory<byte>(0x74, 0x0052e93b);
-            WriteMemory<byte>(0x75, 0x0045ee0a);
-            WriteMemory<byte>(0xce, 0x0045ec66);
-            WriteMemory(std::array<byte, 3>{0x53, 0x55, 0x8b}, 0x00462b80);
-            // Stop Spawning
-            WriteMemory<byte>(0x74, 0x004265dc);
-            // Ignore Sun
-            WriteMemory<byte>(0x7f, 0x0041ba72);
-            WriteMemory<byte>(0x2b, 0x0041ba74);
-            WriteMemory<byte>(0x9e, 0x0041bac0);
-            WriteMemory<byte>(0x8f, 0x00427a92);
-            WriteMemory<byte>(0x8f, 0x00427dfd);
-            WriteMemory<byte>(0x74, 0x0042487f);
-            // Slots No CD
-            WriteMemory<byte>(0x7e, 0x00487296);
-            WriteMemory<byte>(0x75, 0x00488250);
-            // Purple Seed Unlimited
-            WriteMemory(std::array<byte, 3>{0x51, 0x83, 0xf8}, 0x0041d7d0);
-            WriteMemory<byte>(0x74, 0x0040e477);
-            // No Fog
-            WriteMemory<unsigned short>(0xf23b, 0x0041a68d);
-        }
-    }
-}
 
 void PvZ::QuickPass()
 {
@@ -2844,9 +2803,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
             break;
         }
 
-        ClearItems(1);  // Grave
-        ClearItems(3);  // Ladder
-        ClearItems(11); // Rake
+        ClearItems(std::vector<int>{1, 3, 11}); // Grave Ladder Rake
         ClearAllPlants();
         auto has_lawn_mower = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x110) > 0;
         if (has_lawn_mower)
@@ -2892,7 +2849,8 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                 asm_plant(item_row, item_col, item_type, item_imitater, is_iz);
 
                 // wake up mushrooms
-                if ((game_scene == 0 || game_scene == 2 || game_scene == 4) && may_sleep[item_type] && item_state_row == 1)
+                if ((game_scene == 0 || game_scene == 2 || game_scene == 4) //
+                    && may_sleep[item_type] && item_state_row == 1)
                 {
                     asm_push_exx(Reg::EAX);
                     asm_push(0);
@@ -2994,6 +2952,225 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
             WriteMemory<int>(0x1424448b, 0x0040bb41);
         }
     }
+    Sleep(10);
+}
+
+void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
+{
+    const bool may_sleep[] = {false, false, false, false, false, false, false, false,
+                              true, true, true, false, true, true, true, true,
+                              false, false, false, false, false, false, false, false,
+                              true, false, false, false, false, false, false, true,
+                              false, false, false, false, false, false, false, false,
+                              false, false, true, false, false, false, false, false};
+
+    if (!std::regex_match(lineup, std::regex("[a-zA-Z0-9+/=]{18,164}")))
+        return;
+    if (lineup.size() % 4 != 0)
+        return;
+    if (std::count(lineup.begin(), lineup.end(), '=') > 2)
+        return;
+
+    uint16_t items[6 * 9] = {0};
+    uint8_t rake_row = 0, scene = 2;
+
+    unsigned long size = 128;
+    unsigned char lineup_bin[128] = {0};
+    BOOL ret_decode = CryptStringToBinaryA(lineup.c_str(), 0, CRYPT_STRING_BASE64, lineup_bin, &size, nullptr, nullptr);
+    if (ret_decode == FALSE)
+        return;
+
+    for (size_t i = 0; i < size; i++)
+        lineup_bin[i] = lineup_bin[i] ^ (unsigned char)0x54;
+
+    rake_row = lineup_bin[size - 1] >> 4;
+    scene = lineup_bin[size - 1] & 0b00001111;
+    if (scene >= 6)
+        return;
+    if (rake_row != 0 && rake_row > ((scene == 2 || scene == 3) ? 6 : 5))
+        return;
+    if ((scene == 2 || scene == 3) && (rake_row == 3 || rake_row == 4))
+        return;
+
+    unsigned long cut_size = 6 * 9 * sizeof(uint16_t);
+    int ret_decomp = uncompress((unsigned char *)items, &cut_size, lineup_bin, size - 1);
+    if (ret_decomp != Z_OK)
+        return;
+    if (cut_size != ((scene == 2 || scene == 3) ? 6 : 5) * 9 * sizeof(uint16_t))
+        return;
+
+    uint16_t plant[6 * 9] = {0};
+    uint16_t plant_im[6 * 9] = {0};
+    uint16_t plant_awake[6 * 9] = {0};
+    uint16_t base[6 * 9] = {0};
+    uint16_t base_im[6 * 9] = {0};
+    uint16_t pumpkin[6 * 9] = {0};
+    uint16_t pumpkin_im[6 * 9] = {0};
+    uint16_t coffee[6 * 9] = {0};
+    uint16_t coffee_im[6 * 9] = {0};
+    uint16_t ladder[6 * 9] = {0};
+
+    for (size_t r = 0; r < 6; r++)
+    {
+        for (size_t c = 0; c < 9; c++)
+        {
+            uint16_t item = items[r * 9 + c];
+            plant[r * 9 + c] = (item & 0b1111110000000000) >> 10;
+            plant_im[r * 9 + c] = (item & 0b0000001000000000) >> 9;
+            plant_awake[r * 9 + c] = (item & 0b0000000100000000) >> 8;
+            base[r * 9 + c] = (item & 0b0000000011000000) >> 6;
+            base_im[r * 9 + c] = (item & 0b0000000000100000) >> 5;
+            pumpkin[r * 9 + c] = (item & 0b0000000000010000) >> 4;
+            pumpkin_im[r * 9 + c] = (item & 0b0000000000001000) >> 3;
+            coffee[r * 9 + c] = (item & 0b0000000000000100) >> 2;
+            coffee_im[r * 9 + c] = (item & 0b0000000000000010) >> 1;
+            ladder[r * 9 + c] = (item & 0b0000000000000001) >> 0;
+        }
+    }
+
+    // 下面是正式布阵
+
+    if (!GameOn())
+        return;
+    int ui = GameUI();
+    if (ui != 2 && ui != 3)
+        return;
+
+    int mode = GameMode();
+    bool is_el = mode >= 11 && mode <= 15;
+    bool is_iz = mode >= 61 && mode <= 70;
+    if (!is_el && !is_iz)
+    {
+        emit ShowMessageStatusBar(tr("The current mode is not 'Survival: Endless' or 'I, Zombie'."));
+        return;
+    }
+
+    if (scene != GetScene() && !enable_switch_scene)
+    {
+        emit ShowMessageStatusBar(tr("The target lineup scene is inconsistent with the current scene."));
+        return;
+    }
+
+    ClearItems(std::vector<int>{1, 3, 11});
+    ClearAllPlants();
+    auto has_lawn_mower = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x110) > 0;
+    if (has_lawn_mower)
+        ClearLawnMowers();
+
+    SetScene(scene);
+    int music_id = scene + 1;
+    if (music_id == 6)
+        music_id = 2;
+    SetMusic(music_id);
+    if (has_lawn_mower)
+        ResetLawnMowers();
+
+    if (rake_row != 0)
+    {
+        WriteMemory<int>(0x0000a681, 0x0040b9e3);
+        WriteMemory<byte>(0x00, 0x0040bb2b);
+        WriteMemory<int>(0x900c4d8b, 0x0040bb3b);
+        WriteMemory<int>(0x9010458b, 0x0040bb41);
+        asm_init();
+        int r = rake_row - 1;
+        int c = 8 - 1;
+        asm_put_rake(r, c);
+        asm_ret();
+        asm_code_inject();
+        WriteMemory<int>(0x00027984, 0x0040b9e3);
+        WriteMemory<byte>(0xff, 0x0040bb2b);
+        WriteMemory<int>(0x10244c8b, 0x0040bb3b);
+        WriteMemory<int>(0x1424448b, 0x0040bb41);
+    }
+
+    asm_init();
+    // 睡莲 花盆
+    for (size_t r = 0; r < 6; r++)
+    {
+        for (size_t c = 0; c < 9; c++)
+        {
+            if (base[r * 9 + c] == 1)
+                asm_plant(r, c, 16, base_im[r * 9 + c] == 1, is_iz);
+            else if (base[r * 9 + c] == 2)
+                asm_plant(r, c, 33, base_im[r * 9 + c] == 1, is_iz);
+        }
+    }
+    // 主要植物
+    for (size_t r = 0; r < 6; r++)
+    {
+        for (size_t c = 0; c < 9; c++)
+        {
+            if (plant[r * 9 + c] == 0)
+                continue;
+
+            int plant_type = plant[r * 9 + c] - 1;
+            bool plant_imitater = plant_im[r * 9 + c] == 1;
+            bool plant_asleep = plant_awake[r * 9 + c] == 0;
+
+            if (plant_type < 0 || plant_type > 47       //
+                || plant_type == 16 || plant_type == 33 //
+                || plant_type == 30 || plant_type == 35)
+                continue;
+
+            asm_plant(r, c, plant_type, plant_imitater, is_iz);
+
+            // 蘑菇类植物唤醒
+            if ((scene == 0 || scene == 2 || scene == 4) //
+                && may_sleep[plant_type] && !plant_asleep)
+            {
+                asm_push_exx(Reg::EAX);
+                asm_push(0);
+                asm_call(0x0045e860);
+                asm_pop_exx(Reg::EAX);
+            }
+
+            // 土豆雷和阳光菇长大
+            if (plant_type == 4 || plant_type == 9)
+            {
+                asm_add_list(0xc7, 0x40, 0x54); // mov [eax+54],00000001
+                asm_add_dword(0x00000001);
+            }
+        }
+    }
+    // 南瓜壳
+    for (size_t r = 0; r < 6; r++)
+    {
+        for (size_t c = 0; c < 9; c++)
+        {
+            if (pumpkin[r * 9 + c] == 1)
+                asm_plant(r, c, 30, pumpkin_im[r * 9 + c] == 1, is_iz);
+        }
+    }
+    // 咖啡豆
+    for (size_t r = 0; r < 6; r++)
+    {
+        for (size_t c = 0; c < 9; c++)
+        {
+            if (coffee[r * 9 + c] == 1)
+                asm_plant(r, c, 35, coffee_im[r * 9 + c] == 1, is_iz);
+        }
+    }
+    // 墓碑
+    for (size_t r = 0; r < 6; r++)
+    {
+        for (size_t c = 0; c < 9; c++)
+        {
+            if (base[r * 9 + c] == 3)
+                asm_put_grave(r, c);
+        }
+    }
+    // 梯子
+    for (size_t r = 0; r < 6; r++)
+    {
+        for (size_t c = 0; c < 9; c++)
+        {
+            if (ladder[r * 9 + c] == 1)
+                asm_put_ladder(r, c);
+        }
+    }
+    asm_ret();
+    asm_code_inject();
+
     Sleep(10);
 }
 

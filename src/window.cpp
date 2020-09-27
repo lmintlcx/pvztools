@@ -131,9 +131,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     SetLanguage();
     if (TEST_VERSION) // TODO
-        setWindowTitle(tr("PvZ Tools") + " " + VERSION_NAME + " " + "beta");
+        setWindowTitle(tr("Plants vs. Zombies 1.0.0.1051 Toolset") + " " + VERSION_NAME + " " + "beta");
     else
-        setWindowTitle(tr("PvZ Tools"));
+        setWindowTitle(tr("Plants vs. Zombies 1.0.0.1051 Toolset"));
 
     // Default Page
 
@@ -1024,8 +1024,8 @@ void MainWindow::ConnectPages()
     connect(scenePage, &ScenePage::SetMusic,
             pvz, &PvZ::SetMusic);
 
-    connect(scenePage, &ScenePage::ClearItems,
-            pvz, &PvZ::ClearItems);
+    connect(scenePage, &ScenePage::ClearItems, // pvz, &PvZ::ClearItems);
+            pvz, static_cast<void (PvZ::*)(int)>(&PvZ::ClearItems));
 
     connect(scenePage, &ScenePage::StartLawnMowers,
             pvz, &PvZ::StartLawnMowers);
@@ -1068,9 +1068,6 @@ void MainWindow::ConnectPages()
     connect(lineupPage, &LineupPage::SetQuickLineupMode,
             effectPage, &EffectPage::SetQuickLineupMode);
 
-    connect(lineupPage, &LineupPage::SetQuickLineupMode,
-            pvz, &PvZ::SetQuickLineupMode);
-
     connect(lineupPage, &LineupPage::QuickPass,
             pvz, &PvZ::QuickPass);
 
@@ -1091,6 +1088,9 @@ void MainWindow::ConnectPages()
 
     connect(lineupPage, &LineupPage::SetLineup,
             pvz, &PvZ::SetLineup);
+
+    connect(lineupPage, &LineupPage::SetLineup2,
+            pvz, &PvZ::SetLineup2);
 
     connect(lineupPage, &LineupPage::GetLineup,
             pvz, &PvZ::GetLineup);

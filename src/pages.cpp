@@ -635,7 +635,16 @@ void ResourcePage::UpdateGameData()
 
 void ResourcePage::SetQuickLineupMode(bool on)
 {
-    autoCollectCheckBox->setChecked(on);
+    if (on)
+    {
+        autoCollectCheckBox->setEnabled(false);
+        emit AutoCollect(true);
+    }
+    else
+    {
+        autoCollectCheckBox->setEnabled(true);
+        emit AutoCollect(autoCollectCheckBox->isChecked());
+    }
 }
 
 void ResourcePage::KeepSelectedFeatures()
@@ -867,8 +876,27 @@ void PlantsPage::TranslateUI()
 
 void PlantsPage::SetQuickLineupMode(bool on)
 {
-    cobsNoCdCheckBox->setChecked(on);
-    plantInvincibleCheckBox->setChecked(on);
+    if (on)
+    {
+        cobsNoCdCheckBox->setEnabled(false);
+        plantInvincibleCheckBox->setEnabled(false);
+        plantWeakCheckBox->setEnabled(false);
+        emit CobCannonNoCD(true);
+        emit SetPlantStrength(Strength::Invincible);
+    }
+    else
+    {
+        cobsNoCdCheckBox->setEnabled(true);
+        plantInvincibleCheckBox->setEnabled(true);
+        plantWeakCheckBox->setEnabled(true);
+        emit CobCannonNoCD(cobsNoCdCheckBox->isChecked());
+        if (plantInvincibleCheckBox->isChecked())
+            emit SetPlantStrength(Strength::Invincible);
+        else if (plantWeakCheckBox->isChecked())
+            emit SetPlantStrength(Strength::Weak);
+        else
+            emit SetPlantStrength(Strength::Normal);
+    }
 }
 
 void PlantsPage::KeepSelectedFeatures()
@@ -1176,7 +1204,16 @@ void ZombiesPage::TranslateUI()
 
 void ZombiesPage::SetQuickLineupMode(bool on)
 {
-    stopSpawningCheckBox->setChecked(on);
+    if (on)
+    {
+        stopSpawningCheckBox->setEnabled(false);
+        emit StopSpawning(true);
+    }
+    else
+    {
+        stopSpawningCheckBox->setEnabled(true);
+        emit StopSpawning(stopSpawningCheckBox->isChecked());
+    }
 }
 
 void ZombiesPage::KeepSelectedFeatures()
@@ -1714,7 +1751,7 @@ void SpawnDetailedPage::TranslateUI()
     limitBungeeCheckBox->setText(tr("Limit Bungee"));
     limitGigaCheckBox->setText(tr("Limit Giga"));
 
-    weightGigaLabel->setText(tr("Weight of GigaGargantuar in non huge wave:"));
+    weightGigaLabel->setText(tr("Weight of GigaGargantuar in non huge waves:"));
 
     limitFlagCheckBox->setStatusTip(tr("Flag Zombie will only appear in each flag wave (huge wave)."));
     limitYetiCheckBox->setStatusTip(tr("There will be only one Zombie Yeti."));
@@ -2169,9 +2206,24 @@ void SlotsPage::UpdateGameData()
 
 void SlotsPage::SetQuickLineupMode(bool on)
 {
-    ignoreSunCheckBox->setChecked(on);
-    slotsNoCdCheckBox->setChecked(on);
-    purpleSeedUnlimitedCheckBox->setChecked(on);
+    if (on)
+    {
+        ignoreSunCheckBox->setEnabled(false);
+        slotsNoCdCheckBox->setEnabled(false);
+        purpleSeedUnlimitedCheckBox->setEnabled(false);
+        emit IgnoreSun(true);
+        emit SlotsNoCoolDown(true);
+        emit PurpleSeedUnlimited(true);
+    }
+    else
+    {
+        ignoreSunCheckBox->setEnabled(true);
+        slotsNoCdCheckBox->setEnabled(true);
+        purpleSeedUnlimitedCheckBox->setEnabled(true);
+        emit IgnoreSun(ignoreSunCheckBox->isChecked());
+        emit SlotsNoCoolDown(slotsNoCdCheckBox->isChecked());
+        emit PurpleSeedUnlimited(purpleSeedUnlimitedCheckBox->isChecked());
+    }
 }
 
 void SlotsPage::KeepSelectedFeatures()
@@ -2616,6 +2668,7 @@ LineupPage::LineupPage(QWidget *parent)
 
     deleteStringButton->setEnabled(false);
 
+    stringTextEdit->setLineWrapMode(QPlainTextEdit::WidgetWidth);
     stringTextEdit->setPlainText("0,E 1 1 0 0 0,E 2 1 0 0 0,E 3 1 0 0 0,E 4 1 0 0 0,E 5 1 0 0 0,E 5 2 0 0 0,E 1 5 0 0 0,E 1 4 0 0 0,E 2 4 0 0 0,E 3 4 0 0 0,E 4 4 0 0 0,E 5 4 0 0 0,E 5 5 0 0 0,E 1 7 0 0 0,E 2 7 0 0 0,E 3 8 0 0 0,E 4 9 0 0 0,E 5 9 0 0 0,E 1 9 0 0 0,E 2 9 0 0 0,E 4 7 0 0 0,E 5 7 0 0 0"); // LCX
 
     mainLayout = new QGridLayout(this);
@@ -2727,7 +2780,14 @@ LineupPage::LineupPage(QWidget *parent)
                 }
                 else
                 {
+                    // 一边说着不要一边试着当成新字符串去布阵
                     emit ShowMessageStatusBar(tr("Wrong string format!"));
+                    std::string str = string.toStdString();
+                    bool switch_scene = allowSwitchSceneCheckBox->isChecked();
+#ifdef _DEBUG
+                    switch_scene = true;
+#endif
+                    emit SetLineup2(str, switch_scene);
                 }
             });
 
@@ -2749,6 +2809,17 @@ LineupPage::LineupPage(QWidget *parent)
             this, [=]() {
                 QClipboard *clipboard = QApplication::clipboard();
                 QString text = clipboard->text();
+
+                // 去除首尾的空格和任意位置的空白字符
+                // 中间的字符会被替换成单个空格, 再把逗号旁边多余的空格去掉
+                text = text.simplified();
+                text.replace(QString(" ,"), QString(","));
+                text.replace(QString(", "), QString(","));
+
+                // 看起来像新格式的话把所有空格都去掉
+                if (text[0] == "L")
+                    text.remove(QRegExp("\\s"));
+
                 stringTextEdit->setPlainText(text);
                 emit ShowMessageStatusBar(tr("Already pasted."));
             });
@@ -3125,7 +3196,7 @@ void LineupPage::UpdateLineupString()
 void LineupPage::SaveLineupString()
 {
     QString string = stringTextEdit->toPlainText();
-    if (!(StringCheck(string)))
+    if (!StringCheck(string))
     {
         emit ShowMessageStatusBar(tr("Wrong string format!"));
         return;
@@ -4126,7 +4197,16 @@ void EffectPage::ShowIceTrailX(int x)
 
 void EffectPage::SetQuickLineupMode(bool on)
 {
-    noFogCheckBox->setChecked(on);
+    if (on)
+    {
+        noFogCheckBox->setEnabled(false);
+        emit NoFog(true);
+    }
+    else
+    {
+        noFogCheckBox->setEnabled(true);
+        emit NoFog(noFogCheckBox->isChecked());
+    }
 }
 
 void EffectPage::KeepSelectedFeatures()

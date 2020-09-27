@@ -8,6 +8,10 @@
 
 #include <QObject>
 
+#include <QtZlib/zlib.h>
+
+#include <regex>
+
 #include "src/process.h"
 #include "src/code.h"
 
@@ -218,17 +222,18 @@ public:
     void SetRowType(int, int);
     void SetMusic(int);
     void ClearItems(int);
+    void ClearItems(std::vector<int>);
     void StartLawnMowers();
     void ClearLawnMowers();
     void ResetLawnMowers();
     // Lineup
-    void SetQuickLineupMode(bool);
     void QuickPass();
     void ClearAllGraves();
     void LilyPadOnPool(int);
     void FlowerPotOnRoof(int);
     void ClearAllPlants();
     void SetLineup(std::string, bool, bool);
+    void SetLineup2(std::string, bool);
     std::string GetLineup(bool);
     // Garden
     void FertilizerUnlimited(bool);

@@ -560,6 +560,7 @@ signals:
     void FlowerPotOnRoof(int);
     void ClearAllPlants();
     void SetLineup(std::string, bool, bool);
+    void SetLineup2(std::string, bool);
     void GetLineup(bool);
     void ShowMessageStatusBar(QString);
 
