@@ -2672,13 +2672,13 @@
     </message>
     <message>
         <location filename="../src/pvz.cpp" line="2760"/>
-        <location filename="../src/pvz.cpp" line="3044"/>
+        <location filename="../src/pvz.cpp" line="3049"/>
         <source>The current mode is not &apos;Survival: Endless&apos; or &apos;I, Zombie&apos;.</source>
         <translation>当前模式不是“生存无尽”或者“我是僵尸”。</translation>
     </message>
     <message>
         <location filename="../src/pvz.cpp" line="2778"/>
-        <location filename="../src/pvz.cpp" line="3050"/>
+        <location filename="../src/pvz.cpp" line="3055"/>
         <source>The target lineup scene is inconsistent with the current scene.</source>
         <translation>目标阵型场地和当前场地不一致。</translation>
     </message>

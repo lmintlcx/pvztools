@@ -2871,7 +2871,7 @@ void LineupPage::TranslateUI()
 
 bool LineupPage::StringCheck(const QString &text)
 {
-    QRegExp reg("[0-5](,[a-fA-F0-9]{1,2} [1-6] [1-9] [0-2] [0-4] [0-1]){0,}");
+    QRegExp reg("[0-5](,[a-fA-F0-9]{1,2} [1-6] [1-9] [0-2] [0-4]( [a-zA-Z0-9]{1,}){0,}){0,}");
     return reg.exactMatch(text);
     // return true;
 }

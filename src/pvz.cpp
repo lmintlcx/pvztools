@@ -2817,35 +2817,44 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
         if (has_lawn_mower)
             ResetLawnMowers();
 
-        std::vector<std::array<int, 6>> items;
+        int rake_count = 0;
         for (size_t i = 0; i < count; i++)
         {
-            std::array<int, 6> item;
             std::vector<std::string> item_str = split(str_list[i + 1], ' ');
-            item[0] = hex2dec(item_str[0]);
-            item[1] = atoi(item_str[1].c_str()) - 1;
-            item[2] = atoi(item_str[2].c_str()) - 1;
-            item[3] = atoi(item_str[3].c_str());
-            item[4] = atoi(item_str[4].c_str());
-            item[5] = atoi(item_str[5].c_str());
-            items.push_back(item);
+            if (item_str[0] == "31")
+                rake_count++;
         }
 
-        // create plants/ladder/rake/grave
-        int rake_count = 0;
+        if (rake_count > 0)
+        {
+            WriteMemory<int>(0x0000a681, 0x0040b9e3);
+            WriteMemory<byte>(0x00, 0x0040bb2b);
+            WriteMemory<int>(0x900c4d8b, 0x0040bb3b);
+            WriteMemory<int>(0x9010458b, 0x0040bb41);
+        }
 
         asm_init();
+
         for (size_t i = 0; i < count; i++)
         {
-            int item_type = items[i][0];
-            int item_row = items[i][1];
-            int item_col = items[i][2];
-            int item_state_row = items[i][3];
-            int item_state_col = items[i][4];
-            bool item_imitater = items[i][5] != 0;
+            std::vector<std::string> item_str = split(str_list[i + 1], ' ');
+            int item_type = hex2dec(item_str[0]);
 
-            if (item_type >= 0 && item_type <= 0x2f) // plants
+            if (item_type == 0x31) // 钉耙
             {
+                int item_row = atoi(item_str[1].c_str()) - 1;
+                int item_col = atoi(item_str[2].c_str()) - 1;
+                asm_put_rake(item_row, item_col);
+            }
+
+            else if (item_type >= 0 && item_type <= 0x2f) // 植物
+            {
+                int item_row = atoi(item_str[1].c_str()) - 1;
+                int item_col = atoi(item_str[2].c_str()) - 1;
+                int item_state_row = atoi(item_str[3].c_str());
+                int item_state_col = atoi(item_str[4].c_str());
+                bool item_imitater = item_str[5] == "1";
+
                 asm_plant(item_row, item_col, item_type, item_imitater, is_iz);
 
                 // wake up mushrooms
@@ -2921,29 +2930,24 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                 }
             }
 
-            else if (item_type == 0x30) // ladder
+            else if (item_type == 0x32) // 墓碑
             {
-                asm_put_ladder(item_row, item_col);
-            }
-            else if (item_type == 0x31) // rake
-            {
-                asm_put_rake(item_row, item_col);
-                rake_count++;
-            }
-            else if (item_type == 0x32) // grave
-            {
+                int item_row = atoi(item_str[1].c_str()) - 1;
+                int item_col = atoi(item_str[2].c_str()) - 1;
                 asm_put_grave(item_row, item_col);
             }
+
+            else if (item_type == 0x30) // 梯子
+            {
+                int item_row = atoi(item_str[1].c_str()) - 1;
+                int item_col = atoi(item_str[2].c_str()) - 1;
+                asm_put_ladder(item_row, item_col);
+            }
         }
+
         asm_ret();
-        if (rake_count > 0)
-        {
-            WriteMemory<int>(0x0000a681, 0x0040b9e3);
-            WriteMemory<byte>(0x00, 0x0040bb2b);
-            WriteMemory<int>(0x900c4d8b, 0x0040bb3b);
-            WriteMemory<int>(0x9010458b, 0x0040bb41);
-        }
         asm_code_inject();
+
         if (rake_count > 0)
         {
             WriteMemory<int>(0x00027984, 0x0040b9e3);
@@ -2952,6 +2956,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
             WriteMemory<int>(0x1424448b, 0x0040bb41);
         }
     }
+
     Sleep(10);
 }
 
@@ -3686,12 +3691,14 @@ void PvZ::ItsRaining(bool on)
             WriteMemory<byte>(0x70, 0x00426b4e);
             WriteMemory<byte>(0x70, 0x00416f07);
             WriteMemory<byte>(0xeb, 0x00424715);
+            WriteMemory<byte>(0x70, 0x0041f38e);
         }
         else
         {
             WriteMemory<byte>(0x75, 0x00426b4e);
             WriteMemory<byte>(0x75, 0x00416f07);
             WriteMemory<byte>(0x74, 0x00424715);
+            WriteMemory<byte>(0x75, 0x0041f38e);
         }
     }
 }

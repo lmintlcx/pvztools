@@ -1,7 +1,9 @@
 
 # PvZ Tools
 
-Plants vs. Zombies Toolset.
+Plants vs. Zombies 1.0.0.1051 Toolset.
+
+**Development of PvZ Tools has been stopped, please use [PvZ Toolkit](https://github.com/lmintlcx/pvztoolkit/) instead.**
 
 ## Screenshots
 
@@ -23,17 +25,15 @@ Supported game version:
 
 - [1.0.0.1051](https://pvz.lmintlcx.com/download/)
 
-[PvZ Toolkit](https://github.com/lmintlcx/pvztoolkit/) is recommended if you're not using this particular version of game.
-
 ## Build
 
 You will need a C++17 compiler and Qt 5 libraries with SSL support to build it.
 
 Already tested and confirmed works with:
 
-| OpenSSL Library | Qt Framework | Windows SDK | Code Compiler | Executable Packer |
-| ------ | ------ | ------ | ------ | ------ |
-| 1.1.1h | 5.15.1 | 10.0.17763.0 | MSVC 2017 15.9.27 | UPX 3.96w |
+| OpenSSL Library | Qt Framework | Windows SDK  | Code Compiler     | Executable Packer |
+| --------------- | ------------ | ------------ | ----------------- | ----------------- |
+| 1.1.1h          | 5.15.1       | 10.0.17763.0 | MSVC 2017 15.9.27 | UPX 3.96w         |
 
 ## Credit
 
