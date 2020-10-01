@@ -118,6 +118,7 @@ PvZ::PvZ()
     qRegisterMetaType<std::vector<Vase>>("std::vector<Vase>");
     qRegisterMetaType<std::array<int, 12>>("std::array<int, 12>");
     qRegisterMetaType<std::array<int, 54>>("std::array<int, 54>");
+    qRegisterMetaType<std::array<int, 25>>("std::array<int, 25>");
 
     // FindPvZ(); // 不能在这里用!
 }
@@ -214,7 +215,7 @@ bool PvZ::GameOn()
 void PvZ::asm_code_inject()
 {
     WriteMemory<byte>(0xfe, 0x00552014);
-    Sleep(10);
+    Sleep(20);
     if (IsValid())
         Code::asm_code_inject(handle);
     WriteMemory<byte>(0xdb, 0x00552014);
@@ -4231,6 +4232,71 @@ void PvZ::SetPortal(int b1r, int b1c, int b2r, int b2c, int w1r, int w1c, int w2
         WriteMemory<int>(4, (unsigned int)extra_code_addr + 11);
         WriteMemory<int>(2, (unsigned int)extra_code_addr + 4);
     }
+}
+
+// I, Zombie Endless
+
+std::array<int, 25> PvZ::GetIzeLineup()
+{
+    std::array<int, 25> iz_l;
+    iz_l.fill(-1);
+
+    if (!GameOn())
+        return iz_l;
+    int ui = GameUI();
+    if (ui != 2 && ui != 3)
+        return iz_l;
+    int mode = GameMode();
+    bool is_iz = mode >= 61 && mode <= 70;
+    if (!is_iz)
+        return iz_l;
+
+    auto plant_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0xb0);
+    auto plant_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0xac);
+    for (size_t i = 0; i < plant_count_max; i++)
+    {
+        auto plant_disappeared = ReadMemory<bool>(plant_offset + 0x141 + 0x14c * i);
+        auto plant_crushed = ReadMemory<bool>(plant_offset + 0x142 + 0x14c * i);
+        if (!plant_disappeared && !plant_crushed)
+        {
+            auto plant_type = ReadMemory<uint32_t>(plant_offset + 0x24 + 0x14c * i);
+            auto plant_row = ReadMemory<uint32_t>(plant_offset + 0x1c + 0x14c * i);
+            auto plant_col = ReadMemory<uint32_t>(plant_offset + 0x28 + 0x14c * i);
+            if (plant_row < 5 && plant_col < 5)
+                iz_l[plant_row * 5 + plant_col] = plant_type;
+        }
+    }
+
+    emit IzeLineup(iz_l);
+    return iz_l;
+}
+
+void PvZ::SetIzeLineup(std::array<int, 25> iz_l)
+{
+    if (!GameOn())
+        return;
+    int ui = GameUI();
+    if (ui != 2 && ui != 3)
+        return;
+    int mode = GameMode();
+    bool is_iz = mode >= 61 && mode <= 70;
+    if (!is_iz)
+        return;
+
+    ClearAllPlants();
+
+    asm_init();
+    for (size_t r = 0; r < 5; r++)
+    {
+        for (size_t c = 0; c < 5; c++)
+        {
+            int t = iz_l[r * 5 + c];
+            if (t != -1)
+                asm_plant(r, c, t, false, true);
+        }
+    }
+    asm_ret();
+    asm_code_inject();
 }
 
 } // namespace Pt

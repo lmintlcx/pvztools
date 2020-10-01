@@ -55,6 +55,7 @@ private:
     void ShowTargetMapPage();
     void ShowCannonLauncherPage();
     void ShowPortalPage();
+    void ShowIzeLineupPage();
     void ShowDocumentPage();
 
 private:
@@ -84,6 +85,7 @@ private:
     QAction *spawnCountPageAction;
     QAction *cannonLauncherPageAction;
     QAction *portalPageAction;
+    QAction *izeLineupPageAction;
     QActionGroup *pageGroup;
 
     QAction *showSidebarAction;
@@ -147,6 +149,7 @@ private:
     TargetMapPage *targetMapPage;
     CannonLauncherPage *cannonLauncherPage;
     PortalPage *portalPage;
+    IzeLineupPage *izeLineupPage;
     DocumentPage *documentPage;
 
     QHBoxLayout *mainLayout;

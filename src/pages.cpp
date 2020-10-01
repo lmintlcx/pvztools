@@ -2626,6 +2626,7 @@ LineupPage::LineupPage(QWidget *parent)
     quickLineupModeCheckBox = new QCheckBox(this);
     quickPassButton = new QPushButton(this);
     mixModeToSurvivalEndlessButton = new QPushButton(this);
+    hiddenSceneLabel = new QLabel(this);
 
     clearAllGravesButton = new QPushButton(this);
     lilyPadOnPoolButton = new QPushButton(this);
@@ -2648,7 +2649,7 @@ LineupPage::LineupPage(QWidget *parent)
     }
     flowerPotOnRoofButton->setMenu(flowerPotOnRoofMenu);
 
-    openLinkButton = new QPushButton(this);
+    arrayDesignLabel = new QLabel(this);
     updateCheckButton = new QPushButton(this);
     endlessBuildCombo = new QComboBox(this);
     oneKeySetupButton = new QPushButton(this);
@@ -2666,6 +2667,9 @@ LineupPage::LineupPage(QWidget *parent)
     allowSwitchSceneCheckBox = new QCheckBox(this);
     keepHpStatusCheckBox = new QCheckBox(this);
 
+    hiddenSceneLabel->setOpenExternalLinks(true);
+    arrayDesignLabel->setOpenExternalLinks(true);
+
     deleteStringButton->setEnabled(false);
 
     stringTextEdit->setLineWrapMode(QPlainTextEdit::WidgetWidth);
@@ -2674,12 +2678,13 @@ LineupPage::LineupPage(QWidget *parent)
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(quickLineupModeCheckBox, 0, 0, 1, 3);
     mainLayout->addWidget(quickPassButton, 0, 3, 1, 3);
-    mainLayout->addWidget(mixModeToSurvivalEndlessButton, 0, 8, 1, 4);
+    mainLayout->addWidget(mixModeToSurvivalEndlessButton, 0, 6, 1, 4);
+    mainLayout->addWidget(hiddenSceneLabel, 0, 10, 1, 2);
     mainLayout->addWidget(clearAllGravesButton, 1, 0, 1, 3);
     mainLayout->addWidget(lilyPadOnPoolButton, 1, 3, 1, 3);
     mainLayout->addWidget(flowerPotOnRoofButton, 1, 6, 1, 3);
     mainLayout->addWidget(clearAllPlantsButton, 1, 9, 1, 3);
-    mainLayout->addWidget(openLinkButton, 2, 0, 1, 3);
+    mainLayout->addWidget(arrayDesignLabel, 2, 0, 1, 3);
     mainLayout->addWidget(updateCheckButton, 2, 3, 1, 2);
     mainLayout->addWidget(endlessBuildCombo, 2, 5, 1, 4);
     mainLayout->addWidget(oneKeySetupButton, 2, 9, 1, 3);
@@ -2730,11 +2735,6 @@ LineupPage::LineupPage(QWidget *parent)
 
     connect(clearAllPlantsButton, &QPushButton::clicked,
             this, &LineupPage::ClearAllPlants);
-
-    connect(openLinkButton, &QPushButton::clicked,
-            this, [=]() {
-                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/lineup/"));
-            });
 
     connect(updateCheckButton, &QPushButton::clicked,
             this, &LineupPage::UpdateLineupString);
@@ -2799,10 +2799,18 @@ LineupPage::LineupPage(QWidget *parent)
 
     connect(copyStringButton, &QPushButton::clicked,
             this, [=]() {
-                QClipboard *clipboard = QApplication::clipboard();
                 QString text = stringTextEdit->toPlainText();
-                clipboard->setText(text);
-                emit ShowMessageStatusBar(tr("Already copied."));
+                QClipboard *clipboard = QApplication::clipboard();
+                if (StringCheck(text))
+                {
+                    clipboard->setText(QString::fromStdString(ConvertLineup(text.toStdString())));
+                    emit ShowMessageStatusBar(tr("Already copied to new format."));
+                }
+                else
+                {
+                    clipboard->setText(text);
+                    emit ShowMessageStatusBar(tr("Already copied."));
+                }
             });
 
     connect(pasteStringButton, &QPushButton::clicked,
@@ -2838,6 +2846,7 @@ void LineupPage::TranslateUI()
     quickLineupModeCheckBox->setText(tr("Quick Lineup Mode"));
     quickPassButton->setText(tr("Quick Pass"));
     mixModeToSurvivalEndlessButton->setText(tr("Mix Mode To Survival Endless"));
+    hiddenSceneLabel->setText(tr("<style>a {text-decoration: none}</style><a href='https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/'>Hidden Scene</a>"));
 
     quickLineupModeCheckBox->setStatusTip(tr("Turn on a series of features that are convenient for manual lineup."));
     quickPassButton->setStatusTip(tr("Kill all zombies and end current level directly with 8000 sunshine and 2020 flags."));
@@ -2853,7 +2862,7 @@ void LineupPage::TranslateUI()
     for (size_t i = 0; i < 9; i++)
         flowerPotPlantToAction[i]->setText(QString("1 -> ") + QString::number(i + 1));
 
-    openLinkButton->setText(tr("Open Array Design Page"));
+    arrayDesignLabel->setText(tr("<style>a {text-decoration: none}</style><a href='https://pvz.lmintlcx.com/lineup/'>Open Array Design</a>"));
     updateCheckButton->setText(tr("Update"));
     oneKeySetupButton->setText(tr("One Key Setup"));
 
@@ -2874,6 +2883,180 @@ bool LineupPage::StringCheck(const QString &text)
     QRegExp reg("[0-5](,[a-fA-F0-9]{1,2} [1-6] [1-9] [0-2] [0-4]( [a-zA-Z0-9]{1,}){0,}){0,}");
     return reg.exactMatch(text);
     // return true;
+}
+
+std::string LineupPage::ConvertLineup(const std::string &str)
+{
+    auto split = [](const std::string &str, char seperator) -> std::vector<std::string> {
+        std::vector<std::string> result;
+        std::string::size_type prev = 0, pos = 0;
+        while ((pos = str.find(seperator, pos)) != std::string::npos)
+        {
+            std::string sub_string(str.substr(prev, pos - prev));
+            result.push_back(sub_string);
+            prev = ++pos;
+        }
+        result.push_back(str.substr(prev, pos - prev));
+        return result;
+    };
+
+    auto hex2dec = [](const std::string &str) -> long {
+        char *ptr;
+        long num;
+        num = strtol(str.c_str(), &ptr, 16);
+        return num;
+    };
+
+    const bool may_sleep[] = {false, false, false, false, false, false, false, false,
+                              true, true, true, false, true, true, true, true,
+                              false, false, false, false, false, false, false, false,
+                              true, false, false, false, false, false, false, true,
+                              false, false, false, false, false, false, false, false,
+                              false, false, true, false, false, false, false, false};
+
+    uint16_t items[6 * 9] = {0};
+    uint8_t rake_row = 0, scene = 2;
+
+    std::vector<std::string> str_list = split(str, ',');
+    size_t count = str_list.size() - 1;
+
+    std::string str_scene = str_list[0];
+    if (str_scene == "0") // pool
+        scene = 2;
+    else if (str_scene == "1") // fog
+        scene = 3;
+    else if (str_scene == "2") // day
+        scene = 0;
+    else if (str_scene == "3") // night
+        scene = 1;
+    else if (str_scene == "4") // roof
+        scene = 4;
+    else if (str_scene == "5") // moon
+        scene = 5;
+
+    uint16_t plant[6 * 9] = {0};
+    uint16_t plant_im[6 * 9] = {0};
+    uint16_t plant_awake[6 * 9] = {0};
+    uint16_t base[6 * 9] = {0};
+    uint16_t base_im[6 * 9] = {0};
+    uint16_t pumpkin[6 * 9] = {0};
+    uint16_t pumpkin_im[6 * 9] = {0};
+    uint16_t coffee[6 * 9] = {0};
+    uint16_t coffee_im[6 * 9] = {0};
+    uint16_t ladder[6 * 9] = {0};
+
+    for (size_t i = 0; i < count; i++)
+    {
+        std::vector<std::string> item_str = split(str_list[i + 1], ' ');
+        int item_type = hex2dec(item_str[0]);
+
+        if (item_type < 0 || item_type > 0x32)
+            continue;
+
+        if (item_type == 16 || item_type == 33) // 睡莲 花盆
+        {
+            int item_row = atoi(item_str[1].c_str()) - 1;
+            int item_col = atoi(item_str[2].c_str()) - 1;
+            bool item_imitater = item_str[5] == "1";
+            base[item_row * 9 + item_col] = (item_type == 16) ? 1 : 2;
+            base_im[item_row * 9 + item_col] = item_imitater ? 1 : 0;
+        }
+        else if (item_type == 50) // 墓碑
+        {
+            int item_row = atoi(item_str[1].c_str()) - 1;
+            int item_col = atoi(item_str[2].c_str()) - 1;
+            base[item_row * 9 + item_col] = 3;
+            base_im[item_row * 9 + item_col] = 0;
+        }
+        else if (item_type == 30) // 南瓜
+        {
+            int item_row = atoi(item_str[1].c_str()) - 1;
+            int item_col = atoi(item_str[2].c_str()) - 1;
+            bool item_imitater = item_str[5] == "1";
+            pumpkin[item_row * 9 + item_col] = 1;
+            pumpkin_im[item_row * 9 + item_col] = item_imitater ? 1 : 0;
+        }
+        else if (item_type == 35) // 咖啡
+        {
+            int item_row = atoi(item_str[1].c_str()) - 1;
+            int item_col = atoi(item_str[2].c_str()) - 1;
+            bool item_imitater = item_str[5] == "1";
+            coffee[item_row * 9 + item_col] = 1;
+            coffee_im[item_row * 9 + item_col] = item_imitater ? 1 : 0;
+        }
+        else if (item_type == 48) // 梯子 0x30
+        {
+            int item_row = atoi(item_str[1].c_str()) - 1;
+            int item_col = atoi(item_str[2].c_str()) - 1;
+            ladder[item_row * 9 + item_col] = 1;
+        }
+        else if (item_type == 49) // 钉耙 0x31
+        {
+            int item_row = atoi(item_str[1].c_str()) - 1;
+            rake_row = item_row + 1;
+        }
+        else // 主要植物
+        {
+            int item_row = atoi(item_str[1].c_str()) - 1;
+            int item_col = atoi(item_str[2].c_str()) - 1;
+            int item_state_row = atoi(item_str[3].c_str());
+            bool item_imitater = item_str[5] == "1";
+            plant[item_row * 9 + item_col] = item_type + 1;
+            plant_im[item_row * 9 + item_col] = item_imitater ? 1 : 0;
+            plant_awake[item_row * 9 + item_col] = ((scene == 0 || scene == 2 || scene == 4) && may_sleep[item_type] && item_state_row == 0) ? 0 : 1;
+        }
+    }
+
+    for (size_t r = 0; r < 6; r++)
+    {
+        for (size_t c = 0; c < 9; c++)
+        {
+            uint16_t item = 0;
+            item += 0b1111110000000000 & (plant[r * 9 + c] << 10);
+            item += 0b0000001000000000 & (plant_im[r * 9 + c] << 9);
+            item += 0b0000000100000000 & (plant_awake[r * 9 + c] << 8);
+            item += 0b0000000011000000 & (base[r * 9 + c] << 6);
+            item += 0b0000000000100000 & (base_im[r * 9 + c] << 5);
+            item += 0b0000000000010000 & (pumpkin[r * 9 + c] << 4);
+            item += 0b0000000000001000 & (pumpkin_im[r * 9 + c] << 3);
+            item += 0b0000000000000100 & (coffee[r * 9 + c] << 2);
+            item += 0b0000000000000010 & (coffee_im[r * 9 + c] << 1);
+            item += 0b0000000000000001 & (ladder[r * 9 + c] << 0);
+            items[r * 9 + c] = item;
+        }
+    }
+
+    // #ifdef _DEBUG
+    //     std::cout << std::endl;
+    //     for (int r = 0; r < 6; r++)
+    //     {
+    //         for (int c = 0; c < 9; c++)
+    //             std::cout << std::bitset<16>(items[r * 9 + c]) << " ";
+    //         std::cout << std::endl;
+    //     }
+    //     std::cout << std::bitset<8>((rake_row << 4) | (scene & 0b00001111));
+    //     std::cout << std::endl;
+    // #endif
+
+    unsigned long size = 121; // compressBound(6*9*2)
+    unsigned char lineup_bin[128] = {0};
+    unsigned long cut_size = ((scene == 2 || scene == 3) ? 6 : 5) * 9 * sizeof(uint16_t);
+    compress2(lineup_bin, &size, (unsigned char *)items, cut_size, Z_BEST_COMPRESSION);
+    lineup_bin[size - 1 + 1] = (rake_row << 4) | (scene & 0b00001111);
+
+    for (size_t i = 0; i < size + 1; i++)
+        lineup_bin[i] = lineup_bin[i] ^ (unsigned char)0x54;
+
+    DWORD len = 256;
+    char lineup_str[256] = {0};
+    CryptBinaryToStringA(lineup_bin, size + 1, CRYPT_STRING_BASE64, lineup_str, &len);
+
+    std::string lineup(lineup_str);
+    lineup.erase(std::remove(lineup.begin(), lineup.end(), '\r'), lineup.end());
+    lineup.erase(std::remove(lineup.begin(), lineup.end(), '\n'), lineup.end());
+    // std::cout << lineup << " " << lineup.size() << std::endl;
+
+    return lineup;
 }
 
 void LineupPage::ShowLineup(std::string str)
@@ -4276,6 +4459,7 @@ OthersPage::OthersPage(QWidget *parent)
     targetMapButton = new QPushButton(this);
     cannonLauncherButton = new QPushButton(this);
     portalButton = new QPushButton(this);
+    izeLineupButton = new QPushButton(this);
 
     // default
 
@@ -4299,9 +4483,10 @@ OthersPage::OthersPage(QWidget *parent)
     mainLayout->addWidget(openPakFolderButton, 3, 0, 1, 2);
     mainLayout->addWidget(pakPathLineEdit, 3, 2, 1, 8);
     mainLayout->addWidget(packPakButton, 3, 10, 1, 2);
-    mainLayout->addWidget(targetMapButton, 4, 0, 1, 4);
-    mainLayout->addWidget(cannonLauncherButton, 4, 4, 1, 4);
-    mainLayout->addWidget(portalButton, 4, 8, 1, 4);
+    mainLayout->addWidget(targetMapButton, 4, 0, 1, 3);
+    mainLayout->addWidget(cannonLauncherButton, 4, 3, 1, 3);
+    mainLayout->addWidget(portalButton, 4, 6, 1, 3);
+    mainLayout->addWidget(izeLineupButton, 4, 9, 1, 3);
 
     for (int i = 0; i < mainLayout->rowCount(); i++)
         mainLayout->setRowStretch(i, 1);
@@ -4367,6 +4552,9 @@ OthersPage::OthersPage(QWidget *parent)
     connect(portalButton, &QPushButton::clicked,
             this, &OthersPage::ShowPortalPage);
 
+    connect(izeLineupButton, &QPushButton::clicked,
+            this, &OthersPage::ShowIzeLineupPage);
+
     setAcceptDrops(true);
 }
 
@@ -4393,6 +4581,7 @@ void OthersPage::TranslateUI()
     targetMapButton->setText(tr("Target Map Modify"));
     cannonLauncherButton->setText(tr("Cannon Launcher"));
     portalButton->setText(tr("Portal"));
+    izeLineupButton->setText(tr("I, Zombie Endless"));
 }
 
 void OthersPage::GetFileName()
@@ -5187,6 +5376,146 @@ void PortalPage::TranslateUI()
 
     setWindowTitle(tr("Portal"));
 }
+
+// I, Zombie Endless
+
+IzeLineupPage::IzeLineupPage(QWidget *parent)
+    : QWidget(parent)
+{
+    qRegisterMetaType<std::array<int, 25>>("std::array<int, 25>");
+
+    int tmp[22] = {
+        0,  // 豌豆射手
+        1,  // 向日葵
+        3,  // 坚果
+        4,  // 土豆地雷
+        5,  // 寒冰射手
+        6,  // 大嘴花
+        7,  // 双重射手
+        8,  // 小喷菇
+        10, // 大喷菇
+        13, // 胆小菇
+        17, // 倭瓜
+        18, // 三重射手
+        21, // 地刺
+        22, // 火炬树桩
+        23, // 高坚果
+        26, // 仙人掌
+        28, // 裂荚射手
+        29, // 杨桃
+        31, // 磁力菇
+        34, // 玉米投手
+        36, // 大蒜
+        37, // 叶子伞
+    };
+    memcpy(izPlantTypes, tmp, sizeof(tmp));
+
+    for (size_t r = 0; r < 5; r++)
+        for (size_t c = 0; c < 5; c++)
+            comboBoxes[5 * r + c] = new QComboBox(this);
+
+    loadButton = new QPushButton(this);
+    clearButton = new QPushButton(this);
+    setButton = new QPushButton(this);
+
+    mainLayout = new QGridLayout(this);
+    for (size_t r = 0; r < 5; r++)
+        for (size_t c = 0; c < 5; c++)
+            mainLayout->addWidget(comboBoxes[5 * r + c], r, c, 1, 1);
+    mainLayout->addWidget(loadButton, 5, 0, 1, 1);
+    mainLayout->addWidget(clearButton, 5, 1, 1, 1);
+    mainLayout->addWidget(setButton, 5, 4, 1, 1);
+
+    for (int i = 0; i < mainLayout->rowCount(); i++)
+        mainLayout->setRowStretch(i, 1);
+    for (int i = 0; i < mainLayout->columnCount(); i++)
+        mainLayout->setColumnStretch(i, 1);
+
+    connect(loadButton, &QPushButton::clicked,
+            this, &IzeLineupPage::GetIzeLineup);
+
+    connect(clearButton, &QPushButton::clicked,
+            this, [=]() {
+                for (size_t r = 0; r < 5; r++)
+                    for (size_t c = 0; c < 5; c++)
+                        comboBoxes[5 * r + c]->setCurrentIndex(0);
+            });
+
+    connect(setButton, &QPushButton::clicked,
+            this, [=]() {
+                std::array<int, 25> iz_l;
+                for (size_t r = 0; r < 5; r++)
+                {
+                    for (size_t c = 0; c < 5; c++)
+                    {
+                        int index = comboBoxes[5 * r + c]->currentIndex();
+                        if (index == 0)
+                            iz_l[5 * r + c] = -1;
+                        else
+                            iz_l[5 * r + c] = izPlantTypes[index - 1];
+                    }
+                }
+                emit SetIzeLineup(iz_l);
+            });
+}
+
+void IzeLineupPage::TranslateUI()
+{
+    for (size_t r = 0; r < 5; r++)
+    {
+        for (size_t c = 0; c < 5; c++)
+        {
+            if (comboBoxes[5 * r + c]->count() == 0)
+            {
+                comboBoxes[5 * r + c]->addItem(tr("Empty"));
+                for (size_t i = 0; i < 22; i++)
+                    comboBoxes[5 * r + c]->addItem(List::Get().seedList[izPlantTypes[i]]);
+            }
+            else
+            {
+                comboBoxes[5 * r + c]->setItemText(0, tr("Empty"));
+                for (size_t i = 0; i < 22; i++)
+                    comboBoxes[5 * r + c]->setItemText(i + 1, List::Get().seedList[izPlantTypes[i]]);
+            }
+        }
+    }
+
+    loadButton->setText(tr("Load"));
+    clearButton->setText(tr("Clear"));
+    setButton->setText(tr("Set"));
+
+    setWindowTitle(tr("I, Zombie Endless Lineup"));
+}
+
+void IzeLineupPage::ShowIzeLineup(std::array<int, 25> iz_l)
+{
+    for (size_t r = 0; r < 5; r++)
+    {
+        for (size_t c = 0; c < 5; c++)
+        {
+            int plant_type = iz_l[5 * r + c];
+
+            bool found = false;
+            int index = 0;
+            for (size_t i = 0; i < 22; i++)
+            {
+                if (izPlantTypes[i] == plant_type)
+                {
+                    found = true;
+                    index = i;
+                    break;
+                }
+            }
+
+            if (found)
+                comboBoxes[5 * r + c]->setCurrentIndex(index + 1);
+            else
+                comboBoxes[5 * r + c]->setCurrentIndex(0);
+        }
+    }
+}
+
+// Document
 
 DocumentPage::DocumentPage(QWidget *parent)
     : QWidget(parent)

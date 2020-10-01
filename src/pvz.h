@@ -284,6 +284,9 @@ public:
     void StartPortal(bool);
     void LockPortal(bool);
     void SetPortal(int, int, int, int, int, int, int, int);
+    // I, Zombie Endless
+    std::array<int, 25> GetIzeLineup();
+    void SetIzeLineup(std::array<int, 25>);
 
 signals:
     void FindResult(Result);
@@ -311,6 +314,7 @@ signals:
     void GameStatus(std::array<int, 12>);
     void TargetMap(std::array<int, 54>);
     void CobInfo(bool, int, int);
+    void IzeLineup(std::array<int, 25>);
 };
 
 } // namespace Pt

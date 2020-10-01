@@ -580,11 +580,13 @@ private:
     QStringList endlessBuildNameList;
     QStringList endlessBuildStringList;
     bool StringCheck(const QString &);
+    std::string ConvertLineup(const std::string &);
 
 private:
     QCheckBox *quickLineupModeCheckBox;
     QPushButton *quickPassButton;
     QPushButton *mixModeToSurvivalEndlessButton;
+    QLabel *hiddenSceneLabel;
     QPushButton *clearAllGravesButton;
     QPushButton *lilyPadOnPoolButton;
     QMenu *lilyPadOnPoolMenu;
@@ -593,7 +595,7 @@ private:
     QMenu *flowerPotOnRoofMenu;
     QAction *flowerPotPlantToAction[9];
     QPushButton *clearAllPlantsButton;
-    QPushButton *openLinkButton;
+    QLabel *arrayDesignLabel;
     QPushButton *updateCheckButton;
     QComboBox *endlessBuildCombo;
     QPushButton *oneKeySetupButton;
@@ -787,6 +789,7 @@ signals:
     void ShowTargetMapPage();
     void ShowCannonLauncherPage();
     void ShowPortalPage();
+    void ShowIzeLineupPage();
 
 public slots:
     void GetFileName();
@@ -817,6 +820,7 @@ private:
     QPushButton *targetMapButton;
     QPushButton *cannonLauncherButton;
     QPushButton *portalButton;
+    QPushButton *izeLineupButton;
     QGridLayout *mainLayout;
 };
 
@@ -990,6 +994,34 @@ private:
     QPushButton *push_button_portal_set;
     QGridLayout *mainLayout;
 };
+
+// I, Zombie Endless
+
+class IzeLineupPage : public QWidget
+{
+    Q_OBJECT
+
+public:
+    IzeLineupPage(QWidget *parent = nullptr);
+    void TranslateUI();
+
+signals:
+    void GetIzeLineup(int);
+    void SetIzeLineup(std::array<int, 25>);
+
+public slots:
+    void ShowIzeLineup(std::array<int, 25>);
+
+private:
+    int izPlantTypes[22];
+    QComboBox *comboBoxes[25];
+    QPushButton *loadButton;
+    QPushButton *clearButton;
+    QPushButton *setButton;
+    QGridLayout *mainLayout;
+};
+
+// Document
 
 class DocumentPage : public QWidget
 {

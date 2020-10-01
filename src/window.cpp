@@ -82,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
     targetMapPage = new TargetMapPage;
     cannonLauncherPage = new CannonLauncherPage;
     portalPage = new PortalPage;
+    izeLineupPage = new IzeLineupPage;
     documentPage = new DocumentPage;
 
     stackedWidget->addWidget(levelPage);
@@ -336,6 +337,7 @@ void MainWindow::CreateActions()
     targetMapPageAction = new QAction(this);
     cannonLauncherPageAction = new QAction(this);
     portalPageAction = new QAction(this);
+    izeLineupPageAction = new QAction(this);
 
     connect(spawnCountPageAction, &QAction::triggered,
             this, &MainWindow::ShowSpawnCountPage);
@@ -348,6 +350,9 @@ void MainWindow::CreateActions()
 
     connect(portalPageAction, &QAction::triggered,
             this, &MainWindow::ShowPortalPage);
+
+    connect(izeLineupPageAction, &QAction::triggered,
+            this, &MainWindow::ShowIzeLineupPage);
 
     levelPageAction->setCheckable(true);
     resourcePageAction->setCheckable(true);
@@ -628,6 +633,7 @@ void MainWindow::CreateMenus()
     pageMenu->addAction(targetMapPageAction);
     pageMenu->addAction(cannonLauncherPageAction);
     pageMenu->addAction(portalPageAction);
+    pageMenu->addAction(izeLineupPageAction);
 
     settingMenu = new QMenu(this);
     settingMenu->addAction(showSidebarAction);
@@ -1232,6 +1238,9 @@ void MainWindow::ConnectPages()
     connect(othersPage, &OthersPage::ShowPortalPage,
             this, &MainWindow::ShowPortalPage);
 
+    connect(othersPage, &OthersPage::ShowIzeLineupPage,
+            this, &MainWindow::ShowIzeLineupPage);
+
     // Status
 
     connect(statusPage, &StatusPage::GetStatus,
@@ -1289,6 +1298,17 @@ void MainWindow::ConnectPages()
 
     connect(portalPage, &PortalPage::SetPortal,
             pvz, &PvZ::SetPortal);
+
+    // I, Zombie Endless
+
+    connect(izeLineupPage, &IzeLineupPage::GetIzeLineup,
+            pvz, &PvZ::GetIzeLineup);
+
+    connect(izeLineupPage, &IzeLineupPage::SetIzeLineup,
+            pvz, &PvZ::SetIzeLineup);
+
+    connect(pvz, &PvZ::IzeLineup,
+            izeLineupPage, &IzeLineupPage::ShowIzeLineup);
 }
 
 void MainWindow::ReadSettings()
@@ -1475,6 +1495,7 @@ void MainWindow::SetLanguage()
     targetMapPage->TranslateUI();
     cannonLauncherPage->TranslateUI();
     portalPage->TranslateUI();
+    izeLineupPage->TranslateUI();
     documentPage->TranslateUI();
 
     // Hack 2/2
@@ -1509,6 +1530,9 @@ void MainWindow::SetScreenSize()
         x = 400 * scale_x * font_scale;
         y = 120 * scale_y * font_scale;
         portalPage->setFixedSize(x, y);
+        x = 540 * scale_x * font_scale;
+        y = 280 * scale_y * font_scale;
+        izeLineupPage->setFixedSize(x, y);
         x = 610 * scale_x * font_scale;
         y = 420 * scale_y * font_scale;
         documentPage->setFixedSize(x, y);
@@ -1531,6 +1555,9 @@ void MainWindow::SetScreenSize()
         x = 450 * scale_x * font_scale;
         y = 120 * scale_y * font_scale;
         portalPage->setFixedSize(x, y);
+        x = 690 * scale_x * font_scale;
+        y = 280 * scale_y * font_scale;
+        izeLineupPage->setFixedSize(x, y);
         x = 600 * scale_x * font_scale;
         y = 420 * scale_y * font_scale;
         documentPage->setFixedSize(x, y);
@@ -1571,6 +1598,7 @@ void MainWindow::TranslateUI()
     targetMapPageAction->setText(tr("Target Map Modify"));
     cannonLauncherPageAction->setText(tr("Cannon Launcher"));
     portalPageAction->setText(tr("Portal"));
+    izeLineupPageAction->setText(tr("I, Zombie Endless"));
 
     showSidebarAction->setText(tr("Show Sidebar"));
     switchSpawnLayoutAction->setText(tr("Switch Spawn Layout"));
@@ -1688,6 +1716,18 @@ void MainWindow::ShowPortalPage()
     else
     {
         portalPage->show();
+    }
+}
+
+void MainWindow::ShowIzeLineupPage()
+{
+    if (izeLineupPage->isVisible())
+    {
+        izeLineupPage->hide();
+    }
+    else
+    {
+        izeLineupPage->show();
     }
 }
 
