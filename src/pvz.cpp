@@ -215,7 +215,7 @@ bool PvZ::GameOn()
 void PvZ::asm_code_inject()
 {
     WriteMemory<byte>(0xfe, 0x00552014);
-    Sleep(20);
+    Sleep(GetFrameDuration() * 2);
     if (IsValid())
         Code::asm_code_inject(handle);
     WriteMemory<byte>(0xdb, 0x00552014);
@@ -2557,28 +2557,29 @@ void PvZ::QuickPass()
         return;
 
     Bot bot(this->hwnd);
+    int frame_time = GetFrameDuration();
 
     if (true)
     {
         int game_clock = ReadMemory<int>(0x6a9ec0, 0x768, 0x5568);
-        int time_to_wait = 75 - ((game_clock + 500) % 75);
+        int frame_to_wait = 75 - ((game_clock + 500) % 75);
         if (ReadMemory<bool>(0x6a9ec0, 0x768, 0x164))
         {
-            if (time_to_wait != 0)
+            if (frame_to_wait != 0)
             {
                 bot.PressSpace(); // 解除暂停
-                Sleep(time_to_wait * 10);
+                Sleep(frame_to_wait * frame_time);
                 bot.PressSpace(); // 暂停
             }
         }
         else
         {
-            Sleep(time_to_wait * 10);
+            Sleep(frame_to_wait * frame_time);
             bot.PressSpace(); // 暂停
         }
     }
 
-    Sleep(10);
+    Sleep(frame_time);
     asm_init();
     asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
     asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x768);
@@ -2586,7 +2587,7 @@ void PvZ::QuickPass()
     asm_ret();
     asm_code_inject();
 
-    Sleep(10);
+    Sleep(frame_time);
     auto zombie_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x94);
     auto zombie_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x90);
     for (size_t i = 0; i < zombie_count_max; i++)
@@ -2595,11 +2596,11 @@ void PvZ::QuickPass()
 
     if (true)
     {
-        Sleep(10);
+        Sleep(frame_time);
         bot.PressSpace(); // 解除暂停
     }
 
-    Sleep(100);
+    Sleep(frame_time * 10);
     WriteMemory<int>(8000, 0x6a9ec0, 0x768, 0x5560);
     WriteMemory<int>(1009, 0x6a9ec0, 0x768, 0x160, 0x6c);
 }
@@ -2958,7 +2959,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
         }
     }
 
-    Sleep(10);
+    Sleep(GetFrameDuration());
 }
 
 void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
@@ -3177,7 +3178,7 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
     asm_ret();
     asm_code_inject();
 
-    Sleep(10);
+    Sleep(GetFrameDuration());
 }
 
 std::string PvZ::GetLineup(bool keep_hp_status)
@@ -3969,6 +3970,26 @@ void PvZ::DebugMode(int mode)
         WriteMemory<int>(mode, 0x6a9ec0, 0x768, 0x55f8);
 }
 
+int PvZ::GetFrameDuration()
+{
+    int time_ms = 10;
+
+    if (!GameOn())
+        return time_ms;
+
+    time_ms = ReadMemory<int>(0x6a9ec0, 0x454);
+
+    return time_ms;
+}
+
+void PvZ::SetFrameDuration(int time_ms)
+{
+    if (!GameOn())
+        return;
+
+    WriteMemory<int>(time_ms, 0x6a9ec0, 0x454);
+}
+
 // Status
 
 std::array<int, 12> PvZ::GetStatus()
@@ -4203,7 +4224,7 @@ void PvZ::SetPortal(int b1r, int b1c, int b2r, int b2c, int w1r, int w1c, int w2
         asm_ret();
         asm_code_inject();
 
-        Sleep(10);
+        Sleep(GetFrameDuration());
         WriteMemory<int>(b1r, 0x00426fe9);
         WriteMemory<int>(b1c, 0x00426fe2);
         WriteMemory<int>(b2r, 0x00427014);
@@ -4213,7 +4234,7 @@ void PvZ::SetPortal(int b1r, int b1c, int b2r, int b2c, int w1r, int w1c, int w2
         WriteMemory<int>(w2r, (unsigned int)extra_code_addr + 11);
         WriteMemory<int>(w2c, (unsigned int)extra_code_addr + 4);
 
-        Sleep(10);
+        Sleep(GetFrameDuration());
         asm_init();
         asm_mov_exx_dword_ptr(Reg::EDI, 0x6a9ec0);
         asm_mov_exx_dword_ptr_exx_add(Reg::EDI, 0x768);
@@ -4222,7 +4243,7 @@ void PvZ::SetPortal(int b1r, int b1c, int b2r, int b2c, int w1r, int w1c, int w2
         asm_ret();
         asm_code_inject();
 
-        Sleep(10);
+        Sleep(GetFrameDuration());
         WriteMemory<int>(0, 0x00426fe9);
         WriteMemory<int>(2, 0x00426fe2);
         WriteMemory<int>(1, 0x00427014);

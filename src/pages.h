@@ -784,6 +784,7 @@ signals:
     void DisablePause(bool);
     void OpenDataDir();
     void DebugMode(int);
+    void SetFrameDuration(int);
     void UnpackPAK(QString, QString);
     void PackPAK(QString);
     void ShowTargetMapPage();
@@ -808,9 +809,13 @@ private:
     QCheckBox *runningInBackgroundCheckBox;
     QCheckBox *disablePauseCheckBox;
     QPushButton *openDataDirButton;
+    QLabel *dataDirLabel;
     QLabel *debugModeLabel;
     QComboBox *debugModeCombo;
     QPushButton *debugModeButton;
+    QLabel *frameDurationLabel;
+    QSpinBox *frameDurationSpinBox;
+    QPushButton *frameDurationButton;
     QPushButton *openPakFileButton;
     QLineEdit *pakFileLineEdit;
     QPushButton *unpackPakButton;

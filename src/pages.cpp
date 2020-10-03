@@ -2825,7 +2825,7 @@ LineupPage::LineupPage(QWidget *parent)
                 text.replace(QString(", "), QString(","));
 
                 // 看起来像新格式的话把所有空格都去掉
-                if (text[0] == "L")
+                if (text[0] == 'L')
                     text.remove(QRegExp("\\s"));
 
                 stringTextEdit->setPlainText(text);
@@ -4443,10 +4443,14 @@ OthersPage::OthersPage(QWidget *parent)
     disablePauseCheckBox = new QCheckBox(this);
 
     openDataDirButton = new QPushButton(this);
+    dataDirLabel = new QLabel(this);
 
     debugModeLabel = new QLabel(this);
     debugModeCombo = new QComboBox(this);
     debugModeButton = new QPushButton(this);
+    frameDurationLabel = new QLabel(this);
+    frameDurationSpinBox = new QSpinBox(this);
+    frameDurationButton = new QPushButton(this);
 
     openPakFileButton = new QPushButton(this);
     pakFileLineEdit = new QLineEdit(this);
@@ -4463,7 +4467,16 @@ OthersPage::OthersPage(QWidget *parent)
 
     // default
 
+    debugModeLabel->setAlignment(Qt::AlignCenter);
+    frameDurationLabel->setAlignment(Qt::AlignCenter);
+
+    frameDurationSpinBox->setRange(1, 100);
+    frameDurationSpinBox->setSingleStep(1);
+    frameDurationSpinBox->setValue(10);
+
     runningInBackgroundCheckBox->setChecked(true);
+
+    dataDirLabel->setText("C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata");
 
     pakFileLineEdit->setText("");
     pakPathLineEdit->setText("");
@@ -4474,19 +4487,23 @@ OthersPage::OthersPage(QWidget *parent)
     mainLayout->addWidget(runningInBackgroundCheckBox, 0, 6, 1, 3);
     mainLayout->addWidget(disablePauseCheckBox, 0, 9, 1, 3);
     mainLayout->addWidget(openDataDirButton, 1, 0, 1, 3);
-    mainLayout->addWidget(debugModeLabel, 1, 4, 1, 2);
-    mainLayout->addWidget(debugModeCombo, 1, 6, 1, 3);
-    mainLayout->addWidget(debugModeButton, 1, 9, 1, 3);
-    mainLayout->addWidget(openPakFileButton, 2, 0, 1, 2);
-    mainLayout->addWidget(pakFileLineEdit, 2, 2, 1, 8);
-    mainLayout->addWidget(unpackPakButton, 2, 10, 1, 2);
-    mainLayout->addWidget(openPakFolderButton, 3, 0, 1, 2);
-    mainLayout->addWidget(pakPathLineEdit, 3, 2, 1, 8);
-    mainLayout->addWidget(packPakButton, 3, 10, 1, 2);
-    mainLayout->addWidget(targetMapButton, 4, 0, 1, 3);
-    mainLayout->addWidget(cannonLauncherButton, 4, 3, 1, 3);
-    mainLayout->addWidget(portalButton, 4, 6, 1, 3);
-    mainLayout->addWidget(izeLineupButton, 4, 9, 1, 3);
+    mainLayout->addWidget(dataDirLabel, 1, 3, 1, 9);
+    mainLayout->addWidget(debugModeLabel, 2, 0, 1, 2);
+    mainLayout->addWidget(debugModeCombo, 2, 2, 1, 2);
+    mainLayout->addWidget(debugModeButton, 2, 4, 1, 2);
+    mainLayout->addWidget(frameDurationLabel, 2, 6, 1, 2);
+    mainLayout->addWidget(frameDurationSpinBox, 2, 8, 1, 2);
+    mainLayout->addWidget(frameDurationButton, 2, 10, 1, 2);
+    mainLayout->addWidget(openPakFileButton, 3, 0, 1, 2);
+    mainLayout->addWidget(pakFileLineEdit, 3, 2, 1, 8);
+    mainLayout->addWidget(unpackPakButton, 3, 10, 1, 2);
+    mainLayout->addWidget(openPakFolderButton, 4, 0, 1, 2);
+    mainLayout->addWidget(pakPathLineEdit, 4, 2, 1, 8);
+    mainLayout->addWidget(packPakButton, 4, 10, 1, 2);
+    mainLayout->addWidget(targetMapButton, 5, 0, 1, 3);
+    mainLayout->addWidget(cannonLauncherButton, 5, 3, 1, 3);
+    mainLayout->addWidget(portalButton, 5, 6, 1, 3);
+    mainLayout->addWidget(izeLineupButton, 5, 9, 1, 3);
 
     for (int i = 0; i < mainLayout->rowCount(); i++)
         mainLayout->setRowStretch(i, 1);
@@ -4518,6 +4535,12 @@ OthersPage::OthersPage(QWidget *parent)
             this, [=]() {
                 int mode = debugModeCombo->currentIndex();
                 emit DebugMode(mode);
+            });
+
+    connect(frameDurationButton, &QPushButton::clicked,
+            this, [=]() {
+                int time_ms = frameDurationSpinBox->value();
+                emit SetFrameDuration(time_ms);
             });
 
     connect(unpackPakButton, &QPushButton::clicked,
@@ -4572,6 +4595,9 @@ void OthersPage::TranslateUI()
     SET_COMBO_TEXT(debugModeCombo, List::Get().debugModeList, 5);
     debugModeButton->setText(tr("Set"));
 
+    frameDurationLabel->setText(tr("Frame Duration") + " (ms)");
+    frameDurationButton->setText(tr("Set"));
+
     openPakFileButton->setText(tr("Open File"));
     unpackPakButton->setText(tr("Unpack"));
 
@@ -4580,7 +4606,7 @@ void OthersPage::TranslateUI()
 
     targetMapButton->setText(tr("Target Map Modify"));
     cannonLauncherButton->setText(tr("Cannon Launcher"));
-    portalButton->setText(tr("Portal"));
+    portalButton->setText(tr("Custom Portal"));
     izeLineupButton->setText(tr("I, Zombie Endless"));
 }
 

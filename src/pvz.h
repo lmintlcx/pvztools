@@ -270,6 +270,8 @@ public:
     void DisablePause(bool);
     void OpenDataDir();
     void DebugMode(int);
+    int GetFrameDuration();
+    void SetFrameDuration(int);
     // Status
     std::array<int, 12> GetStatus();
     // Target Map

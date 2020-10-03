@@ -131,10 +131,6 @@ MainWindow::MainWindow(QWidget *parent)
     pvztools_zh_CN->load(":/translations/pvztools_zh_CN.qm");
 
     SetLanguage();
-    if (TEST_VERSION) // TODO
-        setWindowTitle(tr("Plants vs. Zombies 1.0.0.1051 Toolset") + " " + VERSION_NAME + " " + "beta");
-    else
-        setWindowTitle(tr("Plants vs. Zombies 1.0.0.1051 Toolset"));
 
     // Default Page
 
@@ -1217,6 +1213,9 @@ void MainWindow::ConnectPages()
     connect(othersPage, &OthersPage::DebugMode,
             pvz, &PvZ::DebugMode);
 
+    connect(othersPage, &OthersPage::SetFrameDuration,
+            pvz, &PvZ::SetFrameDuration);
+
     connect(othersPage, &OthersPage::UnpackPAK,
             pak, &PAK::UnpackPAK);
 
@@ -1501,6 +1500,11 @@ void MainWindow::SetLanguage()
     // Hack 2/2
     spawnPage->SetDetailedZombies(zombie);
 
+    if (TEST_VERSION)
+        setWindowTitle(tr("Plants vs. Zombies 1.0.0.1051 Toolset") + " " + VERSION_NAME + " " + "beta");
+    else
+        setWindowTitle(tr("Plants vs. Zombies 1.0.0.1051 Toolset"));
+
     SetScreenSize();
 }
 
@@ -1558,7 +1562,7 @@ void MainWindow::SetScreenSize()
         x = 690 * scale_x * font_scale;
         y = 280 * scale_y * font_scale;
         izeLineupPage->setFixedSize(x, y);
-        x = 600 * scale_x * font_scale;
+        x = 720 * scale_x * font_scale;
         y = 420 * scale_y * font_scale;
         documentPage->setFixedSize(x, y);
     }
@@ -1597,7 +1601,7 @@ void MainWindow::TranslateUI()
     spawnCountPageAction->setText(tr("Spawning Counting"));
     targetMapPageAction->setText(tr("Target Map Modify"));
     cannonLauncherPageAction->setText(tr("Cannon Launcher"));
-    portalPageAction->setText(tr("Portal"));
+    portalPageAction->setText(tr("Custom Portal"));
     izeLineupPageAction->setText(tr("I, Zombie Endless"));
 
     showSidebarAction->setText(tr("Show Sidebar"));
