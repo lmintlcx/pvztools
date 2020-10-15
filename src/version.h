@@ -22,9 +22,9 @@
 
 
 #define VERSION_MAJOR      2
-#define VERSION_MINOR      4
-#define VERSION_PATCH      5
-#define VERSION_BUILD      6531
+#define VERSION_MINOR      5
+#define VERSION_PATCH      0
+#define VERSION_BUILD      6620
 
 
 #define TOSTRING_(arg) #arg

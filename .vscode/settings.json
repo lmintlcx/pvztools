@@ -1,6 +1,9 @@
 {
     "python.linting.enabled": false,
     "files.associations": {
+        "*.ts": "xml",
+        "*.release": "makefile",
+        "*.debug": "makefile",
         "qtwidgets": "cpp",
         "iostream": "cpp",
         "vector": "cpp",
@@ -138,7 +141,9 @@
         "strstream": "cpp",
         "qlist": "cpp",
         "qjsonarray": "cpp",
-        "qtplugin": "cpp"
+        "qtplugin": "cpp",
+        "qregularexpression": "cpp",
+        "qstylefactory": "cpp"
     },
     "python.pythonPath": "C:\\Python37-32\\python.exe"
 }

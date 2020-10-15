@@ -20,8 +20,10 @@
 #pragma comment(lib, "version.lib")
 #pragma comment(lib, "psapi.lib")
 #pragma comment(lib, "shlwapi.lib")
+#pragma comment(lib, "crypt32.lib")
 
 #include <QSplashScreen>
+#include <QSettings>
 
 #include <ctime>
 #include <random>
@@ -76,7 +78,7 @@ int main(int argc, char *argv[])
     if (app.isRunning())
         return -1;
 
-    QImage image = QImage(":/res/splash.jpg");
+    QImage image = QImage("splash.jpg");
     if (TEST_VERSION)
         image = image.convertToFormat(QImage::Format_Grayscale8);
     QPixmap pixmap = QPixmap::fromImage(image);
@@ -84,6 +86,17 @@ int main(int argc, char *argv[])
     splash.show();
     // splash.showMessage("Loading...");
     // app.processEvents();
+
+    // 转移并删除旧版本的注册表配置
+    // 放在 MainWindow 构造之前, Application 之后
+    QSettings settings_old;
+    if (settings_old.childGroups().contains("v2"))
+    {
+        QSettings settings("pvztools.ini", QSettings::IniFormat);
+        for (auto k : settings_old.allKeys())
+            settings.setValue(k, settings_old.value(k));
+        settings_old.remove("v2");
+    }
 
     MainWindow window;
     QObject::connect(&app, &Application::ActivateWindow,

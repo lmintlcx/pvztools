@@ -733,6 +733,7 @@ signals:
     void FullFog(bool);
     void NoFog(bool);
     void SeeVase(bool);
+    void IgnoreSlope(bool);
 
 public slots:
     void ShowIceTrailX(int);
@@ -764,6 +765,7 @@ private:
     QCheckBox *fullFogCheckBox;
     QCheckBox *noFogCheckBox;
     QCheckBox *seeVaseCheckBox;
+    QCheckBox *ignoreSlopeCheckBox;
     QGridLayout *mainLayout;
 };
 

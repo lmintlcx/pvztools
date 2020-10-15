@@ -1,11 +1,11 @@
 <RCC>
     <qresource prefix="/">
-        <file>translations/qt_zh_CN.qm</file>
-        <file>translations/widgets_zh_CN.qm</file>
-        <file>translations/pvztools_zh_CN.qm</file>
+        <!-- <file>translations/qt_zh_CN.qm</file> -->
+        <!-- <file>translations/widgets_zh_CN.qm</file> -->
+        <!-- <file>translations/pvztools_zh_CN.qm</file> -->
         <file>res/logo.ico</file>
         <file>res/logo_about.png</file>
-        <file>res/splash.jpg</file>
-        <file>res/lineup_string.json</file>
+        <!-- <file>res/splash.jpg</file> -->
+        <!-- <file>res/lineup_string.json</file> -->
     </qresource>
 </RCC>

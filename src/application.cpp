@@ -17,7 +17,7 @@ Application::Application(int argc, char *argv[])
     if (TEST_VERSION) // time limit for test version
     {
         QDate date_build = QLocale(QLocale::English).toDate(QString(__DATE__).replace("  ", " 0"), "MMM dd yyyy");
-        QDate date_limit = date_build.addDays(30);
+        QDate date_limit = date_build.addDays(365);
         QDate date_now = QDate::currentDate();
         if (date_now > date_limit)
         {

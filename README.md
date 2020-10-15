@@ -27,13 +27,15 @@ Supported game version:
 
 ## Build
 
-You will need a C++17 compiler and Qt 5 libraries with SSL support to build it.
+You need a C++17 compiler and Qt 5 libraries to build it.
+
+Qt must be linked with OpenSSL or Schannel, zlib is also required.
 
 Already tested and confirmed works with:
 
-| OpenSSL Library | Qt Framework | Windows SDK  | Code Compiler     | Executable Packer |
-| --------------- | ------------ | ------------ | ----------------- | ----------------- |
-| 1.1.1h          | 5.15.1       | 10.0.17763.0 | MSVC 2017 15.9.27 | UPX 3.96w         |
+| Qt      | OpenSSL | zlib      | Compiler  |
+| ------- | ------- | --------- | --------- |
+| 5.15.\* | 1.1.1\* | 1.2.11.\* | MSVC 2019 |
 
 ## Credit
 

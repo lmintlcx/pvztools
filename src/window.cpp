@@ -1,7 +1,6 @@
 
 #include <QWidget>
 #include <QMainWindow>
-#include <QListWidget>
 #include <QStackedWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -16,6 +15,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QAction>
+#include <QActionGroup>
 #include <QMenu>
 #include <QMenuBar>
 #include <QToolBar>
@@ -35,6 +35,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QFile>
+#include <QStyleFactory>
 
 #include <string>
 #include <array>
@@ -62,7 +64,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     mainWidget = new QWidget(this);
 
-    listWidget = new QListWidget(mainWidget);
     stackedWidget = new QStackedWidget(mainWidget);
 
     levelPage = new LevelPage(stackedWidget);
@@ -100,10 +101,7 @@ MainWindow::MainWindow(QWidget *parent)
     stackedWidget->addWidget(statusPage);
 
     mainLayout = new QHBoxLayout(mainWidget);
-    mainLayout->addWidget(listWidget);
     mainLayout->addWidget(stackedWidget);
-    mainLayout->setStretchFactor(listWidget, 1);
-    mainLayout->setStretchFactor(stackedWidget, 5);
 
     setCentralWidget(mainWidget);
 
@@ -126,22 +124,19 @@ MainWindow::MainWindow(QWidget *parent)
     widgets_zh_CN = new QTranslator(this);
     pvztools_zh_CN = new QTranslator(this);
 
-    qt_zh_CN->load(":/translations/qt_zh_CN.qm");
-    widgets_zh_CN->load(":/translations/widgets_zh_CN.qm");
-    pvztools_zh_CN->load(":/translations/pvztools_zh_CN.qm");
+    qt_zh_CN->load("translations/qt_zh_CN.qm");
+    widgets_zh_CN->load("translations/widgets_zh_CN.qm");
+    pvztools_zh_CN->load("translations/pvztools_zh_CN.qm");
 
     SetLanguage();
+    SetTheme();
 
     // Default Page
 
-    listWidget->setCurrentRow(4);
     spawnPageAction->setChecked(true);
     stackedWidget->setCurrentIndex(4);
 
     // Signals and Slots
-
-    connect(listWidget, &QListWidget::currentRowChanged,
-            stackedWidget, &QStackedWidget::setCurrentIndex);
 
     connect(pageGroup, &QActionGroup::triggered,
             this, [=](QAction *act) {
@@ -160,8 +155,6 @@ MainWindow::MainWindow(QWidget *parent)
             this, [=](int index) {
                 QList<QAction *> acts = pageGroup->actions();
                 acts[index]->setChecked(true);
-
-                listWidget->setCurrentRow(index);
             });
 
     // // Already called FindPvZ() in next pvz->GameOn().
@@ -204,24 +197,28 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ...
 
-    QSettings settings;
+    QSettings settings("pvztools.ini", QSettings::IniFormat);
     bool first_open = settings.value("v2/FirstOpen", true).toBool();
     int lineup_version = settings.value("v2/LineupVersion", 0).toInt();
 
     if (first_open)
         QTimer::singleShot(1618, documentPage, &QWidget::show);
 
-    QFile file(":/res/lineup_string.json");
+    QFile file("lineup_string.json");
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     QString content = file.readAll();
     file.close();
-    QJsonDocument document = QJsonDocument::fromJson(content.toUtf8());
-    QJsonObject json_object = document.object();
-    int version = json_object["version"].toInt();
-    if (version > lineup_version)
+    QJsonParseError parse_json_err;
+    QJsonDocument document = QJsonDocument::fromJson(content.toUtf8(), &parse_json_err);
+    if (parse_json_err.error == QJsonParseError::NoError)
     {
-        lineupPage->InitLineupString();
-        lineupPage->RefreshLineupString(); // page create before string for first time
+        QJsonObject json_object = document.object();
+        int version = json_object["version"].toInt();
+        if (version > lineup_version)
+        {
+            lineupPage->InitLineupString(content);
+            lineupPage->RefreshLineupString(); // page create before string for first time
+        }
     }
 
     // ...
@@ -379,7 +376,6 @@ void MainWindow::CreateActions()
     pageGroup->addAction(othersPageAction);
     pageGroup->addAction(statusPageAction);
 
-    showSidebarAction = new QAction(this);
     switchSpawnLayoutAction = new QAction(this);
     limitSpawnCountAction = new QAction(this);
     saveSpawnAction = new QAction(this);
@@ -387,7 +383,6 @@ void MainWindow::CreateActions()
     fontAction = new QAction(this);
     restoreDefaultAction = new QAction(this);
 
-    showSidebarAction->setCheckable(true);
     switchSpawnLayoutAction->setCheckable(true);
     limitSpawnCountAction->setCheckable(true);
     saveSpawnAction->setCheckable(true);
@@ -395,9 +390,6 @@ void MainWindow::CreateActions()
 
     limitSpawnCountAction->setChecked(true);
     saveSpawnAction->setChecked(true);
-
-    connect(showSidebarAction, &QAction::triggered,
-            this, &MainWindow::SetNavBar);
 
     connect(switchSpawnLayoutAction, &QAction::triggered,
             spawnPage, &SpawnPage::SwitchLayout);
@@ -423,13 +415,11 @@ void MainWindow::CreateActions()
 
     connect(restoreDefaultAction, &QAction::triggered,
             this, [=]() {
-                showSidebarAction->setChecked(false);
                 switchSpawnLayoutAction->setChecked(false);
                 limitSpawnCountAction->setChecked(true);
                 saveSpawnAction->setChecked(true);
                 muteAction->setChecked(false);
 
-                emit showSidebarAction->triggered(false);
                 emit switchSpawnLayoutAction->triggered(false);
                 emit limitSpawnCountAction->triggered(true);
                 emit saveSpawnAction->triggered(true);
@@ -461,6 +451,29 @@ void MainWindow::CreateActions()
 
     connect(languageEnglishAction, &QAction::triggered,
             this, &MainWindow::SetLanguage);
+
+    themeWindowsAction = new QAction(this);
+    themeWindowsVistaAction = new QAction(this);
+    themeFusionAction = new QAction(this);
+
+    themeWindowsAction->setCheckable(true);
+    themeWindowsVistaAction->setCheckable(true);
+    themeFusionAction->setCheckable(true);
+
+    themeGroup = new QActionGroup(this);
+    themeGroup->addAction(themeWindowsAction);
+    themeGroup->addAction(themeWindowsVistaAction);
+    themeGroup->addAction(themeFusionAction);
+    themeFusionAction->setChecked(true);
+
+    connect(themeWindowsAction, &QAction::triggered,
+            this, &MainWindow::SetTheme);
+
+    connect(themeWindowsVistaAction, &QAction::triggered,
+            this, &MainWindow::SetTheme);
+
+    connect(themeFusionAction, &QAction::triggered,
+            this, &MainWindow::SetTheme);
 
     helpDocumentAction = new QAction(this);
     videoDemoAction = new QAction(this);
@@ -501,7 +514,7 @@ void MainWindow::CreateActions()
                 request.setUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/version.txt"));
                 request.setRawHeader("User-Agent", PRODUCT_NAME "/" VERSION_NAME " "
                                                                 "(" COMPANY_NAME ")");
-                request.setRawHeader("Accept-Encoding", "deflate"); // no gzip
+                // request.setRawHeader("Accept-Encoding", "deflate"); // no gzip
                 request.setRawHeader("Cache-Control", "no-cache");
                 QNetworkReply *reply = manager.get(request);
 
@@ -512,6 +525,7 @@ void MainWindow::CreateActions()
                         &loop, &QEventLoop::quit);
                 loop.exec();
 
+                // TODO Qt6
                 if (manager.networkAccessible() == QNetworkAccessManager::NotAccessible)
                 {
                     QMessageBox::warning(this, tr("Update Check"), tr("Unable to connect to network."), QMessageBox::Ok);
@@ -632,10 +646,10 @@ void MainWindow::CreateMenus()
     pageMenu->addAction(izeLineupPageAction);
 
     settingMenu = new QMenu(this);
-    settingMenu->addAction(showSidebarAction);
     settingMenu->addAction(switchSpawnLayoutAction);
     settingMenu->addAction(limitSpawnCountAction);
     settingMenu->addAction(saveSpawnAction);
+    settingMenu->addSeparator();
     settingMenu->addAction(muteAction);
     settingMenu->addSeparator();
     settingMenu->addAction(fontAction);
@@ -645,12 +659,16 @@ void MainWindow::CreateMenus()
     languageMenu = new QMenu(this);
     languageMenu->addActions(languageGroup->actions());
 
+    themeMenu = new QMenu(this);
+    themeMenu->addActions(themeGroup->actions());
+
     helpMenu = new QMenu(this);
     helpMenu->addAction(helpDocumentAction);
     helpMenu->addAction(videoDemoAction);
     helpMenu->addSeparator();
     helpMenu->addAction(visitWebsiteAction);
     helpMenu->addAction(sendFeedbackAction);
+    helpMenu->addSeparator();
     helpMenu->addAction(changeLogAction);
     helpMenu->addAction(checkUpdateAction);
     helpMenu->addSeparator();
@@ -662,6 +680,7 @@ void MainWindow::CreateMenus()
     menuBar()->addMenu(pageMenu);
     menuBar()->addMenu(settingMenu);
     menuBar()->addMenu(languageMenu);
+    menuBar()->addMenu(themeMenu);
     menuBar()->addMenu(helpMenu);
 }
 
@@ -1190,6 +1209,9 @@ void MainWindow::ConnectPages()
     connect(effectPage, &EffectPage::SeeVase,
             pvz, &PvZ::SeeVase);
 
+    connect(effectPage, &EffectPage::IgnoreSlope,
+            pvz, &PvZ::IgnoreSlope);
+
     connect(pvz, &PvZ::IceTrailX,
             effectPage, &EffectPage::ShowIceTrailX);
 
@@ -1312,17 +1334,13 @@ void MainWindow::ConnectPages()
 
 void MainWindow::ReadSettings()
 {
-    QSettings settings;
+    QSettings settings("pvztools.ini", QSettings::IniFormat);
 
     settings.beginGroup("v2");
 
     bool keep_selected = settings.value("KeepSelectedFeatures", true).toBool();
     keepSelectedAction->setChecked(keep_selected);
     // emit keepSelectedAction->triggered(keep_selected);
-
-    bool sidebar_visible = settings.value("ShowSidebar", false).toBool();
-    showSidebarAction->setChecked(sidebar_visible);
-    emit showSidebarAction->triggered(sidebar_visible);
 
     bool another_layout = settings.value("SwitchAnotherLayout", false).toBool();
     switchSpawnLayoutAction->setChecked(another_layout);
@@ -1384,20 +1402,26 @@ void MainWindow::ReadSettings()
             languageEnglishAction->setChecked(true);
     }
 
+    QString theme = settings.value("Theme", QString("Fusion")).toString();
+    if (theme == QString("Windows"))
+        themeWindowsAction->setChecked(true);
+    else if (theme == QString("WindowsVista"))
+        themeWindowsVistaAction->setChecked(true);
+    else
+        themeFusionAction->setChecked(true);
+
     settings.endGroup();
 }
 
 void MainWindow::WriteSettings()
 {
-    QSettings settings;
+    QSettings settings("pvztools.ini", QSettings::IniFormat);
 
     settings.beginGroup("v2");
 
     settings.setValue("FirstOpen", false);
 
     settings.setValue("KeepSelectedFeatures", keepSelectedAction->isChecked());
-
-    settings.setValue("ShowSidebar", showSidebarAction->isChecked());
 
     settings.setValue("SwitchAnotherLayout", switchSpawnLayoutAction->isChecked());
 
@@ -1434,23 +1458,16 @@ void MainWindow::WriteSettings()
         language = "English";
     settings.setValue("Language", language);
 
-    settings.endGroup();
-}
-
-void MainWindow::SetNavBar(bool show_sidebar)
-{
-    if (show_sidebar)
-    {
-        listWidget->setVisible(true);
-        pageToolBar->setVisible(false);
-    }
+    QString theme;
+    if (themeWindowsAction->isChecked())
+        theme = "Windows";
+    else if (themeWindowsVistaAction->isChecked())
+        theme = "WindowsVista";
     else
-    {
-        listWidget->setVisible(false);
-        pageToolBar->setVisible(true);
-    }
+        theme = "Fusion";
+    settings.setValue("Theme", theme);
 
-    SetScreenSize();
+    settings.endGroup();
 }
 
 void MainWindow::SetLanguage()
@@ -1500,12 +1517,31 @@ void MainWindow::SetLanguage()
     // Hack 2/2
     spawnPage->SetDetailedZombies(zombie);
 
+    QString window_title;
+    window_title += "PvZ Tools";
+    window_title += QString(" ") + VERSION_NAME;
     if (TEST_VERSION)
-        setWindowTitle(tr("Plants vs. Zombies 1.0.0.1051 Toolset") + " " + VERSION_NAME + " " + "beta");
-    else
-        setWindowTitle(tr("Plants vs. Zombies 1.0.0.1051 Toolset"));
+        window_title += QString(" ") + "beta";
+    window_title += QString("  -  ") + tr("Plants vs. Zombies 1.0.0.1051 Toolset");
+    setWindowTitle(window_title);
 
     SetScreenSize();
+}
+
+void MainWindow::SetTheme()
+{
+    if (themeWindowsAction->isChecked())
+    {
+        QApplication::setStyle(QStyleFactory::create("Windows"));
+    }
+    else if (themeWindowsVistaAction->isChecked())
+    {
+        QApplication::setStyle(QStyleFactory::create("WindowsVista"));
+    }
+    else
+    {
+        QApplication::setStyle(QStyleFactory::create("Fusion"));
+    }
 }
 
 void MainWindow::SetScreenSize()
@@ -1514,12 +1550,11 @@ void MainWindow::SetScreenSize()
     // auto [scale_x, scale_y] = GetDpiScale();
     auto [scale_x, scale_y] = std::tuple<double, double>{1.0, 1.0};
     double font_scale = qApp->font().pointSize() / 10.0;
-    bool sidebar_visible = showSidebarAction->isChecked();
 
     if (languageChineseAction->isChecked())
     {
-        x = (610 + (sidebar_visible ? 80 : 0)) * scale_x * font_scale;
-        y = (380 + (sidebar_visible ? -25 : 0)) * scale_y * font_scale;
+        x = 610 * scale_x * font_scale;
+        y = 380 * scale_y * font_scale;
         this->setFixedSize(x, y);
         x = 720 * scale_x * font_scale;
         y = 430 * scale_y * font_scale;
@@ -1543,8 +1578,8 @@ void MainWindow::SetScreenSize()
     }
     else if (languageEnglishAction->isChecked())
     {
-        x = (900 + (sidebar_visible ? 100 : 0)) * scale_x * font_scale;
-        y = (380 + (sidebar_visible ? -25 : 0)) * scale_y * font_scale;
+        x = 900 * scale_x * font_scale;
+        y = 380 * scale_y * font_scale;
         this->setFixedSize(x, y);
         x = 820 * scale_x * font_scale;
         y = 430 * scale_y * font_scale;
@@ -1570,12 +1605,6 @@ void MainWindow::SetScreenSize()
 
 void MainWindow::TranslateUI()
 {
-    if (listWidget->count() == 0)
-        listWidget->addItems(List::Get().pageList);
-    else
-        for (int i = 0; i < listWidget->count(); i++)
-            listWidget->item(i)->setText(List::Get().pageList[i]);
-
     openFileAction->setText(tr("Open File"));
     openFolderAction->setText(tr("Open Folder"));
     restartAction->setText(tr("Restart"));
@@ -1604,7 +1633,6 @@ void MainWindow::TranslateUI()
     portalPageAction->setText(tr("Custom Portal"));
     izeLineupPageAction->setText(tr("I, Zombie Endless"));
 
-    showSidebarAction->setText(tr("Show Sidebar"));
     switchSpawnLayoutAction->setText(tr("Switch Spawn Layout"));
     limitSpawnCountAction->setText(tr("Limit Spawn Species"));
     saveSpawnAction->setText(tr("Save Selected Species"));
@@ -1614,6 +1642,10 @@ void MainWindow::TranslateUI()
 
     languageChineseAction->setText("简体中文");
     languageEnglishAction->setText("English");
+
+    themeWindowsAction->setText("Windows");
+    themeWindowsVistaAction->setText("WindowsVista");
+    themeFusionAction->setText("Fusion");
 
     helpDocumentAction->setText(tr("Help Document"));
     videoDemoAction->setText(tr("Video Demo"));
@@ -1629,6 +1661,7 @@ void MainWindow::TranslateUI()
     pageMenu->setTitle(tr("&Page"));
     settingMenu->setTitle(tr("&Setting"));
     languageMenu->setTitle(tr("&Language"));
+    themeMenu->setTitle(tr("&Theme"));
     helpMenu->setTitle(tr("&Help"));
 
     pageToolBar->setWindowTitle(tr("Page"));

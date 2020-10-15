@@ -8,7 +8,7 @@
 
 #include <QObject>
 
-#include <QtZlib/zlib.h>
+#include <zlib.h>
 
 #include <regex>
 
@@ -263,6 +263,7 @@ public:
     void FullFog(bool);
     void NoFog(bool);
     void SeeVase(bool);
+    void IgnoreSlope(bool);
     // Others
     void DisableSaveData(bool);
     void DisableDeleteData(bool);

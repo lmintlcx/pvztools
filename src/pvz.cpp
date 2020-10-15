@@ -237,6 +237,9 @@ void PvZ::GetGoldSunflowerTrophy()
 {
     if (GameOn())
     {
+        if (ReadMemory<uintptr_t>(0x6a9ec0, 0x82c) == 0)
+            return;
+
         // Adventure 2 times
         if (ReadMemory<int>(0x6a9ec0, 0x82c, 0x2c) < 2)
             WriteMemory<int>(2, 0x6a9ec0, 0x82c, 0x2c);
@@ -274,6 +277,9 @@ void PvZ::GetAllShopItems()
 {
     if (GameOn())
     {
+        if (ReadMemory<uintptr_t>(0x6a9ec0, 0x82c) == 0)
+            return;
+
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x1c0); // Gatling Pea
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x1c4); // Twin Sunflower
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x1c8); // Gloom-shroom
@@ -3913,6 +3919,17 @@ void PvZ::SeeVase(bool on)
     }
 }
 
+void PvZ::IgnoreSlope(bool on)
+{
+    if (GameOn())
+    {
+        if (on)
+            WriteMemory(std::array<byte, 6>{0xd9, 0xee, 0x90, 0x90, 0x90, 0x90}, 0x0041c6de);
+        else
+            WriteMemory(std::array<byte, 6>{0xdd, 0x05, 0x20, 0x95, 0x67, 0x00}, 0x0041c6de);
+    }
+}
+
 // Others
 
 void PvZ::DisableSaveData(bool on)
@@ -3961,7 +3978,10 @@ void PvZ::DisablePause(bool on)
 
 void PvZ::OpenDataDir()
 {
-    ShellExecuteW(nullptr, L"open", L"C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata", nullptr, nullptr, SW_SHOWNORMAL);
+    std::wstring path = L"C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata";
+    DWORD fa = GetFileAttributesW(path.c_str());
+    if ((fa != INVALID_FILE_ATTRIBUTES) && (fa & FILE_ATTRIBUTE_DIRECTORY))
+        ShellExecuteW(nullptr, L"open", path.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 void PvZ::DebugMode(int mode)

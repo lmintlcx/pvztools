@@ -40,8 +40,9 @@
 #include <QInputDialog>
 #include <QAction>
 #include <QMenu>
+#include <QRegularExpression>
 
-#include <QtZlib/zlib.h>
+#include <zlib.h>
 
 #include <array>
 #include <functional>
@@ -1452,9 +1453,9 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
     qRegisterMetaType<std::array<bool, 33>>("std::array<bool, 33>");
     qRegisterMetaType<std::array<bool, 20>>("std::array<bool, 20>");
 
-    QRegExp regExpHex("[a-fA-F0-9]{8}");
+    QRegularExpression regExpHex("[a-fA-F0-9]{8}");
     randomSeedLineEdit = new QLineEdit(this);
-    randomSeedLineEdit->setValidator(new QRegExpValidator(regExpHex, this));
+    randomSeedLineEdit->setValidator(new QRegularExpressionValidator(regExpHex, this));
     randomSeedLineEdit->setAlignment(Qt::AlignCenter);
     randomSeedButton = new QPushButton(this);
 
@@ -2826,7 +2827,7 @@ LineupPage::LineupPage(QWidget *parent)
 
                 // 看起来像新格式的话把所有空格都去掉
                 if (text[0] == 'L')
-                    text.remove(QRegExp("\\s"));
+                    text.remove(QRegularExpression("\\s"));
 
                 stringTextEdit->setPlainText(text);
                 emit ShowMessageStatusBar(tr("Already pasted."));
@@ -2880,8 +2881,8 @@ void LineupPage::TranslateUI()
 
 bool LineupPage::StringCheck(const QString &text)
 {
-    QRegExp reg("[0-5](,[a-fA-F0-9]{1,2} [1-6] [1-9] [0-2] [0-4]( [a-zA-Z0-9]{1,}){0,}){0,}");
-    return reg.exactMatch(text);
+    QRegularExpression reg("^[0-5](,[a-fA-F0-9]{1,2} [1-6] [1-9] [0-2] [0-4]( [a-zA-Z0-9]{1,}){0,}){0,}$");
+    return reg.match(text).hasMatch();
     // return true;
 }
 
@@ -3071,7 +3072,7 @@ void LineupPage::InitLineupString(QString str)
     QString content;
     if (str == "")
     {
-        QFile file(":/res/lineup_string.json");
+        QFile file("lineup_string.json");
         file.open(QIODevice::ReadOnly | QIODevice::Text);
         content = file.readAll();
         file.close();
@@ -3099,7 +3100,7 @@ void LineupPage::InitLineupString(QString str)
         return;
     QJsonArray array = array_value.toArray();
 
-    QSettings settings;
+    QSettings settings("pvztools.ini", QSettings::IniFormat);
     settings.setValue("v2/LineupVersion", json_object["version"].toInt());
     settings.remove("v2/Lineup/Official");
     settings.beginGroup("v2/Lineup/Official");
@@ -3126,7 +3127,7 @@ void LineupPage::RefreshLineupString()
     groups << "v2/Lineup/Official"
            << "v2/Lineup/Custom";
 
-    QSettings settings;
+    QSettings settings("pvztools.ini", QSettings::IniFormat);
     foreach (QString group, groups)
     {
         settings.beginGroup(group);
@@ -3295,7 +3296,7 @@ void LineupPage::UpdateLineupString()
     request.setUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/lineup_string.json"));
     request.setRawHeader("User-Agent", PRODUCT_NAME "/" VERSION_NAME " "
                                                     "(" COMPANY_NAME ")");
-    request.setRawHeader("Accept-Encoding", "gzip, deflate");
+    request.setRawHeader("Accept-Encoding", "gzip");
     request.setRawHeader("Cache-Control", "no-cache");
     QNetworkReply *reply = manager.get(request);
 
@@ -3311,6 +3312,7 @@ void LineupPage::UpdateLineupString()
     //         });
     loop.exec();
 
+    // TODO Qt6
     if (manager.networkAccessible() == QNetworkAccessManager::NotAccessible)
     {
         emit ShowMessageStatusBar(tr("Unable to connect to network."));
@@ -3346,7 +3348,7 @@ void LineupPage::UpdateLineupString()
             int version = json_object["version"].toInt();
             int counts = json_object["counts"].toInt();
             // qDebug() << author << version << counts;
-            QSettings settings;
+            QSettings settings("pvztools.ini", QSettings::IniFormat);
             int lineup_version = settings.value("v2/LineupVersion", 0).toInt();
             settings.beginGroup("v2/Lineup/Official");
             QStringList groups = settings.childGroups();
@@ -3362,6 +3364,12 @@ void LineupPage::UpdateLineupString()
             {
                 emit ShowMessageStatusBar(tr("Lineup already up to date, version %1, total %2.").arg(lineup_version).arg(lineup_counts));
             }
+
+            // 更新文件
+            QFile file("lineup_string.json");
+            file.open(QIODevice::WriteOnly | QIODevice::Truncate);
+            file.write(lineup_string.toUtf8());
+            file.close();
         }
     }
     else
@@ -3427,7 +3435,7 @@ void LineupPage::SaveLineupString()
             ShowMessageStatusBar(tr("Save failed, name cannot contain character \"|\"."));
             return;
         }
-        QSettings settings;
+        QSettings settings("pvztools.ini", QSettings::IniFormat);
         QString uuid = QUuid::createUuid().toString();
         settings.beginGroup("v2/Lineup/Custom");
         settings.beginGroup(uuid);
@@ -3466,7 +3474,7 @@ void LineupPage::DeleteLineupString()
 
         endlessBuildCombo->removeItem(index);
 
-        QSettings settings;
+        QSettings settings("pvztools.ini", QSettings::IniFormat);
         settings.remove(group + "/" + uuid);
 
         emit ShowMessageStatusBar(tr("Lineup %1 already deleted.").arg(name));
@@ -4212,6 +4220,7 @@ EffectPage::EffectPage(QWidget *parent)
     fullFogCheckBox = new QCheckBox(this);
     noFogCheckBox = new QCheckBox(this);
     seeVaseCheckBox = new QCheckBox(this);
+    ignoreSlopeCheckBox = new QCheckBox(this);
 
     sukhbirCodeButton->setText("SUKHBIR");
     futureCodeButton->setText("FUTURE");
@@ -4246,9 +4255,10 @@ EffectPage::EffectPage(QWidget *parent)
     mainLayout->addWidget(iceTrailCombo, 5, 3, 1, 3);
     mainLayout->addWidget(iceTrailLineEdit, 5, 6, 1, 3);
     mainLayout->addWidget(iceTrailButton, 5, 9, 1, 3);
-    mainLayout->addWidget(fullFogCheckBox, 6, 0, 1, 4);
-    mainLayout->addWidget(noFogCheckBox, 6, 4, 1, 4);
-    mainLayout->addWidget(seeVaseCheckBox, 6, 8, 1, 4);
+    mainLayout->addWidget(fullFogCheckBox, 6, 0, 1, 3);
+    mainLayout->addWidget(noFogCheckBox, 6, 3, 1, 3);
+    mainLayout->addWidget(seeVaseCheckBox, 6, 6, 1, 3);
+    mainLayout->addWidget(ignoreSlopeCheckBox, 6, 9, 1, 3);
 
     for (int i = 0; i < mainLayout->rowCount(); i++)
         mainLayout->setRowStretch(i, 1);
@@ -4350,6 +4360,9 @@ EffectPage::EffectPage(QWidget *parent)
 
     connect(seeVaseCheckBox, &QCheckBox::clicked,
             this, &EffectPage::SeeVase);
+
+    connect(ignoreSlopeCheckBox, &QCheckBox::clicked,
+            this, &EffectPage::IgnoreSlope);
 }
 
 void EffectPage::TranslateUI()
@@ -4371,6 +4384,7 @@ void EffectPage::TranslateUI()
     fullFogCheckBox->setText(tr("Full Fog"));
     noFogCheckBox->setText(tr("No Fog"));
     seeVaseCheckBox->setText(tr("See Vase"));
+    ignoreSlopeCheckBox->setText(tr("Ignore Slope"));
 }
 
 void EffectPage::ShowIceTrailX(int x)
@@ -4429,6 +4443,9 @@ void EffectPage::KeepSelectedFeatures()
 
     if (seeVaseCheckBox->isChecked())
         emit SeeVase(true);
+
+    if (ignoreSlopeCheckBox->isChecked())
+        emit IgnoreSlope(true);
 }
 
 // Others
@@ -4620,7 +4637,7 @@ void OthersPage::GetFileName()
     if (!file_name.isNull())
     {
         pakFileLineEdit->setText(file_name);
-        pakPathLineEdit->setText(QCoreApplication::applicationDirPath() + "/" + QString::number(QDateTime::currentDateTime().toTime_t(), 16));
+        pakPathLineEdit->setText(QCoreApplication::applicationDirPath() + "/" + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch(), 16));
     }
 }
 
@@ -4686,7 +4703,7 @@ void OthersPage::dropEvent(QDropEvent *event)
         if (input_url_info.isFile() && input_url_info.suffix() == "pak") // pak file
         {
             pakFileLineEdit->setText(input_url);
-            pakPathLineEdit->setText(QCoreApplication::applicationDirPath() + "/" + QString::number(QDateTime::currentDateTime().toTime_t(), 16));
+            pakPathLineEdit->setText(QCoreApplication::applicationDirPath() + "/" + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch(), 16));
         }
         else if (input_url_info.isDir()) // folder
         {

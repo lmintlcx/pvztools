@@ -18,6 +18,10 @@ contains(CONFIG, static) {
 
 INCLUDEPATH += .
 
+# zlib
+INCLUDEPATH += $$quote(C:\Qt\zlib_1.2.11.1\msvc2019_x86\include)
+LIBS += -L$$quote(C:\Qt\zlib_1.2.11.1\msvc2019_x86\lib) -lzdll
+
 win32-msvc*:PRECOMPILED_HEADER = src/stable.h
 
 HEADERS += src/version.h \

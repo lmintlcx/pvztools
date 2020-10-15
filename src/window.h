@@ -18,7 +18,6 @@ class QMenu;
 class QToolBar;
 class QThread;
 class QWidget;
-class QListWidget;
 class QStackedWidget;
 class QHBoxLayout;
 class QTranslator;
@@ -46,8 +45,8 @@ private:
     void ConnectPages();
     void ReadSettings();
     void WriteSettings();
-    void SetNavBar(bool);
     void SetLanguage();
+    void SetTheme();
     void SetScreenSize();
     void TranslateUI();
     void FindResult(Result);
@@ -88,7 +87,6 @@ private:
     QAction *izeLineupPageAction;
     QActionGroup *pageGroup;
 
-    QAction *showSidebarAction;
     QAction *switchSpawnLayoutAction;
     QAction *limitSpawnCountAction;
     QAction *saveSpawnAction;
@@ -99,6 +97,11 @@ private:
     QAction *languageChineseAction;
     QAction *languageEnglishAction;
     QActionGroup *languageGroup;
+
+    QAction *themeWindowsAction;
+    QAction *themeWindowsVistaAction;
+    QAction *themeFusionAction;
+    QActionGroup *themeGroup;
 
     QAction *helpDocumentAction;
     QAction *videoDemoAction;
@@ -114,6 +117,7 @@ private:
     QMenu *pageMenu;
     QMenu *settingMenu;
     QMenu *languageMenu;
+    QMenu *themeMenu;
     QMenu *helpMenu;
 
     QToolBar *pageToolBar;
@@ -129,7 +133,6 @@ private:
     QThread *pak_thread;
 
     QWidget *mainWidget;
-    QListWidget *listWidget;
     QStackedWidget *stackedWidget;
 
     LevelPage *levelPage;
