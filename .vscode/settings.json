@@ -144,6 +144,5 @@
         "qtplugin": "cpp",
         "qregularexpression": "cpp",
         "qstylefactory": "cpp"
-    },
-    "python.pythonPath": "C:\\Python37-32\\python.exe"
+    }
 }

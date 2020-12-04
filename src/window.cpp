@@ -124,9 +124,9 @@ MainWindow::MainWindow(QWidget *parent)
     widgets_zh_CN = new QTranslator(this);
     pvztools_zh_CN = new QTranslator(this);
 
-    qt_zh_CN->load("translations/qt_zh_CN.qm");
-    widgets_zh_CN->load("translations/widgets_zh_CN.qm");
-    pvztools_zh_CN->load("translations/pvztools_zh_CN.qm");
+    qt_zh_CN->load(":/translations/qt_zh_CN.qm");
+    widgets_zh_CN->load(":/translations/widgets_zh_CN.qm");
+    pvztools_zh_CN->load(":/translations/pvztools_zh_CN.qm");
 
     SetLanguage();
     SetTheme();
@@ -464,7 +464,7 @@ void MainWindow::CreateActions()
     themeGroup->addAction(themeWindowsAction);
     themeGroup->addAction(themeWindowsVistaAction);
     themeGroup->addAction(themeFusionAction);
-    themeFusionAction->setChecked(true);
+    themeWindowsVistaAction->setChecked(true);
 
     connect(themeWindowsAction, &QAction::triggered,
             this, &MainWindow::SetTheme);
@@ -579,10 +579,10 @@ void MainWindow::CreateActions()
                 compiler = QString("Visual Studio") + " " + msvc_version + " " + QString::number(_MSC_VER);
 #endif
 #ifdef __MINGW32__
-                compiler = QString("MinGW-w64/GCC") + " " + QString::number(__GNUC__) + "." + QString::number(__GNUC_MINOR__) + "." + QString::number(__GNUC_PATCHLEVEL__);
+                compiler = QString("MinGW-w64(GCC)") + " " + QString::number(__GNUC__) + "." + QString::number(__GNUC_MINOR__) + "." + QString::number(__GNUC_PATCHLEVEL__);
 #endif
 #ifdef __clang__
-                compiler = QString("LLVM/Clang") + " " + QString::number(__clang_major__) + "." + QString::number(__clang_minor__) + "." + QString::number(__clang_patchlevel__);
+                compiler = QString("Clang/LLVM") + " " + QString::number(__clang_major__) + "." + QString::number(__clang_minor__) + "." + QString::number(__clang_patchlevel__);
 #endif
 
                 QString qt_version = QString("Qt") + " " + QT_VERSION_STR;
@@ -1402,7 +1402,7 @@ void MainWindow::ReadSettings()
             languageEnglishAction->setChecked(true);
     }
 
-    QString theme = settings.value("Theme", QString("Fusion")).toString();
+    QString theme = settings.value("Theme", QString("WindowsVista")).toString();
     if (theme == QString("Windows"))
         themeWindowsAction->setChecked(true);
     else if (theme == QString("WindowsVista"))
@@ -1534,14 +1534,17 @@ void MainWindow::SetTheme()
     {
         QApplication::setStyle(QStyleFactory::create("Windows"));
     }
-    else if (themeWindowsVistaAction->isChecked())
-    {
-        QApplication::setStyle(QStyleFactory::create("WindowsVista"));
-    }
-    else
+    else if (themeFusionAction->isChecked())
     {
         QApplication::setStyle(QStyleFactory::create("Fusion"));
     }
+    else
+    {
+        QApplication::setStyle(QStyleFactory::create("WindowsVista"));
+    }
+
+    // 更改主题会导致菜单栏字体变小
+    QApplication::setFont(QApplication::font());
 }
 
 void MainWindow::SetScreenSize()

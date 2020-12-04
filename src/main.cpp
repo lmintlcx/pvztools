@@ -24,6 +24,7 @@
 
 #include <QSplashScreen>
 #include <QSettings>
+#include <QFileInfo>
 
 #include <ctime>
 #include <random>
@@ -74,11 +75,16 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 
+    QGuiApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
+
     Application app(argc, argv);
     if (app.isRunning())
         return -1;
 
-    QImage image = QImage("splash.jpg");
+    QString splash_filename = ":/res/logo.ico";
+    if (QFileInfo::QFileInfo("splash.jpg").isFile())
+        splash_filename = "splash.jpg";
+    QImage image = QImage(splash_filename);
     if (TEST_VERSION)
         image = image.convertToFormat(QImage::Format_Grayscale8);
     QPixmap pixmap = QPixmap::fromImage(image);
@@ -87,15 +93,22 @@ int main(int argc, char *argv[])
     // splash.showMessage("Loading...");
     // app.processEvents();
 
-    // 转移并删除旧版本的注册表配置
-    // 放在 MainWindow 构造之前, Application 之后
-    QSettings settings_old;
-    if (settings_old.childGroups().contains("v2"))
+    HKEY hKey;
+    DWORD ret = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Cube Studio\\PvZ Tools", 0, KEY_READ, &hKey);
+    if (ret == ERROR_SUCCESS)
     {
-        QSettings settings("pvztools.ini", QSettings::IniFormat);
-        for (auto k : settings_old.allKeys())
-            settings.setValue(k, settings_old.value(k));
-        settings_old.remove("v2");
+        // 转移并删除旧版本的注册表配置
+        // 放在 MainWindow 构造之前, Application 之后
+        QSettings settings_old;
+        if (settings_old.childGroups().contains("v2"))
+        {
+            QSettings settings("pvztools.ini", QSettings::IniFormat);
+            for (auto k : settings_old.allKeys())
+                settings.setValue(k, settings_old.value(k));
+            settings_old.remove("v2");
+        }
+
+        RegCloseKey(hKey);
     }
 
     MainWindow window;

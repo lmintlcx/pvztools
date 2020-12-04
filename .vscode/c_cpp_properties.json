@@ -3,14 +3,14 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.27.29110/include",
-                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/ucrt",
-                "C:/Qt/Qt_5.15.1/msvc2019_x86/static/include",
-                "C:/Qt/Qt_5.15.1/msvc2019_x86/static/include/QtCore",
-                "C:/Qt/Qt_5.15.1/msvc2019_x86/static/include/QtGui",
-                "C:/Qt/Qt_5.15.1/msvc2019_x86/static/include/QtWidgets",
-                "C:/Qt/Qt_5.15.1/msvc2019_x86/static/include/QtNetwork",
-                "C:/Qt/zlib_1.2.11.1/msvc2019_x86/include",
+                "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/include",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10240.0/ucrt",
+                "C:/Dev/Qt_5.15.2/msvc2017_x86/shared/include",
+                "C:/Dev/Qt_5.15.2/msvc2017_x86/shared/include/QtCore",
+                "C:/Dev/Qt_5.15.2/msvc2017_x86/shared/include/QtGui",
+                "C:/Dev/Qt_5.15.2/msvc2017_x86/shared/include/QtWidgets",
+                "C:/Dev/Qt_5.15.2/msvc2017_x86/shared/include/QtNetwork",
+                "C:/Dev/zlib_1.2.11.1/msvc2017_x86/shared/include",
                 "${workspaceFolder}/**"
             ],
             "defines": [
@@ -18,8 +18,8 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "windowsSdkVersion": "10.0.19041.0",
-            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.27.29110/bin/Hostx86/x86/cl.exe",
+            "windowsSdkVersion": "10.0.10240.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/bin/Hostx86/x86/cl.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "msvc-x86"

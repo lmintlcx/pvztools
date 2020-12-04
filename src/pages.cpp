@@ -1486,7 +1486,7 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
     spawnLimitLayout->addWidget(limitGigaCheckBox, 0, 6, 1, 2);
     spawnLimitLayout->addWidget(weightGigaLabel, 0, 0, 1, 3);
     spawnLimitLayout->addWidget(weightGigaSpinBox, 0, 3, 1, 2);
-    spawnLimitLayout->setMargin(0);
+    spawnLimitLayout->setMargin(0); // TODO Qt6
 
     for (int i = 0; i < spawnLimitLayout->rowCount(); i++)
         spawnLimitLayout->setRowStretch(i, 1);
@@ -1513,7 +1513,7 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
         gigaWavesLayout->addWidget(waveCheckBox[i]);
     gigaWavesLayout->addWidget(waveLine19);
     gigaWavesLayout->addWidget(waveCheckBox[19]);
-    gigaWavesLayout->setMargin(0);
+    gigaWavesLayout->setMargin(0); // TODO Qt6
     gigaWavesLayout->setSpacing(4);
 
     spawnResetButton = new QPushButton(this);
@@ -2670,6 +2670,8 @@ LineupPage::LineupPage(QWidget *parent)
 
     hiddenSceneLabel->setOpenExternalLinks(true);
     arrayDesignLabel->setOpenExternalLinks(true);
+
+    hiddenSceneLabel->setAlignment(Qt::AlignCenter);
 
     deleteStringButton->setEnabled(false);
 
@@ -5584,7 +5586,7 @@ void DocumentPage::TranslateUI()
                          "<p>Some behavior of trainer (finding game progress, modifying memory data, remote injection code, etc.) may be considered dangerous by anti-virus software. Please decide whether to trust this software yourself.</p>"
                          "<p>Reasonable uses of trainer include, but not limited to, demonstrations, testing, research, and entertainment. Abuse of modifiers may reduce the fun of game seriously, please use it with caution, especially newbies.</p>"
                          "<p>There may be some bugs with this software, users can summit feedback or feature request to the author. The beta version of this software has a time limit, please download latest version if it prompt expires.</p>"
-                         "<p>Configuration information is saved in \"HKEY_CURRENT_USER\\SOFTWARE\\Cube Studio\\PvZ Tools\\v2\". You can export this registry item for back up, or clean it after delete this software.</p>"
+                         "<p>Configuration information is saved in \"HKEY_CURRENT_USER\\SOFTWARE\\Cube Studio\\PvZ Tools\\v2\", you can export this registry item for back up, or clean it after delete this software.<br>(Starting from version 2.5.0, these configurations are in the \"pvztools.ini\" file which located at the same directory as the main program.)</p>"
                          "<p>Most important data (memory address) comes from existing public information and other open source modifiers. And source code is copy and paste from Stack Overflow.</p>"
                          "<p>All source code is located at <a href=\"https://github.com/lmintlcx/pvztools/\">https://github.com/lmintlcx/pvztools/</a>.</p>"
                          "<h2>Spawn</h2>"
@@ -5620,7 +5622,7 @@ void DocumentPage::TranslateUI()
 // <p>修改器的部分行为（查找游戏进程，修改内存数据，远程注入代码等）可能会被杀毒软件视为危险行为，请自行决定是否信任本软件。</p>
 // <p>修改器的合理用途包括但不限于演示、测试、研究和娱乐。滥用修改器会严重降低游戏乐趣，新手请慎重使用。</p>
 // <p>本软件可能存在一些问题，用户可以向作者提供问题反馈或者功能需求。测试版有使用期限限制，如果提示过期请下载最新版本。</p>
-// <p>配置信息保存在“HKEY_CURRENT_USER\SOFTWARE\Cube Studio\PvZ Tools\v2”。你可以导出这个注册表项目来备份，或者在删除本软件后清理它。</p>
+// <p>配置信息保存在“HKEY_CURRENT_USER\SOFTWARE\Cube Studio\PvZ Tools\v2”，你可以导出这个注册表项目来备份，或者在删除本软件后清理它。<br>从 2.5.0 版本开始，这些配置位于主程序同目录下的 “pvztools.ini” 文件中。）</p>
 // <p>大部分核心数据（内存基址）来自于已有公开资料和其他开源修改器。而源代码是从栈溢出（Stack Overflow）复制粘贴的。</p>
 // <p>所有源代码位于 <a href="https://github.com/lmintlcx/pvztools/">https://github.com/lmintlcx/pvztools/</a> 。</p>
 // <h2>出怪</h2>

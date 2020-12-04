@@ -3,7 +3,7 @@
 
 Plants vs. Zombies 1.0.0.1051 Toolset.
 
-**Development of PvZ Tools has been stopped, please use [PvZ Toolkit](https://github.com/lmintlcx/pvztoolkit/) instead.**
+**PvZ Tools has been deprecated, please use [PvZ Toolkit](https://github.com/lmintlcx/pvztoolkit/) instead.**
 
 ## Screenshots
 
@@ -13,15 +13,11 @@ Plants vs. Zombies 1.0.0.1051 Toolset.
 
 [Download](https://pvz.lmintlcx.com/tools/)
 
-Supported operating systems:
+Supported operating systems: (x86/x64)
 
-- Windows 7 SP1
+- Windows 7 / 8.x / 10
 
-- Windows 8.1
-
-- Windows 10 v1507+
-
-Supported game version:
+Supported game version: (PC)
 
 - [1.0.0.1051](https://pvz.lmintlcx.com/download/)
 
@@ -35,7 +31,7 @@ Already tested and confirmed works with:
 
 | Qt      | OpenSSL | zlib      | Compiler  |
 | ------- | ------- | --------- | --------- |
-| 5.15.\* | 1.1.1\* | 1.2.11.\* | MSVC 2019 |
+| 5.15.\* | 1.1.1\* | 1.2.11.\* | MSVC 2017 |
 
 ## Credit
 

@@ -11,6 +11,8 @@ win32-msvc*:QMAKE_CXXFLAGS += /std:c++17 /MP /utf-8
 
 DEFINES += _WIN32_WINNT=0x0601
 
+# QMAKE_LFLAGS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
+
 contains(CONFIG, static) {
   CONFIG -= import_plugins
   QTPLUGIN += qwindows qwindowsvistastyle qjpeg qico qgenericbearer
@@ -19,8 +21,13 @@ contains(CONFIG, static) {
 INCLUDEPATH += .
 
 # zlib
-INCLUDEPATH += $$quote(C:\Qt\zlib_1.2.11.1\msvc2019_x86\include)
-LIBS += -L$$quote(C:\Qt\zlib_1.2.11.1\msvc2019_x86\lib) -lzdll
+contains(CONFIG, static) {
+  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.11.1\msvc2017_x86\static\include)
+  LIBS += -L$$quote(C:\Dev\zlib_1.2.11.1\msvc2017_x86\static\lib) -lzlib
+} else {
+  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.11.1\msvc2017_x86\shared\include)
+  LIBS += -L$$quote(C:\Dev\zlib_1.2.11.1\msvc2017_x86\shared\lib) -lzdll
+}
 
 win32-msvc*:PRECOMPILED_HEADER = src/stable.h
 
