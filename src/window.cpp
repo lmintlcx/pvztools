@@ -84,7 +84,6 @@ MainWindow::MainWindow(QWidget *parent)
     cannonLauncherPage = new CannonLauncherPage;
     portalPage = new PortalPage;
     izeLineupPage = new IzeLineupPage;
-    documentPage = new DocumentPage;
 
     stackedWidget->addWidget(levelPage);
     stackedWidget->addWidget(resourcePage);
@@ -139,7 +138,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Signals and Slots
 
     connect(pageGroup, &QActionGroup::triggered,
-            this, [=](QAction *act) {
+            this, [=](QAction *act)
+            {
                 QList<QAction *> acts = pageGroup->actions();
                 for (int i = 0; i < acts.size(); i++)
                 {
@@ -152,7 +152,8 @@ MainWindow::MainWindow(QWidget *parent)
             });
 
     connect(stackedWidget, &QStackedWidget::currentChanged,
-            this, [=](int index) {
+            this, [=](int index)
+            {
                 QList<QAction *> acts = pageGroup->actions();
                 acts[index]->setChecked(true);
             });
@@ -183,7 +184,8 @@ MainWindow::MainWindow(QWidget *parent)
             pak, &QObject::deleteLater);
 
     connect(stackedWidget, &QStackedWidget::currentChanged,
-            this, [=](int row) {
+            this, [=](int row)
+            {
                 if (statusPage->IsAutoRefresh())
                 {
                     if (row == stackedWidget->indexOf(statusPage))
@@ -202,7 +204,17 @@ MainWindow::MainWindow(QWidget *parent)
     int lineup_version = settings.value("v2/LineupVersion", 0).toInt();
 
     if (first_open)
-        QTimer::singleShot(1618, documentPage, &QWidget::show);
+        QTimer::singleShot(1618, [this]()
+                           {
+                               auto ret = QMessageBox::question(this,                //
+                                                                tr("Better Choice"), //
+                                                                tr("PvZ Tools only supports version 1.0.0.1051,\n"
+                                                                   "yet PvZ Toolkit supports a dozen versions.\n\n"
+                                                                   "Do you want to download PvZ Toolkit now?"), //
+                                                                QMessageBox::Yes | QMessageBox::No);            //
+                               if (ret == QMessageBox::Yes)
+                                   QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/toolkit/"));
+                           });
 
     QFile file("lineup_string.json");
     file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -277,27 +289,29 @@ void MainWindow::CreateActions()
     exitAction = new QAction(this);
 
     connect(openFileAction, &QAction::triggered,
-            this, [=]() {
+            this, [=]()
+            {
                 stackedWidget->setCurrentWidget(othersPage);
                 othersPage->GetFileName();
             });
 
     connect(openFolderAction, &QAction::triggered,
-            this, [=]() {
+            this, [=]()
+            {
                 stackedWidget->setCurrentWidget(othersPage);
                 othersPage->GetFolderName();
             });
 
     connect(restartAction, &QAction::triggered,
-            this, [=]() {
+            this, [=]()
+            {
                 qApp->quit();
                 QProcess::startDetached(QApplication::applicationFilePath(), QStringList());
             });
 
     connect(exitAction, &QAction::triggered,
-            this, [=]() {
-                qApp->quit();
-            });
+            this, [=]()
+            { qApp->quit(); });
 
     findGameAction = new QAction(this);
     gameTopMostAction = new QAction(this);
@@ -398,7 +412,8 @@ void MainWindow::CreateActions()
             spawnPage, &SpawnPage::LimitSpawnCount);
 
     connect(fontAction, &QAction::triggered,
-            this, [=]() {
+            this, [=]()
+            {
                 bool ok;
                 QFont font = QFontDialog::getFont(&ok, this);
                 if (ok)
@@ -414,7 +429,8 @@ void MainWindow::CreateActions()
             });
 
     connect(restoreDefaultAction, &QAction::triggered,
-            this, [=]() {
+            this, [=]()
+            {
                 switchSpawnLayoutAction->setChecked(false);
                 limitSpawnCountAction->setChecked(true);
                 saveSpawnAction->setChecked(true);
@@ -475,40 +491,28 @@ void MainWindow::CreateActions()
     connect(themeFusionAction, &QAction::triggered,
             this, &MainWindow::SetTheme);
 
-    helpDocumentAction = new QAction(this);
     videoDemoAction = new QAction(this);
     visitWebsiteAction = new QAction(this);
-    sendFeedbackAction = new QAction(this);
     changeLogAction = new QAction(this);
     checkUpdateAction = new QAction(this);
     aboutAction = new QAction(this);
     aboutQtAction = new QAction(this);
 
-    connect(helpDocumentAction, &QAction::triggered,
-            this, &MainWindow::ShowDocumentPage);
-
     connect(videoDemoAction, &QAction::triggered,
-            this, [=]() {
-                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/pvztoolsdemo/"));
-            });
+            this, [=]()
+            { QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/pvztoolsdemo/")); });
 
     connect(visitWebsiteAction, &QAction::triggered,
-            this, [=]() {
-                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/tools/"));
-            });
-
-    connect(sendFeedbackAction, &QAction::triggered,
-            this, [=]() {
-                QDesktopServices::openUrl(QUrl("mailto:pvztools@lmintlcx.com"));
-            });
+            this, [=]()
+            { QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/tools/")); });
 
     connect(changeLogAction, &QAction::triggered,
-            this, [=]() {
-                QDesktopServices::openUrl(QUrl("https://github.com/lmintlcx/PvZTools/blob/master/CHANGELOG.md"));
-            });
+            this, [=]()
+            { QDesktopServices::openUrl(QUrl("https://github.com/lmintlcx/PvZTools/blob/master/CHANGELOG.md")); });
 
     connect(checkUpdateAction, &QAction::triggered,
-            this, [=]() {
+            this, [=]()
+            {
                 QNetworkAccessManager manager;
                 QNetworkRequest request;
                 request.setUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/version.txt"));
@@ -563,7 +567,8 @@ void MainWindow::CreateActions()
             });
 
     connect(aboutAction, &QAction::triggered,
-            this, [=]() {
+            this, [=]()
+            {
                 QString build_date = QLocale(QLocale::English).toDate(QString(__DATE__).replace("  ", " 0"), "MMM dd yyyy").toString("yyyy/MM/dd");
                 QString build_time = QTime::fromString(__TIME__, "hh:mm:ss").toString("hh:mm:ss");
 
@@ -574,6 +579,8 @@ void MainWindow::CreateActions()
                     msvc_version = "2017";
                 else if (_MSC_VER >= 1920 && _MSC_VER < 1930)
                     msvc_version = "2019";
+                else if (_MSC_VER >= 1930 && _MSC_VER < 1940)
+                    msvc_version = "2022";
                 else
                     ; // TODO
                 compiler = QString("Visual Studio") + " " + msvc_version + " " + QString::number(_MSC_VER);
@@ -616,9 +623,8 @@ void MainWindow::CreateActions()
             });
 
     connect(aboutQtAction, &QAction::triggered,
-            this, [=]() {
-                QApplication::aboutQt();
-            });
+            this, [=]()
+            { QApplication::aboutQt(); });
 }
 
 void MainWindow::CreateMenus()
@@ -663,17 +669,22 @@ void MainWindow::CreateMenus()
     themeMenu->addActions(themeGroup->actions());
 
     helpMenu = new QMenu(this);
-    helpMenu->addAction(helpDocumentAction);
     helpMenu->addAction(videoDemoAction);
-    helpMenu->addSeparator();
     helpMenu->addAction(visitWebsiteAction);
-    helpMenu->addAction(sendFeedbackAction);
+    helpMenu->addSeparator();
     helpMenu->addSeparator();
     helpMenu->addAction(changeLogAction);
     helpMenu->addAction(checkUpdateAction);
     helpMenu->addSeparator();
     helpMenu->addAction(aboutAction);
     helpMenu->addAction(aboutQtAction);
+
+    cakeMenu = new QMenu(this);
+    cakeMenu->setEnabled(false);
+
+    QDate time = QDate::currentDate();
+    if (time.year() > 2009 && time.month() == 5 && time.day() == 5)
+        cakeMenu->setTitle("🎂");
 
     menuBar()->addMenu(fileMenu);
     menuBar()->addMenu(gameMenu);
@@ -682,6 +693,7 @@ void MainWindow::CreateMenus()
     menuBar()->addMenu(languageMenu);
     menuBar()->addMenu(themeMenu);
     menuBar()->addMenu(helpMenu);
+    menuBar()->addMenu(cakeMenu);
 }
 
 void MainWindow::CreateToolBars()
@@ -925,6 +937,9 @@ void MainWindow::ConnectPages()
 
     connect(slotsPage, &SlotsPage::SetSlotsCount,
             pvz, &PvZ::SetSlotsCount);
+
+    connect(slotsPage, &SlotsPage::TopSlots,
+            pvz, &PvZ::TopSlots);
 
     connect(slotsPage, &SlotsPage::HideSlots,
             pvz, &PvZ::HideSlots);
@@ -1512,7 +1527,6 @@ void MainWindow::SetLanguage()
     cannonLauncherPage->TranslateUI();
     portalPage->TranslateUI();
     izeLineupPage->TranslateUI();
-    documentPage->TranslateUI();
 
     // Hack 2/2
     spawnPage->SetDetailedZombies(zombie);
@@ -1575,9 +1589,6 @@ void MainWindow::SetScreenSize()
         x = 540 * scale_x * font_scale;
         y = 280 * scale_y * font_scale;
         izeLineupPage->setFixedSize(x, y);
-        x = 610 * scale_x * font_scale;
-        y = 420 * scale_y * font_scale;
-        documentPage->setFixedSize(x, y);
     }
     else if (languageEnglishAction->isChecked())
     {
@@ -1600,9 +1611,6 @@ void MainWindow::SetScreenSize()
         x = 690 * scale_x * font_scale;
         y = 280 * scale_y * font_scale;
         izeLineupPage->setFixedSize(x, y);
-        x = 720 * scale_x * font_scale;
-        y = 420 * scale_y * font_scale;
-        documentPage->setFixedSize(x, y);
     }
 }
 
@@ -1650,10 +1658,8 @@ void MainWindow::TranslateUI()
     themeWindowsVistaAction->setText("WindowsVista");
     themeFusionAction->setText("Fusion");
 
-    helpDocumentAction->setText(tr("Help Document"));
     videoDemoAction->setText(tr("Video Demo"));
     visitWebsiteAction->setText(tr("Visit Website"));
-    sendFeedbackAction->setText(tr("Send Feedback"));
     changeLogAction->setText(tr("Change Log"));
     checkUpdateAction->setText(tr("Check Update"));
     aboutAction->setText(tr("About PvZ Tools"));
@@ -1674,7 +1680,7 @@ void MainWindow::FindResult(Result result)
 {
     if (result == Result::OK)
     {
-        ShowMessageStatusBar(tr("Game Found."));
+        ShowMessageStatusBar(tr("Game found successfully."));
 
         resourcePage->UpdateGameData();
         slotsPage->UpdateGameData();
@@ -1694,17 +1700,25 @@ void MainWindow::FindResult(Result result)
     }
     else if (result == Result::WrongVersion)
     {
-        ShowMessageStatusBar(tr("Unsupported game version."));
+        ShowMessageStatusBar(tr("Unsupported game version. Try to use PvZ Toolkit instead."));
         statusPage->StopTimer(true);
+        auto ret = QMessageBox::question(this,                //
+                                         tr("Better Choice"), //
+                                         tr("PvZ Tools only supports version 1.0.0.1051,\n"
+                                            "yet PvZ Toolkit supports a dozen versions.\n\n"
+                                            "Do you want to download PvZ Toolkit now?"), //
+                                         QMessageBox::Yes | QMessageBox::No);            //
+        if (ret == QMessageBox::Yes)
+            QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/toolkit/"));
     }
     else if (result == Result::NotFound)
     {
-        ShowMessageStatusBar(tr("Game window not found."));
+        ShowMessageStatusBar(tr("No game window was found. Run Plants vs. Zombies first."));
         statusPage->StopTimer(true);
     }
     else if (result == Result::OpenError)
     {
-        ShowMessageStatusBar(tr("Open game process error."));
+        ShowMessageStatusBar(tr("Error opening game process. Try run Pt as administrator."));
         statusPage->StopTimer(true);
     }
 }
@@ -1768,18 +1782,6 @@ void MainWindow::ShowIzeLineupPage()
     else
     {
         izeLineupPage->show();
-    }
-}
-
-void MainWindow::ShowDocumentPage()
-{
-    if (documentPage->isVisible())
-    {
-        documentPage->hide();
-    }
-    else
-    {
-        documentPage->show();
     }
 }
 

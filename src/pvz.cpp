@@ -139,7 +139,15 @@ void PvZ::FindPvZ()
                 result = Result::WrongVersion;
         else
             result = Result::OpenError;
-    else if (OpenByWindow(L"MainWindow", nullptr))
+    else if (OpenByWindow(L"MainWindow", L"植物大战僵尸中文版")                       //
+             || OpenByWindow(L"MainWindow", L"植物大战僵尸汉化版")                    //
+             || OpenByWindow(L"MainWindow", L"Plants vs. Zombies 1.2.0.1073")         //
+             || OpenByWindow(L"MainWindow", L"Plants vs. Zombies 1.2.0.1073 RELEASE") //
+             || OpenByWindow(L"MainWindow", L"Plants vs. Zombies GOTY")               //
+             || OpenByWindow(L"MainWindow", L"Pflanzen gegen Zombies 1.2.0.1093")     //
+             || OpenByWindow(L"MainWindow", L"Plantas contra Zombis 1.2.0.1093")      //
+             || OpenByWindow(L"MainWindow", L"Plantes contre Zombies 1.2.0.1093")     //
+             || OpenByWindow(L"MainWindow", L"Piante contro zombi 1.2.0.1093"))       //
         if (IsValid())
             if (ReadMemory<unsigned int>(0x004140c5) == 0x0019b337)
                 result = Result::OK;
@@ -240,8 +248,9 @@ void PvZ::GetGoldSunflowerTrophy()
         if (ReadMemory<uintptr_t>(0x6a9ec0, 0x82c) == 0)
             return;
 
-        // Adventure 2 times
-        if (ReadMemory<int>(0x6a9ec0, 0x82c, 0x2c) < 2)
+        // Adventure
+        int adventure_playthrough = ReadMemory<int>(0x6a9ec0, 0x82c, 0x2c);
+        if (adventure_playthrough < 2)
             WriteMemory<int>(2, 0x6a9ec0, 0x82c, 0x2c);
 
         // Mini-games
@@ -268,6 +277,18 @@ void PvZ::GetGoldSunflowerTrophy()
         for (size_t i = 0; i < 5; i++)
             if (ReadMemory<int>(0x6a9ec0, 0x82c, 0x44 + i * 4) != 10)
                 WriteMemory<int>(10, 0x6a9ec0, 0x82c, 0x44 + i * 4);
+
+        // 刷新主界面
+        if (adventure_playthrough == 0 && GameUI() == 1)
+        {
+            asm_init();
+            asm_mov_exx_dword_ptr(Reg::ESI, 0x6a9ec0);
+            asm_call(0x0044faf0);
+            asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
+            asm_call(0x0044f8e0);
+            asm_ret();
+            asm_code_inject();
+        }
 
         emit ShowMessageStatusBar(tr("Already unlocked golden sunflower trophy."));
     }
@@ -300,7 +321,7 @@ void PvZ::GetAllShopItems()
         WriteMemory<int>(0, 0x6a9ec0, 0x82c, 0x1e8);        // Marigold Sprout #1
         WriteMemory<int>(0, 0x6a9ec0, 0x82c, 0x1ec);        // Marigold Sprout #2
         WriteMemory<int>(0, 0x6a9ec0, 0x82c, 0x1f0);        // Marigold Sprout #3
-        WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x1f4);        // Golden Watering
+        WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x1f4);        // Golden Watering Can
         if (ReadMemory<int>(0x6a9ec0, 0x82c, 0x1f8) == 0)   //
             WriteMemory<int>(1020, 0x6a9ec0, 0x82c, 0x1f8); // Fertilizer 20->1020
         if (ReadMemory<int>(0x6a9ec0, 0x82c, 0x1fc) == 0)   //
@@ -359,6 +380,18 @@ void PvZ::UnlockAllMode(bool on)
             WriteMemory<byte>(0x7f, 0x0048a54c);
             WriteMemory<byte>(0x7f, 0x0048d32b);
             WriteMemory<byte>(0x7f, 0x0048c491);
+        }
+
+        // 刷新主界面
+        if (GameUI() == 1)
+        {
+            asm_init();
+            asm_mov_exx_dword_ptr(Reg::ESI, 0x6a9ec0);
+            asm_call(0x0044faf0);
+            asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
+            asm_call(0x0044f8e0);
+            asm_ret();
+            asm_code_inject();
         }
     }
 }
@@ -1622,9 +1655,17 @@ void PvZ::SetSlotsCount(int num)
     }
 }
 
+void PvZ::TopSlots(bool on)
+{
+    if (!GameOn())
+        return;
+
+    WriteMemory<int>(on ? 500001 : 100001, 0x416dbe);
+}
+
 void PvZ::HideSlots(bool on)
 {
-    if (GameOn())
+    if (GameOn() && (GameUI() == 2 || GameUI() == 3))
         WriteMemory<bool>(!on, 0x6a9ec0, 0x768, 0x144, 0x18);
 }
 
@@ -1923,14 +1964,17 @@ void PvZ::SetScene(int scene)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
-        WriteMemory<int>(scene, 0x6a9ec0, 0x768, 0x554c);
-
         asm_init();
         asm_mov_exx_dword_ptr(Reg::ESI, 0x6a9ec0);
         asm_mov_exx_dword_ptr_exx_add(Reg::ESI, 0x768);
+        asm_add_list({0xc7, 0x86}); // mov [esi+0000554C],scene
+        asm_add_dword(0x554c);      //
+        asm_add_dword(scene);       //
         asm_call(0x0040a160);
         asm_ret();
         asm_code_inject();
+
+        assert(ReadMemory<int>(0x6a9ec0, 0x768, 0x554c) == scene);
 
         // 0.none 1.land 2.water
         int row_0[6] = {1, 1, 1, 1, 1, 0};
@@ -1986,28 +2030,54 @@ void PvZ::SetScene(int scene)
             break;
         }
 
-        if (scene != 2 && scene != 3) // 泳池和雾夜仍然保留水波光
+        // 泳池和雾夜仍然保留水波光
+        if (scene == 2 || scene == 3)
+            return;
+
+        asm_init();
+        auto particle_system_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x0);
+        auto particle_system_count_max = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x4);
+        for (size_t i = 0; i < particle_system_count_max; i++)
         {
-            auto particle_systems_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x0);
-            auto particle_systems_count_max = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x4);
-
-            asm_init();
-            for (size_t i = 0; i < particle_systems_count_max; i++)
+            auto particle_system_type = ReadMemory<int>(particle_system_offset + 0x00 + 0x2c * i);
+            auto particle_system_dead = ReadMemory<bool>(particle_system_offset + 0x1c + 0x2c * i);
+            if (!particle_system_dead && particle_system_type == 34)
             {
-                auto particle_systems_type = ReadMemory<int>(particle_systems_offset + 0x00 + 0x2c * i);
-                auto particle_systems_dead = ReadMemory<bool>(particle_systems_offset + 0x1c + 0x2c * i);
-                if (!particle_systems_dead && particle_systems_type == 34)
-                {
-                    uintptr_t addr = particle_systems_offset + 0x2c * i;
-                    asm_push(addr);
-                    asm_call(0x005160c0);
-                }
+                uintptr_t addr = particle_system_offset + 0x2c * i;
+                asm_push(addr);
+                asm_call(0x005160c0);
             }
-            asm_ret();
-            asm_code_inject();
-
-            WriteMemory<int>(0, 0x6a9ec0, 0x768, 0x5620);
         }
+        asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
+        asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
+        asm_add_list({0xc7, 0x80}); // mov [eax+00005620],00000000
+        asm_add_dword(0x5620);      //
+        asm_add_dword(0);           //
+        asm_ret();
+        asm_code_inject();
+
+        assert(ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x5620) == 0);
+
+#ifdef _DEBUG
+        auto row_type = ReadMemory<int, 6>(0x6a9ec0, 0x768, 0x5d8);
+        auto block_type = ReadMemory<int, 6 * 9>(0x6a9ec0, 0x768, 0x168);
+
+        std::cout << "Row Type: " << std::endl;
+        for (size_t i = 0; i < 6; i++)
+            std::cout << row_type[i] << std::endl;
+        std::cout << std::endl;
+
+        std::cout << "Block Type: " << std::endl;
+        for (size_t c = 0; c < 9; c++)
+        {
+            for (size_t r = 0; r < 6; r++)
+            {
+                std::cout << block_type[r + c * 6] << " ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+#endif
     }
 }
 
@@ -2176,22 +2246,29 @@ void PvZ::PutGrave(int row, int col)
 
 void PvZ::asm_put_rake(int row, int col)
 {
-    asm_push(row);
-    asm_push(col);
-    asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
-    asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x768);
-    asm_push_exx(Reg::ECX);
+    WriteMemory<int>(row, 0x0040bb25 + 1);
+    WriteMemory<int>(col, 0x0040ba8e + 4);
+
+    asm_init();
+    asm_mov_exx_dword_ptr(Reg::EDX, 0x6a9ec0);
+    asm_mov_exx_dword_ptr_exx_add(Reg::EDX, 0x768);
+    asm_push_exx(Reg::EDX);
     asm_call(0x0040b9c0);
-    asm_add_exx(Reg::ESP, 0x08);
+    asm_ret();
+    asm_code_inject();
 }
 
 void PvZ::PutRake(int row, int col)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
+        WriteMemory<uint8_t, 7>({0xba, 0x00, 0x00, 0x00, 0x00, 0x90, 0x90}, 0x0040bb25);
+        WriteMemory<uint8_t, 8>({0xc7, 0x44, 0x24, 0x10, 0x00, 0x00, 0x00, 0x00}, 0x0040ba8e);
+
+        WriteMemory<uint16_t>(0x800f, 0x0040b9e2);
+
         int row_count = GetRowCount();
         int col_count = 9;
-        asm_init();
         if (row == -1 && col == -1)
             for (int r = 0; r < row_count; r++)
                 for (int c = 0; c < col_count; c++)
@@ -2204,16 +2281,11 @@ void PvZ::PutRake(int row, int col)
                 asm_put_rake(r, col);
         else
             asm_put_rake(row, col);
-        asm_ret();
-        WriteMemory<int>(0x0000a681, 0x0040b9e3);
-        WriteMemory<byte>(0x00, 0x0040bb2b);
-        WriteMemory<int>(0x900c4d8b, 0x0040bb3b);
-        WriteMemory<int>(0x9010458b, 0x0040bb41);
-        asm_code_inject();
-        WriteMemory<int>(0x00027984, 0x0040b9e3);
-        WriteMemory<byte>(0xff, 0x0040bb2b);
-        WriteMemory<int>(0x10244c8b, 0x0040bb3b);
-        WriteMemory<int>(0x1424448b, 0x0040bb41);
+
+        WriteMemory<uint16_t>(0x840f, 0x0040b9e2);
+
+        WriteMemory<uint8_t, 7>({0x83, 0x80, 0x20, 0x02, 0x00, 0x00, 0xff}, 0x0040bb25);
+        WriteMemory<uint8_t, 8>({0xc7, 0x44, 0x24, 0x10, 0x07, 0x00, 0x00, 0x00}, 0x0040ba8e);
     }
 }
 
@@ -2731,7 +2803,8 @@ void PvZ::ClearAllPlants()
 
 void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_status)
 {
-    auto split = [](const std::string &str, char seperator) -> std::vector<std::string> {
+    auto split = [](const std::string &str, char seperator) -> std::vector<std::string>
+    {
         std::vector<std::string> result;
         std::string::size_type prev = 0, pos = 0;
         while ((pos = str.find(seperator, pos)) != std::string::npos)
@@ -2744,7 +2817,8 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
         return result;
     };
 
-    auto hex2dec = [](const std::string &str) -> long {
+    auto hex2dec = [](const std::string &str) -> long
+    {
         char *ptr;
         long num;
         num = strtol(str.c_str(), &ptr, 16);
@@ -2811,7 +2885,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
             break;
         }
 
-        ClearItems(std::vector<int>{1, 3, 11}); // Grave Ladder Rake
+        ClearItems({1, 3, 11}); // Grave Ladder Rake
         ClearAllPlants();
         auto has_lawn_mower = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x110) > 0;
         if (has_lawn_mower)
@@ -2825,20 +2899,15 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
         if (has_lawn_mower)
             ResetLawnMowers();
 
-        int rake_count = 0;
         for (size_t i = 0; i < count; i++)
         {
             std::vector<std::string> item_str = split(str_list[i + 1], ' ');
-            if (item_str[0] == "31")
-                rake_count++;
-        }
-
-        if (rake_count > 0)
-        {
-            WriteMemory<int>(0x0000a681, 0x0040b9e3);
-            WriteMemory<byte>(0x00, 0x0040bb2b);
-            WriteMemory<int>(0x900c4d8b, 0x0040bb3b);
-            WriteMemory<int>(0x9010458b, 0x0040bb41);
+            if (item_str[0] == "31") // 钉耙
+            {
+                int item_row = atoi(item_str[1].c_str()) - 1;
+                int item_col = atoi(item_str[2].c_str()) - 1;
+                PutRake(item_row, item_col);
+            }
         }
 
         asm_init();
@@ -2848,14 +2917,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
             std::vector<std::string> item_str = split(str_list[i + 1], ' ');
             int item_type = hex2dec(item_str[0]);
 
-            if (item_type == 0x31) // 钉耙
-            {
-                int item_row = atoi(item_str[1].c_str()) - 1;
-                int item_col = atoi(item_str[2].c_str()) - 1;
-                asm_put_rake(item_row, item_col);
-            }
-
-            else if (item_type >= 0 && item_type <= 0x2f) // 植物
+            if (item_type >= 0 && item_type <= 0x2f) // 植物
             {
                 int item_row = atoi(item_str[1].c_str()) - 1;
                 int item_col = atoi(item_str[2].c_str()) - 1;
@@ -2955,14 +3017,6 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
 
         asm_ret();
         asm_code_inject();
-
-        if (rake_count > 0)
-        {
-            WriteMemory<int>(0x00027984, 0x0040b9e3);
-            WriteMemory<byte>(0xff, 0x0040bb2b);
-            WriteMemory<int>(0x10244c8b, 0x0040bb3b);
-            WriteMemory<int>(0x1424448b, 0x0040bb41);
-        }
     }
 
     Sleep(GetFrameDuration());
@@ -3064,7 +3118,7 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
         return;
     }
 
-    ClearItems(std::vector<int>{1, 3, 11});
+    ClearItems({1, 3, 11});
     ClearAllPlants();
     auto has_lawn_mower = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x110) > 0;
     if (has_lawn_mower)
@@ -3080,20 +3134,9 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
 
     if (rake_row != 0)
     {
-        WriteMemory<int>(0x0000a681, 0x0040b9e3);
-        WriteMemory<byte>(0x00, 0x0040bb2b);
-        WriteMemory<int>(0x900c4d8b, 0x0040bb3b);
-        WriteMemory<int>(0x9010458b, 0x0040bb41);
-        asm_init();
         int r = rake_row - 1;
         int c = 8 - 1;
-        asm_put_rake(r, c);
-        asm_ret();
-        asm_code_inject();
-        WriteMemory<int>(0x00027984, 0x0040b9e3);
-        WriteMemory<byte>(0xff, 0x0040bb2b);
-        WriteMemory<int>(0x10244c8b, 0x0040bb3b);
-        WriteMemory<int>(0x1424448b, 0x0040bb41);
+        PutRake(r, c);
     }
 
     asm_init();
@@ -3189,7 +3232,8 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
 
 std::string PvZ::GetLineup(bool keep_hp_status)
 {
-    auto int_to_hex_string = [](unsigned int num) -> std::string {
+    auto int_to_hex_string = [](unsigned int num) -> std::string
+    {
         std::stringstream sstream;
         sstream << std::hex << num;
         std::string str = sstream.str();

@@ -38,11 +38,11 @@ class PAK : public QObject
 {
     Q_OBJECT
 
-public:
+  public:
     PAK();
     ~PAK();
 
-private:
+  private:
     std::string utf8_encode(const std::wstring &);
     std::wstring utf8_decode(const std::string &);
 
@@ -55,7 +55,7 @@ private:
                     std::vector<int> &,          //
                     std::vector<FILETIME> &);
 
-public:
+  public:
     // 解包, 参数分别为源文件名和解包文件夹
     int Unpack(std::wstring, std::wstring);
     int Unpack(std::string, std::string);
@@ -67,7 +67,7 @@ public:
     void UnpackPAK(QString, QString);
     void PackPAK(QString);
 
-signals:
+  signals:
     void ShowMessageBox(QString);
     void ShowMessageStatusBar(QString);
     void UnpackFinished();

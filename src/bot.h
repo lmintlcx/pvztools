@@ -13,7 +13,7 @@ namespace Pt
 
 class Bot : public Process
 {
-public:
+  public:
     Bot(HWND hwnd = nullptr);
     ~Bot();
 
@@ -38,7 +38,7 @@ public:
     void ClickShovel();
     void ClickGrid(double, double);
 
-private:
+  private:
     void OpenProcess();
     int GetSlotsCount();
     int GetGameScene();

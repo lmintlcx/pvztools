@@ -29,14 +29,14 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-public:
+  public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     // protected:
     //   void changeEvent(QEvent *);
 
-private:
+  private:
     std::tuple<double, double> GetDpiScale();
     void CreateActions();
     void CreateMenus();
@@ -55,9 +55,8 @@ private:
     void ShowCannonLauncherPage();
     void ShowPortalPage();
     void ShowIzeLineupPage();
-    void ShowDocumentPage();
 
-private:
+  private:
     QAction *openFileAction;
     QAction *openFolderAction;
     QAction *restartAction;
@@ -103,10 +102,8 @@ private:
     QAction *themeFusionAction;
     QActionGroup *themeGroup;
 
-    QAction *helpDocumentAction;
     QAction *videoDemoAction;
     QAction *visitWebsiteAction;
-    QAction *sendFeedbackAction;
     QAction *changeLogAction;
     QAction *checkUpdateAction;
     QAction *aboutAction;
@@ -119,6 +116,7 @@ private:
     QMenu *languageMenu;
     QMenu *themeMenu;
     QMenu *helpMenu;
+    QMenu *cakeMenu;
 
     QToolBar *pageToolBar;
 
@@ -153,7 +151,6 @@ private:
     CannonLauncherPage *cannonLauncherPage;
     PortalPage *portalPage;
     IzeLineupPage *izeLineupPage;
-    DocumentPage *documentPage;
 
     QHBoxLayout *mainLayout;
 
@@ -161,7 +158,7 @@ private:
     QTranslator *widgets_zh_CN;
     QTranslator *pvztools_zh_CN;
 
-public slots:
+  public slots:
     void ActivateWindow();
     void ShowMessageBox(QString);
     void ShowMessageStatusBar(QString);

@@ -22,7 +22,7 @@ namespace Pt
 
 class Process
 {
-public:
+  public:
     Process();
     ~Process();
 
@@ -49,13 +49,13 @@ public:
     template <typename T, size_t size, typename... Args>
     void WriteMemory(std::array<T, size>, Args...);
 
-protected:
+  protected:
     HWND hwnd;
     DWORD pid;
     HANDLE handle;
 
 #ifdef _DEBUG
-private:
+  private:
     std::string int_to_hex_string(unsigned int num)
     {
         std::stringstream sstream;

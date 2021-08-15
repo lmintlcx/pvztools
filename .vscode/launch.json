@@ -10,7 +10,7 @@
             "stopAtEntry": false,
             "cwd": "D:/tmp/pvztools_build/debug",
             "environment": [],
-            "externalConsole": true,
+            "console": "newExternalWindow",
             "preLaunchTask": "Build"
         }
     ]

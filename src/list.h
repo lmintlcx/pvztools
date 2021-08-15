@@ -16,15 +16,15 @@ class List : public QObject
 {
     Q_OBJECT
 
-private:
+  private:
     List();
     ~List();
 
-public:
+  public:
     static List &Get();
     void Init();
 
-public:
+  public:
     QStringList pageList;
     QStringList izeArrayList;
     QStringList adventureList;
@@ -42,6 +42,7 @@ public:
     QStringList itemList;
     QStringList zombieStatusList;
     QStringList zombieList;
+    QStringList slotsCountList;
     QStringList slotsIndexList;
     QStringList seedList;
     QStringList rowList;

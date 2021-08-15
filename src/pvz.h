@@ -89,14 +89,14 @@ class PvZ : public QObject, public Process, public Code
 {
     Q_OBJECT
 
-public:
+  public:
     PvZ();
     ~PvZ();
 
-protected:
+  protected:
     void *extra_code_addr;
 
-public:
+  public:
     static uintptr_t value_addr[];
     static uintptr_t damage_addr[];
     static uintptr_t hp_addr[];
@@ -180,6 +180,7 @@ public:
     void SetRandomSeed(int);
     // Slots
     void SetSlotsCount(int);
+    void TopSlots(bool);
     void HideSlots(bool);
     void ShowShovel(bool);
     void LockShovel(bool);
@@ -291,7 +292,7 @@ public:
     std::array<int, 25> GetIzeLineup();
     void SetIzeLineup(std::array<int, 25>);
 
-signals:
+  signals:
     void FindResult(Result);
     void Value(int);
     void Damage(int);

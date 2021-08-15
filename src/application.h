@@ -17,18 +17,18 @@ class Application : public QApplication
 {
     Q_OBJECT
 
-public:
+  public:
     Application(int, char **);
     ~Application();
     bool isRunning();
 
-signals:
+  signals:
     void ActivateWindow();
 
-private slots:
+  private slots:
     void NewLocalConnection();
 
-private:
+  private:
     QLocalServer *server;
     bool _isRunning;
 };

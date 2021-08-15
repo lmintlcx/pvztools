@@ -38,6 +38,7 @@ void List::Init()
     itemList.clear();
     zombieStatusList.clear();
     zombieList.clear();
+    slotsCountList.clear();
     slotsIndexList.clear();
     seedList.clear();
     rowList.clear();
@@ -398,6 +399,18 @@ void List::Init()
         << tr("Squash Zombie", "Zombie")          // 30
         << tr("Tall-nut Zombie", "Zombie")        // 31
         << tr("GigaGargantuar", "Zombie");        // 32
+
+    slotsCountList
+        << tr("1 slot")
+        << tr("2 slots")
+        << tr("3 slots")
+        << tr("4 slots")
+        << tr("5 slots")
+        << tr("6 slots")
+        << tr("7 slots")
+        << tr("8 slots")
+        << tr("9 slots")
+        << tr("10 slots");
 
     slotsIndexList
         << tr("1st slot")

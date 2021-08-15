@@ -15,16 +15,16 @@
 #define COMPANY_NAME       "Cube Studio"
 #define COMPANY_WEBSITE    "https://pvz.lmintlcx.com"
 #define FILE_DESCRIPTION   "PvZ Tools"
-#define LEGAL_COPYRIGHT    "(C) 2018-2020 lmintlcx"
+#define LEGAL_COPYRIGHT    "(C) 2018-2021 lmintlcx"
 #define INTERNAL_NAME      "pvztools"
 #define ORIGINAL_FILENAME  "pvztools.exe"
 #define PRODUCT_NAME       "PvZ Tools"
 
 
 #define VERSION_MAJOR      2
-#define VERSION_MINOR      5
-#define VERSION_PATCH      1
-#define VERSION_BUILD      6667
+#define VERSION_MINOR      6
+#define VERSION_PATCH      0
+#define VERSION_BUILD      6785
 
 
 #define TOSTRING_(arg) #arg

@@ -40,11 +40,11 @@ class LevelPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     LevelPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void GetGoldSunflowerTrophy();
     void GetAllShopItems();
     void UnlockAllMode(bool);
@@ -54,10 +54,10 @@ signals:
     void LockIZE(bool, int);
     void JumpLevel(int);
 
-public slots:
+  public slots:
     void KeepSelectedFeatures();
 
-private:
+  private:
     QPushButton *getGoldSunflowerTrophyButton;
     QPushButton *getAllShopItemsButton;
     QCheckBox *unlockAllModeCheckBox;
@@ -85,11 +85,11 @@ class ResourcePage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     ResourcePage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void SetSun(int);
     void SetSunLimit(int);
     void SetMoney(int);
@@ -106,7 +106,7 @@ signals:
     void GetTime(int);
     void SetTime(int, int);
 
-public slots:
+  public slots:
     void ShowValue(int);
     void ShowDamage(int);
     void ShowHP(int);
@@ -115,7 +115,7 @@ public slots:
     void SetQuickLineupMode(bool);
     void KeepSelectedFeatures();
 
-private:
+  private:
     QLabel *sunLabel;
     QLineEdit *sunLineEdit;
     QPushButton *sunButton;
@@ -157,11 +157,11 @@ class PlantsPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     PlantsPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void CobCannonNoCD(bool);
     void MagnetsNoCD(bool);
     void PotatoMineNoCD(bool);
@@ -180,11 +180,11 @@ signals:
     void PlantUmbrella(bool);
     void PlantPaper(bool);
 
-public slots:
+  public slots:
     void SetQuickLineupMode(bool);
     void KeepSelectedFeatures();
 
-private:
+  private:
     QCheckBox *cobsNoCdCheckBox;
     QCheckBox *magnetsNoCdCheckBox;
     QCheckBox *potatoMineNoCdCheckBox;
@@ -214,11 +214,11 @@ class ZombiesPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     ZombiesPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void SetZombieExplode(Explode);
     void SetZombieVisibility(Visibility);
     void SetZombieStrength(Strength);
@@ -236,11 +236,11 @@ signals:
     void SpawningNextWave();
     void AllZombiesXXX(int);
 
-public slots:
+  public slots:
     void SetQuickLineupMode(bool);
     void KeepSelectedFeatures();
 
-private:
+  private:
     QCheckBox *zombieExplodeImmediatelyCheckBox;
     QCheckBox *zombieExplodeNeverCheckBox;
     QCheckBox *zombieInvisibleCheckBox;
@@ -272,27 +272,27 @@ class SpawnBriefPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     SpawnBriefPage(QWidget *parent = nullptr);
     void TranslateUI();
     std::array<bool, 33> GetZombies();
     void SetZombies(std::array<bool, 33>);
 
-signals:
+  signals:
     void SwitchToDetailedPage();
     void ShowSpawnCountPage();
     void InternalSpawn(std::array<bool, 33>, bool);
     void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>, int);
     void GetRandomSeed();
 
-public slots:
+  public slots:
     void SwitchLayout(bool);
     void LimitSpawnCount(bool);
 
-private:
+  private:
     void CountCheck();
 
-private:
+  private:
     bool limit_count;
     QWidget *spawnBriefWidget;
     QGridLayout *spawnBriefLayout;
@@ -309,24 +309,24 @@ class SpawnDetailedPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     SpawnDetailedPage(QWidget *parent = nullptr);
     void TranslateUI();
     std::array<bool, 33> GetZombies();
     void SetZombies(std::array<bool, 33>);
     std::array<bool, 20> GetGigaWaves();
 
-signals:
+  signals:
     void SwitchToBriefPage();
     void SetRandomSeed(int);
     void InternalSpawn(std::array<bool, 33>, bool);
     void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>, int);
 
-public slots:
+  public slots:
     void ShowRandomSeed(int);
     void ShowGigaWaves(std::array<uint32_t, 1000>);
 
-private:
+  private:
     QLineEdit *randomSeedLineEdit;
     QPushButton *randomSeedButton;
     QComboBox *spawnZombieCombo;
@@ -363,7 +363,7 @@ class SpawnPage : public QStackedWidget
 {
     Q_OBJECT
 
-public:
+  public:
     SpawnPage(QWidget *parent = nullptr);
     void TranslateUI();
     std::array<bool, 33> GetBriefZombies();
@@ -371,20 +371,20 @@ public:
     void SetBriefZombies(std::array<bool, 33>);
     void SetDetailedZombies(std::array<bool, 33>);
 
-signals:
+  signals:
     void ShowSpawnCountPage();
     void InternalSpawn(std::array<bool, 33>, bool);
     void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>, int);
     void GetRandomSeed();
     void SetRandomSeed(int);
 
-public slots:
+  public slots:
     void ShowRandomSeed(int);
     void ShowGigaWaves(std::array<uint32_t, 1000>);
     void SwitchLayout(bool);
     void LimitSpawnCount(bool);
 
-private:
+  private:
     SpawnBriefPage *briefPage;
     SpawnDetailedPage *detailedPage;
 };
@@ -395,12 +395,13 @@ class SlotsPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     SlotsPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void SetSlotsCount(int);
+    void TopSlots(bool);
     void HideSlots(bool);
     void ShowShovel(bool);
     void LockShovel(bool);
@@ -421,7 +422,7 @@ signals:
     void GetRecharge(int);
     void SetRecharge(int, int);
 
-public slots:
+  public slots:
     void ShowSeedType(int);
     void ShowSeedImitater(bool);
     void ShowSeedVisible(bool);
@@ -432,10 +433,10 @@ public slots:
     void SetQuickLineupMode(bool);
     void KeepSelectedFeatures();
 
-private:
-    QLabel *slotsCountLabel;
-    QSpinBox *slotsCountSpinBox;
+  private:
+    QComboBox *slotsCountCombo;
     QPushButton *slotsCountButton;
+    QCheckBox *topSlotsCheckBox;
     QCheckBox *hideSlotsCheckBox;
     QCheckBox *showShovelCheckBox;
     QCheckBox *lockShovelCheckBox;
@@ -470,11 +471,11 @@ class ScenePage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     ScenePage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void Plant(int, int, int, bool);
     void PutZombie(int, int, int);
     void PutGrave(int, int);
@@ -496,15 +497,15 @@ signals:
     void ClearAllPlants();
     void AllZombiesXXX(int);
 
-public slots:
+  public slots:
     void ShowScene(int);
     void ShowBlock(int);
     void ShowRow(int);
 
-private:
+  private:
     void Check();
 
-private:
+  private:
     QLabel *sceneRowLabel;
     QLabel *sceneColLabel;
     QSpinBox *sceneRowSpinBox;
@@ -547,11 +548,11 @@ class LineupPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     LineupPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void SetQuickLineupMode(bool);
     void QuickPass();
     void MixMode(int, int);
@@ -564,7 +565,7 @@ signals:
     void GetLineup(bool);
     void ShowMessageStatusBar(QString);
 
-public slots:
+  public slots:
     void ShowLineup(std::string);
     void InitLineupString(QString str = "");
     void RefreshLineupString();
@@ -573,7 +574,7 @@ public slots:
     void DeleteLineupString();
     void KeepSelectedFeatures();
 
-private:
+  private:
     QString lastSelectedBuildName;
     QStringList endlessBuildGroupList;
     QStringList endlessBuildUuidList;
@@ -582,7 +583,7 @@ private:
     bool StringCheck(const QString &);
     std::string ConvertLineup(const std::string &);
 
-private:
+  private:
     QCheckBox *quickLineupModeCheckBox;
     QPushButton *quickPassButton;
     QPushButton *mixModeToSurvivalEndlessButton;
@@ -617,11 +618,11 @@ class GardenPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     GardenPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void FertilizerUnlimited(bool);
     void BugSprayUnlimited(bool);
     void ChocolateUnlimited(bool);
@@ -630,14 +631,14 @@ signals:
     void GetGardenPlants();
     void SetGardenPlants(std::vector<GardenPlant>);
 
-public slots:
+  public slots:
     void ShowGardenPlants(std::vector<GardenPlant>);
     void KeepSelectedFeatures();
 
-private:
+  private:
     void UpdateContent();
 
-private:
+  private:
     QCheckBox *fertilizerUnlimitedCheckBox;
     QCheckBox *bugSprayUnlimitedCheckBox;
     QCheckBox *chocolateUnlimitedCheckBox;
@@ -668,22 +669,22 @@ class VasePage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     VasePage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void GetVases();
     void SetVases(std::vector<Vase>);
 
-public slots:
+  public slots:
     void ShowVases(std::vector<Vase>);
 
-private:
+  private:
     void UpdateContent();
     void SetComboEnabled();
 
-private:
+  private:
     QLabel *vaseCountLabel;
     QPushButton *clearButton;
     QPushButton *loadButton;
@@ -712,11 +713,11 @@ class EffectPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     EffectPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void WisdomTreeCode(int);
     void KonamiCode();
     void ItsRaining(bool);
@@ -735,12 +736,12 @@ signals:
     void SeeVase(bool);
     void IgnoreSlope(bool);
 
-public slots:
+  public slots:
     void ShowIceTrailX(int);
     void SetQuickLineupMode(bool);
     void KeepSelectedFeatures();
 
-private:
+  private:
     QPushButton *sukhbirCodeButton;
     QPushButton *futureCodeButton;
     QPushButton *mustacheCodeButton;
@@ -775,11 +776,11 @@ class OthersPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     OthersPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void DisableSaveData(bool);
     void DisableDeleteData(bool);
     void RunningInBackground(bool);
@@ -794,18 +795,18 @@ signals:
     void ShowPortalPage();
     void ShowIzeLineupPage();
 
-public slots:
+  public slots:
     void GetFileName();
     void GetFolderName();
     void UnpackFinished();
     void PackFinished();
     void KeepSelectedFeatures();
 
-protected:
+  protected:
     void dragEnterEvent(QDragEnterEvent *);
     void dropEvent(QDropEvent *);
 
-private:
+  private:
     QCheckBox *disableSaveDataCheckBox;
     QCheckBox *disableDeleteDataCheckBox;
     QCheckBox *runningInBackgroundCheckBox;
@@ -837,20 +838,20 @@ class StatusPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     StatusPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void GetStatus();
 
-public slots:
+  public slots:
     void ShowStatus(std::array<int, 12>);
     bool IsAutoRefresh();
     void StartTimer();
     void StopTimer(bool uncheck_it = false);
 
-private:
+  private:
     QTimer *refreshStatusTimer;
     QLabel *gameModeTextLabel;
     QCheckBox *autoRefreshCheckBox;
@@ -888,17 +889,17 @@ class SpawnCountPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     SpawnCountPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void GetSpawnList();
 
-public slots:
+  public slots:
     void UpdateSpawnCount(std::array<uint32_t, 1000>);
 
-private:
+  private:
     QTableWidget *table;
     QGridLayout *mainLayout;
     QAbstractButton *cornerButton;
@@ -910,18 +911,18 @@ class TargetMapPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     TargetMapPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void GetTargetMap(int);
     void SetTargetMap(int, std::array<int, 54>);
 
-public slots:
+  public slots:
     void ShowTargetMap(std::array<int, 54>);
 
-private:
+  private:
     QComboBox *comboBoxes[54];
     QRadioButton *seeingStarsRadioButton;
     QRadioButton *artChallengeWallnutRadioButton;
@@ -938,21 +939,21 @@ class CannonLauncherPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     CannonLauncherPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void GetCobInfo(int);
     void GetScene();
     void LaunchCannon(int, int, int);
     void LaunchAllCannon(bool, int, int);
 
-public slots:
+  public slots:
     void ShowCobInfo(bool, int, int);
     void CalculateCoord(int);
 
-private:
+  private:
     QLabel *indexLabel;
     QSpinBox *indexSpinBox;
     QLabel *infoLabel;
@@ -978,16 +979,16 @@ class PortalPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     PortalPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void StartPortal(bool);
     void LockPortal(bool);
     void SetPortal(int, int, int, int, int, int, int, int);
 
-private:
+  private:
     QLabel *label_black_row, *label_black_col;
     QLabel *label_white_row, *label_white_col;
     QLabel *label_black_1, *label_black_2;
@@ -1008,38 +1009,23 @@ class IzeLineupPage : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     IzeLineupPage(QWidget *parent = nullptr);
     void TranslateUI();
 
-signals:
+  signals:
     void GetIzeLineup(int);
     void SetIzeLineup(std::array<int, 25>);
 
-public slots:
+  public slots:
     void ShowIzeLineup(std::array<int, 25>);
 
-private:
+  private:
     int izPlantTypes[22];
     QComboBox *comboBoxes[25];
     QPushButton *loadButton;
     QPushButton *clearButton;
     QPushButton *setButton;
-    QGridLayout *mainLayout;
-};
-
-// Document
-
-class DocumentPage : public QWidget
-{
-    Q_OBJECT
-
-public:
-    DocumentPage(QWidget *parent = nullptr);
-    void TranslateUI();
-
-private:
-    QTextBrowser *document;
     QGridLayout *mainLayout;
 };
 

@@ -171,7 +171,8 @@ LevelPage::LevelPage(QWidget *parent)
             survivalCombo, &QComboBox::setEnabled);
 
     connect(mixmodeButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 // Adventure  // 0
                 // Mini-Games // 16-50
                 // Puzzle     // 51-72
@@ -196,21 +197,24 @@ LevelPage::LevelPage(QWidget *parent)
             this, &LevelPage::ShowHiddenGames);
 
     connect(izeArrayCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [=](int index) {
+            this, [=](int index)
+            {
                 bool on = lockIzeArrayCheckBox->isChecked();
                 int mode = index;
                 emit LockIZE(on, mode);
             });
 
     connect(lockIzeArrayCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 bool on = checked;
                 int mode = izeArrayCombo->currentIndex();
                 emit LockIZE(on, mode);
             });
 
     connect(jumpLevelButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int level = levelLineEdit->text().toInt();
                 emit JumpLevel(level);
             });
@@ -222,10 +226,6 @@ void LevelPage::TranslateUI()
     getAllShopItemsButton->setText(tr("Get All Shop Items"));
     unlockAllModeCheckBox->setText(tr("Unlock All Mode Temporarily"));
     directWinButton->setText(tr("Direct Win"));
-
-    getGoldSunflowerTrophyButton->setStatusTip(tr("Switch to another game interface (like help) and return to view results after the operation is done."));
-    getAllShopItemsButton->setStatusTip(tr("Switch to another game interface (like help) and return to view results after the operation is done."));
-    unlockAllModeCheckBox->setStatusTip(tr("Switch to another game interface (like help) and return to view results after the operation is done."));
 
     adventureRadioButton->setText(tr("Adventure"));
     miniGamesRadioButton->setText(tr("Mini-Games"));
@@ -357,7 +357,7 @@ ResourcePage::ResourcePage(QWidget *parent)
     sunLineEdit->setText("8000");
     sunLimitLineEdit->setText("9990");
 
-    moneyLineEdit->setText("80000");
+    moneyLineEdit->setText("99999");
     moneyLimitLineEdit->setText("99999");
 
     valueLineEdit->setText("");
@@ -405,19 +405,22 @@ ResourcePage::ResourcePage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(manyFallingSunCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     noFallingSunCheckBox->setChecked(false);
             });
 
     connect(noFallingSunCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     manyFallingSunCheckBox->setChecked(false);
             });
 
     connect(autoCollectCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     manyFallingSunCheckBox->setEnabled(true);
                 else
@@ -428,31 +431,36 @@ ResourcePage::ResourcePage(QWidget *parent)
             });
 
     connect(sunButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int sun = sunLineEdit->text().toInt();
                 emit SetSun(sun);
             });
 
     connect(sunLimitButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int sun_limit = sunLimitLineEdit->text().toInt();
                 emit SetSunLimit(sun_limit);
             });
 
     connect(moneyButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int money = moneyLineEdit->text().toInt();
                 emit SetMoney(money);
             });
 
     connect(moneyLimitButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int money_limit = moneyLimitLineEdit->text().toInt();
                 emit SetMoneyLimit(money_limit);
             });
 
     connect(manyFallingSunCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     emit SetFallingSun(Sun::Many);
                 else
@@ -460,7 +468,8 @@ ResourcePage::ResourcePage(QWidget *parent)
             });
 
     connect(noFallingSunCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetFallingSun(Sun::None);
                 else
@@ -481,7 +490,8 @@ ResourcePage::ResourcePage(QWidget *parent)
     // 5 0<=x<=127
 
     connect(valueCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [=](int index) {
+            this, [=](int index)
+            {
                 if (index == 0 || index == 2)
                     valueLabel->setText(tr("Value") + " x10");
                 else if (index == 1)
@@ -495,7 +505,8 @@ ResourcePage::ResourcePage(QWidget *parent)
             });
 
     connect(valueButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int index = valueCombo->currentIndex();
                 int value = valueLineEdit->text().toInt();
 
@@ -510,7 +521,8 @@ ResourcePage::ResourcePage(QWidget *parent)
             });
 
     connect(damageCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [=](int index) {
+            this, [=](int index)
+            {
                 if (index == 17)
                     damageLabel->setText(tr("Damage") + " /4cs");
                 else
@@ -520,7 +532,8 @@ ResourcePage::ResourcePage(QWidget *parent)
             });
 
     connect(damageButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int index = damageCombo->currentIndex();
                 int damage = damageLineEdit->text().toInt();
 
@@ -540,7 +553,8 @@ ResourcePage::ResourcePage(QWidget *parent)
             });
 
     connect(hpCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [=](int index) {
+            this, [=](int index)
+            {
                 std::vector<int> accessories = {7, 9, 10, 11, 12, 17, 21, 25, 27, 30};
                 if (std::find(accessories.begin(), accessories.end(), index) != accessories.end())
                     hpLabel->setText(tr("HP") + " " + "(" + tr("Accessories") + ")");
@@ -551,7 +565,8 @@ ResourcePage::ResourcePage(QWidget *parent)
             });
 
     connect(hpButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int index = hpCombo->currentIndex();
                 int hp = hpLineEdit->text().toInt();
                 emit SetHP(index, hp);
@@ -561,7 +576,8 @@ ResourcePage::ResourcePage(QWidget *parent)
             this, &ResourcePage::GetTime);
 
     connect(timeButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int index = timeCombo->currentIndex();
                 int t = timeLineEdit->text().toInt();
                 emit SetTime(index, t);
@@ -721,37 +737,43 @@ PlantsPage::PlantsPage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(plantInvincibleCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     plantWeakCheckBox->setChecked(false);
             });
 
     connect(plantWeakCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     plantInvincibleCheckBox->setChecked(false);
             });
 
     connect(lockKernelCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     lockButterCheckBox->setChecked(false);
             });
 
     connect(lockButterCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     lockKernelCheckBox->setChecked(false);
             });
 
     connect(explodeImmediatelyCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     explodeNeverCheckBox->setChecked(false);
             });
 
     connect(explodeNeverCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     explodeImmediatelyCheckBox->setChecked(false);
             });
@@ -769,7 +791,8 @@ PlantsPage::PlantsPage(QWidget *parent)
             this, &PlantsPage::ChomperNoCD);
 
     connect(plantInvincibleCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetPlantStrength(Strength::Invincible);
                 else
@@ -777,7 +800,8 @@ PlantsPage::PlantsPage(QWidget *parent)
             });
 
     connect(plantWeakCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetPlantStrength(Strength::Weak);
                 else
@@ -785,7 +809,8 @@ PlantsPage::PlantsPage(QWidget *parent)
             });
 
     connect(lockKernelCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit LockPult(Bullet::Kernel);
                 else
@@ -793,7 +818,8 @@ PlantsPage::PlantsPage(QWidget *parent)
             });
 
     connect(lockButterCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit LockPult(Bullet::Butter);
                 else
@@ -813,7 +839,8 @@ PlantsPage::PlantsPage(QWidget *parent)
             this, &PlantsPage::StrongPeas);
 
     connect(explodeImmediatelyCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetPlantExplode(Explode::Immediately);
                 else
@@ -821,7 +848,8 @@ PlantsPage::PlantsPage(QWidget *parent)
             });
 
     connect(explodeNeverCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetPlantExplode(Explode::Never);
                 else
@@ -1035,43 +1063,50 @@ ZombiesPage::ZombiesPage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(zombieExplodeImmediatelyCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     zombieExplodeNeverCheckBox->setChecked(false);
             });
 
     connect(zombieExplodeNeverCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     zombieExplodeImmediatelyCheckBox->setChecked(false);
             });
 
     connect(zombieInvisibleCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     zombieShowCheckBox->setChecked(false);
             });
 
     connect(zombieShowCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     zombieInvisibleCheckBox->setChecked(false);
             });
 
     connect(zombieInvincibleCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     zombieWeakCheckBox->setChecked(false);
             });
 
     connect(zombieWeakCheckBox, &QCheckBox::stateChanged,
-            [=](int state) {
+            [=](int state)
+            {
                 if (state == Qt::Checked)
                     zombieInvincibleCheckBox->setChecked(false);
             });
 
     connect(zombieExplodeImmediatelyCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetZombieExplode(Explode::Immediately);
                 else
@@ -1079,7 +1114,8 @@ ZombiesPage::ZombiesPage(QWidget *parent)
             });
 
     connect(zombieExplodeNeverCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetZombieExplode(Explode::Never);
                 else
@@ -1087,7 +1123,8 @@ ZombiesPage::ZombiesPage(QWidget *parent)
             });
 
     connect(zombieInvisibleCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetZombieVisibility(Visibility::Invisible);
                 else
@@ -1095,7 +1132,8 @@ ZombiesPage::ZombiesPage(QWidget *parent)
             });
 
     connect(zombieShowCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetZombieVisibility(Visibility::Visible);
                 else
@@ -1103,7 +1141,8 @@ ZombiesPage::ZombiesPage(QWidget *parent)
             });
 
     connect(zombieInvincibleCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetZombieStrength(Strength::Invincible);
                 else
@@ -1111,7 +1150,8 @@ ZombiesPage::ZombiesPage(QWidget *parent)
             });
 
     connect(zombieWeakCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                     emit SetZombieStrength(Strength::Weak);
                 else
@@ -1149,13 +1189,15 @@ ZombiesPage::ZombiesPage(QWidget *parent)
             this, &ZombiesPage::BalloonBurst);
 
     connect(gatherZombiesCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 float pos = static_cast<float>(gatherZombiesSlider->value());
                 emit GatherZombies(checked, pos);
             });
 
     connect(gatherZombiesSlider, &QSlider::valueChanged,
-            this, [=](int value) {
+            this, [=](int value)
+            {
                 if (gatherZombiesCheckBox->isChecked())
                     emit GatherZombies(true, static_cast<float>(value));
             });
@@ -1164,7 +1206,8 @@ ZombiesPage::ZombiesPage(QWidget *parent)
             this, &ZombiesPage::SpawningNextWave);
 
     connect(allZombiesButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int zombie_status = allZombiesCombo->currentIndex();
                 emit AllZombiesXXX(zombie_status);
             });
@@ -1325,12 +1368,14 @@ SpawnBriefPage::SpawnBriefPage(QWidget *parent)
 
     // zombieTypes[i] == 2 / 5, i == 0 / 3
     connect(spawnCheckBox[0], &QCheckBox::stateChanged,
-            this, [=](int state) {
+            this, [=](int state)
+            {
                 if (limit_count && state == Qt::Checked)
                     spawnCheckBox[3]->setChecked(false);
             });
     connect(spawnCheckBox[3], &QCheckBox::stateChanged,
-            this, [=](int state) {
+            this, [=](int state)
+            {
                 if (limit_count && state == Qt::Checked)
                     spawnCheckBox[0]->setChecked(false);
             });
@@ -1350,14 +1395,16 @@ SpawnBriefPage::SpawnBriefPage(QWidget *parent)
             this, &SpawnBriefPage::ShowSpawnCountPage);
 
     connect(naturalSpawnButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 std::array<bool, 33> zombies = GetZombies();
                 zombies[0] = true;
                 emit InternalSpawn(zombies, false);
             });
 
     connect(extremeSpawnButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 std::array<bool, 33> zombies = GetZombies();
                 zombies[0] = true;
                 zombies[1] = true;
@@ -1574,7 +1621,8 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(naturalSpawnRadioButton, &QRadioButton::toggled,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                 {
                     spawnLimitWidget->setEnabled(false);
@@ -1583,7 +1631,8 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
             });
 
     connect(extremeSpawnRadioButton, &QRadioButton::toggled,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                 {
                     spawnLimitWidget->setEnabled(true);
@@ -1598,7 +1647,8 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
             });
 
     connect(simulateSpawnRadioButton, &QRadioButton::toggled,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 if (checked)
                 {
                     spawnLimitWidget->setEnabled(true);
@@ -1613,7 +1663,8 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
             });
 
     connect(limitGigaCheckBox, &QCheckBox::stateChanged,
-            this, [=](int state) {
+            this, [=](int state)
+            {
                 if ((state == Qt::Checked)            //
                     && !waveCheckBox[0]->isChecked()  //
                     && !waveCheckBox[1]->isChecked()  //
@@ -1650,7 +1701,8 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
             });
 
     connect(spawnAddButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 QString spawn_item = spawnZombieCombo->currentText();
                 QList<QListWidgetItem *> item_list = spawnListWidget->findItems(spawn_item, Qt::MatchContains);
                 if (item_list.count() == 0)
@@ -1658,7 +1710,8 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
             });
 
     connect(spawnDeleteButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = spawnListWidget->currentRow();
                 if (row != -1)
                 {
@@ -1669,15 +1722,15 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
             });
 
     connect(spawnClearButton, &QPushButton::clicked,
-            this, [=]() {
-                spawnListWidget->clear();
-            });
+            this, [=]()
+            { spawnListWidget->clear(); });
 
     connect(briefModeButton, &QPushButton::clicked,
             this, &SpawnDetailedPage::SwitchToBriefPage);
 
     connect(randomSeedButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 bool ok;
                 int random_seed = randomSeedLineEdit->text().toInt(&ok, 16);
                 if (ok)
@@ -1689,13 +1742,15 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
             });
 
     connect(spawnResetButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 std::array<bool, 33> zombies = {false}; // useless
                 emit InternalSpawn(zombies, true);
             });
 
     connect(spawnSetButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 std::array<bool, 33> zombies = GetZombies();
 
                 if (naturalSpawnRadioButton->isChecked())
@@ -1827,7 +1882,8 @@ SpawnPage::SpawnPage(QWidget *parent)
     addWidget(detailedPage);
 
     connect(briefPage, &SpawnBriefPage::SwitchToDetailedPage,
-            this, [=]() {
+            this, [=]()
+            {
                 setCurrentWidget(detailedPage);
                 if (true) // TODO
                 {
@@ -1845,7 +1901,8 @@ SpawnPage::SpawnPage(QWidget *parent)
             });
 
     connect(detailedPage, &SpawnDetailedPage::SwitchToBriefPage,
-            this, [=]() {
+            this, [=]()
+            {
                 setCurrentWidget(briefPage);
                 if (true) // TODO
                 {
@@ -1935,12 +1992,9 @@ void SpawnPage::LimitSpawnCount(bool on)
 SlotsPage::SlotsPage(QWidget *parent)
     : QWidget(parent)
 {
-    slotsCountLabel = new QLabel(this);
-    slotsCountSpinBox = new QSpinBox(this);
-    slotsCountSpinBox->setRange(1, 10);
-    slotsCountSpinBox->setSingleStep(1);
-    slotsCountSpinBox->setValue(10);
+    slotsCountCombo = new QComboBox(this);
     slotsCountButton = new QPushButton(this);
+    topSlotsCheckBox = new QCheckBox(this);
     hideSlotsCheckBox = new QCheckBox(this);
     showShovelCheckBox = new QCheckBox(this);
     lockShovelCheckBox = new QCheckBox(this);
@@ -1987,9 +2041,9 @@ SlotsPage::SlotsPage(QWidget *parent)
     showShovelCheckBox->setChecked(true);
 
     mainLayout = new QGridLayout(this);
-    mainLayout->addWidget(slotsCountLabel, 0, 0, 1, 1);
-    mainLayout->addWidget(slotsCountSpinBox, 0, 1, 1, 1);
-    mainLayout->addWidget(slotsCountButton, 0, 2, 1, 1);
+    mainLayout->addWidget(slotsCountCombo, 0, 0, 1, 1);
+    mainLayout->addWidget(slotsCountButton, 0, 1, 1, 1);
+    mainLayout->addWidget(topSlotsCheckBox, 0, 2, 1, 1);
     mainLayout->addWidget(hideSlotsCheckBox, 0, 3, 1, 1);
     mainLayout->addWidget(showShovelCheckBox, 0, 4, 1, 1);
     mainLayout->addWidget(lockShovelCheckBox, 0, 5, 1, 1);
@@ -2022,13 +2076,15 @@ SlotsPage::SlotsPage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(slotsSlotCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [=](int index) {
+            this, [=](int index)
+            {
                 emit GetSeedType(index);
                 emit GetSeedVisible(index);
             });
 
     connect(slotsSeedCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [=](int index) {
+            this, [=](int index)
+            {
                 if (index >= 53)
                     imitaterCheckBox->setEnabled(false); // Zombies have no imitater.
                 else
@@ -2040,10 +2096,14 @@ SlotsPage::SlotsPage(QWidget *parent)
             });
 
     connect(slotsCountButton, &QPushButton::clicked,
-            this, [=]() {
-                int num = slotsCountSpinBox->text().toInt();
+            this, [=]()
+            {
+                int num = slotsCountCombo->currentIndex() + 1;
                 emit SetSlotsCount(num);
             });
+
+    connect(topSlotsCheckBox, &QCheckBox::clicked,
+            this, &SlotsPage::TopSlots);
 
     connect(hideSlotsCheckBox, &QCheckBox::clicked,
             this, &SlotsPage::HideSlots);
@@ -2055,7 +2115,8 @@ SlotsPage::SlotsPage(QWidget *parent)
             this, &SlotsPage::LockShovel);
 
     connect(slotsSetButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int slot = slotsSlotCombo->currentIndex();
                 int type = slotsSeedCombo->currentIndex();
                 bool imitater = imitaterCheckBox->isChecked();
@@ -2063,7 +2124,8 @@ SlotsPage::SlotsPage(QWidget *parent)
             });
 
     connect(hideSlotsSeedCheckBox, &QCheckBox::clicked,
-            this, [=](bool checked) {
+            this, [=](bool checked)
+            {
                 int slot = slotsSlotCombo->currentIndex();
                 bool visible = !checked;
                 emit SetSeedVisible(slot, visible);
@@ -2088,28 +2150,32 @@ SlotsPage::SlotsPage(QWidget *parent)
             this, &SlotsPage::HideMenuButton);
 
     connect(seedCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            [=](int index) {
+            [=](int index)
+            {
                 emit GetSpeed(index);
                 emit GetCost(index);
                 emit GetRecharge(index);
             });
 
     connect(seedSpeedButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int index = seedCombo->currentIndex();
                 int speed = seedSpeedLineEdit->text().toInt();
                 emit SetSpeed(index, speed);
             });
 
     connect(seedCostButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int index = seedCombo->currentIndex();
                 int cost = seedCostLineEdit->text().toInt();
                 emit SetCost(index, cost);
             });
 
     connect(seedRechargeButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int index = seedCombo->currentIndex();
                 int recharge = seedRechargeLineEdit->text().toInt();
                 emit SetRecharge(index, recharge);
@@ -2118,9 +2184,21 @@ SlotsPage::SlotsPage(QWidget *parent)
 
 void SlotsPage::TranslateUI()
 {
-    slotsCountLabel->setText(tr("Count of Slots"));
+    // SET_COMBO_TEXT(slotsCountCombo, List::Get().slotsCountList, 10);
+    if (slotsCountCombo->count() == 0)
+    {
+        for (size_t i = 0; i < 10; i++)
+            slotsCountCombo->addItem(List::Get().slotsCountList[i]);
+        slotsCountCombo->setCurrentIndex(10 - 1); // 默认十格
+    }
+    else
+    {
+        for (size_t i = 0; i < 10; i++)
+            slotsCountCombo->setItemText(i, List::Get().slotsCountList[i]);
+    }
     slotsCountButton->setText(tr("Set"));
 
+    topSlotsCheckBox->setText(tr("Top Slots"));
     hideSlotsCheckBox->setText(tr("Hide Slots"));
     showShovelCheckBox->setText(tr("Show Shovel"));
     lockShovelCheckBox->setText(tr("Lock Shovel"));
@@ -2358,7 +2436,8 @@ ScenePage::ScenePage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(putPlantButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = sceneRowSpinBox->text().toInt() - 1;
                 int col = sceneColSpinBox->text().toInt() - 1;
                 int type = plantMenuCombo->currentIndex();
@@ -2367,7 +2446,8 @@ ScenePage::ScenePage(QWidget *parent)
             });
 
     connect(putZombieButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = sceneRowSpinBox->text().toInt() - 1;
                 int col = sceneColSpinBox->text().toInt() - 1;
                 int type = zombieMenuCombo->currentIndex();
@@ -2375,21 +2455,24 @@ ScenePage::ScenePage(QWidget *parent)
             });
 
     connect(putGraveButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = sceneRowSpinBox->text().toInt() - 1;
                 int col = sceneColSpinBox->text().toInt() - 1;
                 emit PutGrave(row, col);
             });
 
     connect(putRakeButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = sceneRowSpinBox->text().toInt() - 1;
                 int col = sceneColSpinBox->text().toInt() - 1;
                 emit PutRake(row, col);
             });
 
     connect(putCoinButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = sceneRowSpinBox->text().toInt() - 1;
                 int col = sceneColSpinBox->text().toInt() - 1;
                 int type = coinTypeCombo->currentIndex() + 1;
@@ -2397,14 +2480,16 @@ ScenePage::ScenePage(QWidget *parent)
             });
 
     connect(putLadderButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = sceneRowSpinBox->text().toInt() - 1;
                 int col = sceneColSpinBox->text().toInt() - 1;
                 emit PutLadder(row, col);
             });
 
     connect(autoLadderButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 bool imitater_pumpkin_only = imitaterPumpkinCheckBox->isChecked();
                 emit AutoLadder(imitater_pumpkin_only);
             });
@@ -2416,7 +2501,8 @@ ScenePage::ScenePage(QWidget *parent)
             this, &ScenePage::Check);
 
     connect(blockTypeButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = sceneRowSpinBox->text().toInt() - 1;
                 int col = sceneColSpinBox->text().toInt() - 1;
                 // 0 1 2 -> 1 2 3
@@ -2425,26 +2511,30 @@ ScenePage::ScenePage(QWidget *parent)
             });
 
     connect(rowTypeButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = sceneRowSpinBox->text().toInt() - 1;
                 int type = rowTypeCombo->currentIndex();
                 emit SetRowType(row, type);
             });
 
     connect(sceneButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int scene = sceneCombo->currentIndex();
                 emit SetScene(scene);
             });
 
     connect(musicButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int id = musicCombo->currentIndex() + 1;
                 emit SetMusic(id);
             });
 
     connect(clearItemButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int type = itemCombo->currentIndex();
                 switch (type)
                 {
@@ -2531,11 +2621,23 @@ void ScenePage::TranslateUI()
     imitaterPumpkinCheckBox->setText(tr("Imitater Pumpkin Only"));
 
     blockTypeLabel->setText(tr("Block Type"));
-    SET_COMBO_TEXT(blockTypeCombo, List::Get().blockTypeList, 3);
+    // SET_COMBO_TEXT(blockTypeCombo, List::Get().blockTypeList, 3);
+    if (blockTypeCombo->count() == 0)
+        for (size_t i = 0; i < 3; i++)
+            blockTypeCombo->addItem(QString("[") + QString::number(i + 1) + "]" + " " + List::Get().blockTypeList[i]);
+    else
+        for (size_t i = 0; i < 3; i++)
+            blockTypeCombo->setItemText(i, QString("[") + QString::number(i + 1) + "]" + " " + List::Get().blockTypeList[i]);
     blockTypeButton->setText(tr("Set"));
 
     rowTypeLabel->setText(tr("Row Type (Spawn)"));
-    SET_COMBO_TEXT(rowTypeCombo, List::Get().rowTypeList, 3);
+    // SET_COMBO_TEXT(rowTypeCombo, List::Get().rowTypeList, 3);
+    if (rowTypeCombo->count() == 0)
+        for (size_t i = 0; i < 3; i++)
+            rowTypeCombo->addItem(QString("[") + QString::number(i) + "]" + " " + List::Get().rowTypeList[i]);
+    else
+        for (size_t i = 0; i < 3; i++)
+            rowTypeCombo->setItemText(i, QString("[") + QString::number(i) + "]" + " " + List::Get().rowTypeList[i]);
     rowTypeButton->setText(tr("Set"));
 
     sceneLabel->setText(tr("Game Scene"));
@@ -2713,9 +2815,8 @@ LineupPage::LineupPage(QWidget *parent)
             this, &LineupPage::QuickPass);
 
     connect(mixModeToSurvivalEndlessButton, &QPushButton::clicked,
-            this, [=]() {
-                emit MixMode(13, 0);
-            });
+            this, [=]()
+            { emit MixMode(13, 0); });
 
     connect(clearAllGravesButton, &QPushButton::clicked,
             this, &LineupPage::ClearAllGraves);
@@ -2723,17 +2824,15 @@ LineupPage::LineupPage(QWidget *parent)
     for (size_t i = 0; i < 9; i++)
     {
         connect(lilyPadPlantToAction[i], &QAction::triggered,
-                this, [=]() {
-                    emit this->LilyPadOnPool(i + 1);
-                });
+                this, [=]()
+                { emit this->LilyPadOnPool(i + 1); });
     }
 
     for (size_t i = 0; i < 9; i++)
     {
         connect(flowerPotPlantToAction[i], &QAction::triggered,
-                this, [=]() {
-                    emit this->FlowerPotOnRoof(i + 1);
-                });
+                this, [=]()
+                { emit this->FlowerPotOnRoof(i + 1); });
     }
 
     connect(clearAllPlantsButton, &QPushButton::clicked,
@@ -2743,17 +2842,23 @@ LineupPage::LineupPage(QWidget *parent)
             this, &LineupPage::UpdateLineupString);
 
     connect(endlessBuildCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [=](int index) {
+            this, [=](int index)
+            {
                 if (index != -1)
                 {
-                    lastSelectedBuildName = endlessBuildNameList[index];                                // save current selected
-                    stringTextEdit->setPlainText(endlessBuildStringList[index]);                        // show string
+                    lastSelectedBuildName = endlessBuildNameList[index]; // save current selected
+
+                    std::string ls_old_fmt = endlessBuildStringList[index].toStdString();
+                    std::string ls_new_fmt = ConvertLineup(ls_old_fmt);
+                    stringTextEdit->setPlainText(QString::fromStdString(ls_new_fmt)); // show string
+
                     deleteStringButton->setEnabled(endlessBuildGroupList[index] == "v2/Lineup/Custom"); // deleteable
                 }
             });
 
     connect(oneKeySetupButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int index = endlessBuildCombo->currentIndex();
                 QString string = endlessBuildStringList[index];
                 // if (StringCheck(string)) // no need
@@ -2769,7 +2874,8 @@ LineupPage::LineupPage(QWidget *parent)
             });
 
     connect(string2buildButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 QString string = stringTextEdit->toPlainText();
                 if (StringCheck(string))
                 {
@@ -2795,13 +2901,15 @@ LineupPage::LineupPage(QWidget *parent)
             });
 
     connect(build2stringButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 bool ignore_hp = keepHpStatusCheckBox->isChecked();
                 emit GetLineup(ignore_hp);
             });
 
     connect(copyStringButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 QString text = stringTextEdit->toPlainText();
                 QClipboard *clipboard = QApplication::clipboard();
                 if (StringCheck(text))
@@ -2817,7 +2925,8 @@ LineupPage::LineupPage(QWidget *parent)
             });
 
     connect(pasteStringButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 QClipboard *clipboard = QApplication::clipboard();
                 QString text = clipboard->text();
 
@@ -2890,7 +2999,8 @@ bool LineupPage::StringCheck(const QString &text)
 
 std::string LineupPage::ConvertLineup(const std::string &str)
 {
-    auto split = [](const std::string &str, char seperator) -> std::vector<std::string> {
+    auto split = [](const std::string &str, char seperator) -> std::vector<std::string>
+    {
         std::vector<std::string> result;
         std::string::size_type prev = 0, pos = 0;
         while ((pos = str.find(seperator, pos)) != std::string::npos)
@@ -2903,7 +3013,8 @@ std::string LineupPage::ConvertLineup(const std::string &str)
         return result;
     };
 
-    auto hex2dec = [](const std::string &str) -> long {
+    auto hex2dec = [](const std::string &str) -> long
+    {
         char *ptr;
         long num;
         num = strtol(str.c_str(), &ptr, 16);
@@ -3145,8 +3256,10 @@ void LineupPage::RefreshLineupString()
         settings.endGroup();
     }
 
-    auto LessThan = [&](const QString &s1, const QString &s2) {
-        auto GetWeight = [&](const QString &s) {
+    auto LessThan = [&](const QString &s1, const QString &s2)
+    {
+        auto GetWeight = [&](const QString &s)
+        {
             //    场地 1000000000000
             // 2F 春哥 10000000000
             // 2A 曾哥 100000000
@@ -3248,7 +3361,8 @@ void LineupPage::UpdateLineupString()
     endlessBuildCombo->setEnabled(false);
     oneKeySetupButton->setEnabled(false);
 
-    auto decompress_gzip = [&](const QByteArray &gzip_data) -> QByteArray {
+    auto decompress_gzip = [&](const QByteArray &gzip_data) -> QByteArray
+    {
         QByteArray raw_data;
 
         const int CHUNK_SIZE = 1024 * 16;
@@ -3544,7 +3658,7 @@ GardenPage::GardenPage(QWidget *parent)
     colorCombo->setEnabled(false);
     statusCombo->setEnabled(false);
 
-    treeHeightLineEdit->setText("1000");
+    treeHeightLineEdit->setText("1437");
 
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(fertilizerUnlimitedCheckBox, 0, 0, 1, 3);
@@ -3587,13 +3701,15 @@ GardenPage::GardenPage(QWidget *parent)
             this, &GardenPage::TreeFoodUnlimited);
 
     connect(treeHeightButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int height = treeHeightLineEdit->text().toInt();
                 emit SetTreeHeight(height);
             });
 
     connect(table, &QTableWidget::itemSelectionChanged,
-            this, [=]() {
+            this, [=]()
+            {
                 sceneCombo->blockSignals(true);
                 typeCombo->blockSignals(true);
                 directionCombo->blockSignals(true);
@@ -3664,14 +3780,16 @@ GardenPage::GardenPage(QWidget *parent)
             this, &GardenPage::UpdateContent);
 
     connect(clearButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 table->clearContents();
                 table->setRowCount(0);
                 table->horizontalHeader()->setVisible(false);
             });
 
     connect(loadButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 table->clearContents();
                 table->setRowCount(0);
                 table->horizontalHeader()->setVisible(false);
@@ -3686,7 +3804,8 @@ GardenPage::GardenPage(QWidget *parent)
             });
 
     connect(setButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 std::vector<GardenPlant> plants;
 
                 int count = table->rowCount();
@@ -3915,7 +4034,8 @@ VasePage::VasePage(QWidget *parent)
             this, &VasePage::UpdateContent);
 
     connect(clearButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 table->clearContents();
                 table->setRowCount(0);
                 table->horizontalHeader()->setVisible(false);
@@ -3924,7 +4044,8 @@ VasePage::VasePage(QWidget *parent)
             });
 
     connect(loadButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 table->clearContents();
                 table->setRowCount(0);
                 table->horizontalHeader()->setVisible(false);
@@ -3941,7 +4062,8 @@ VasePage::VasePage(QWidget *parent)
             });
 
     connect(setButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 std::vector<Vase> vases;
 
                 int count = table->rowCount();
@@ -3968,7 +4090,8 @@ VasePage::VasePage(QWidget *parent)
             });
 
     connect(table, &QTableWidget::itemSelectionChanged,
-            this, [=]() {
+            this, [=]()
+            {
                 rowCombo->blockSignals(true);
                 colCombo->blockSignals(true);
                 vaseSkinCombo->blockSignals(true);
@@ -4231,7 +4354,7 @@ EffectPage::EffectPage(QWidget *parent)
     daisiesCodeButton->setText("DAISIES");
     danceCodeButton->setText("DANCE");
     pinataCodeButton->setText("PINATA");
-    konamiCodeButton->setText("KONAMI");
+    konamiCodeButton->setText("↑↑↓↓←→←→BA");
 
     iceTrailLineEdit->setText("800");
 
@@ -4268,44 +4391,36 @@ EffectPage::EffectPage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(sukhbirCodeButton, &QPushButton::clicked,
-            this, [=]() {
-                emit WisdomTreeCode(0);
-            });
+            this, [=]()
+            { emit WisdomTreeCode(0); });
 
     connect(futureCodeButton, &QPushButton::clicked,
-            this, [=]() {
-                emit WisdomTreeCode(5);
-            });
+            this, [=]()
+            { emit WisdomTreeCode(5); });
 
     connect(mustacheCodeButton, &QPushButton::clicked,
-            this, [=]() {
-                emit WisdomTreeCode(20);
-            });
+            this, [=]()
+            { emit WisdomTreeCode(20); });
 
     connect(trickedoutCodeButton, &QPushButton::clicked,
-            this, [=]() {
-                emit WisdomTreeCode(48);
-            });
+            this, [=]()
+            { emit WisdomTreeCode(48); });
 
     connect(daisiesCodeButton, &QPushButton::clicked,
-            this, [=]() {
-                emit WisdomTreeCode(99);
-            });
+            this, [=]()
+            { emit WisdomTreeCode(99); });
 
     connect(danceCodeButton, &QPushButton::clicked,
-            this, [=]() {
-                emit WisdomTreeCode(500);
-            });
+            this, [=]()
+            { emit WisdomTreeCode(500); });
 
     connect(pinataCodeButton, &QPushButton::clicked,
-            this, [=]() {
-                emit WisdomTreeCode(999);
-            });
+            this, [=]()
+            { emit WisdomTreeCode(999); });
 
     connect(konamiCodeButton, &QPushButton::clicked,
-            this, [=]() {
-                emit KonamiCode();
-            });
+            this, [=]()
+            { emit KonamiCode(); });
 
     connect(itsRainingCheckBox, &QCheckBox::clicked,
             this, &EffectPage::ItsRaining);
@@ -4335,7 +4450,8 @@ EffectPage::EffectPage(QWidget *parent)
             this, &EffectPage::BungeeBlitz);
 
     connect(iceTrailCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [=](int index) {
+            this, [=](int index)
+            {
                 if (index != 0)
                 {
                     int row = index - 1;
@@ -4348,7 +4464,8 @@ EffectPage::EffectPage(QWidget *parent)
             });
 
     connect(iceTrailButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int row = iceTrailCombo->currentIndex() - 1;
                 int x = iceTrailLineEdit->text().toInt();
                 emit SetIceTrailX(row, x);
@@ -4551,19 +4668,22 @@ OthersPage::OthersPage(QWidget *parent)
             this, &OthersPage::OpenDataDir);
 
     connect(debugModeButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int mode = debugModeCombo->currentIndex();
                 emit DebugMode(mode);
             });
 
     connect(frameDurationButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int time_ms = frameDurationSpinBox->value();
                 emit SetFrameDuration(time_ms);
             });
 
     connect(unpackPakButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 QString file_name = pakFileLineEdit->text();
                 QString dir_name = pakPathLineEdit->text();
                 if (file_name.size() > 0 && dir_name.size() > 0)
@@ -4575,7 +4695,8 @@ OthersPage::OthersPage(QWidget *parent)
             });
 
     connect(packPakButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 QString dir_name = pakPathLineEdit->text();
                 if (dir_name.size() > 0)
                 {
@@ -4810,7 +4931,8 @@ StatusPage::StatusPage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(autoRefreshCheckBox, &QCheckBox::stateChanged,
-            this, [=](int state) {
+            this, [=](int state)
+            {
                 if (state == Qt::Checked)
                     refreshStatusTimer->start();
                 else
@@ -4818,9 +4940,8 @@ StatusPage::StatusPage(QWidget *parent)
             });
 
     connect(refreshIntervalSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, [=](int value) {
-                refreshStatusTimer->setInterval(value * 10);
-            });
+            this, [=](int value)
+            { refreshStatusTimer->setInterval(value * 10); });
 
     connect(refreshStatusTimer, &QTimer::timeout,
             this, &StatusPage::GetStatus);
@@ -4981,7 +5102,8 @@ void SpawnCountPage::UpdateSpawnCount(std::array<uint32_t, 1000> zombies_list)
     table->setColumnCount(20 + 1);
     table->setRowCount(33);
 
-    auto min = [](unsigned int a, unsigned int b) -> unsigned int {
+    auto min = [](unsigned int a, unsigned int b) -> unsigned int
+    {
         return a < b ? a : b;
     };
 
@@ -5073,7 +5195,8 @@ TargetMapPage::TargetMapPage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(loadButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 if (seeingStarsRadioButton->isChecked())
                     emit GetTargetMap(22);
                 if (artChallengeWallnutRadioButton->isChecked())
@@ -5083,14 +5206,16 @@ TargetMapPage::TargetMapPage(QWidget *parent)
             });
 
     connect(clearButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 for (size_t r = 0; r < 6; r++)
                     for (size_t c = 0; c < 9; c++)
                         comboBoxes[9 * r + c]->setCurrentIndex(0);
             });
 
     connect(setButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 std::array<int, 54> map;
                 for (size_t r = 0; r < 6; r++)
                     for (size_t c = 0; c < 9; c++)
@@ -5224,7 +5349,8 @@ CannonLauncherPage::CannonLauncherPage(QWidget *parent)
             this, &CannonLauncherPage::GetScene);
 
     connect(launchButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 int index = indexSpinBox->value();
                 int x = xValueLabel->text().toInt();
                 int y = yValueLabel->text().toInt();
@@ -5232,7 +5358,8 @@ CannonLauncherPage::CannonLauncherPage(QWidget *parent)
             });
 
     connect(launchAllButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 bool random_fall = randomFallCheckBox->isChecked();
                 int x = xValueLabel->text().toInt();
                 int y = yValueLabel->text().toInt();
@@ -5378,17 +5505,16 @@ PortalPage::PortalPage(QWidget *parent)
         mainLayout->setColumnStretch(i, 1);
 
     connect(check_box_portal_start, &QCheckBox::stateChanged,
-            this, [=]() {
-                emit StartPortal(check_box_portal_start->isChecked());
-            });
+            this, [=]()
+            { emit StartPortal(check_box_portal_start->isChecked()); });
 
     connect(check_box_portal_lock, &QCheckBox::stateChanged,
-            this, [=]() {
-                emit LockPortal(check_box_portal_lock->isChecked());
-            });
+            this, [=]()
+            { emit LockPortal(check_box_portal_lock->isChecked()); });
 
     connect(push_button_portal_set, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 if (check_box_portal_start->checkState() == Qt::Checked)
                 {
                     int b1r = line_edit_black_1_row->text().toInt() - 1;
@@ -5480,14 +5606,16 @@ IzeLineupPage::IzeLineupPage(QWidget *parent)
             this, &IzeLineupPage::GetIzeLineup);
 
     connect(clearButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 for (size_t r = 0; r < 5; r++)
                     for (size_t c = 0; c < 5; c++)
                         comboBoxes[5 * r + c]->setCurrentIndex(0);
             });
 
     connect(setButton, &QPushButton::clicked,
-            this, [=]() {
+            this, [=]()
+            {
                 std::array<int, 25> iz_l;
                 for (size_t r = 0; r < 5; r++)
                 {
@@ -5559,93 +5687,5 @@ void IzeLineupPage::ShowIzeLineup(std::array<int, 25> iz_l)
         }
     }
 }
-
-// Document
-
-DocumentPage::DocumentPage(QWidget *parent)
-    : QWidget(parent)
-{
-    document = new QTextBrowser(this);
-    document->setOpenExternalLinks(true);
-
-    mainLayout = new QGridLayout(this);
-    mainLayout->addWidget(document, 0, 0, 1, 1);
-
-    for (int i = 0; i < mainLayout->rowCount(); i++)
-        mainLayout->setRowStretch(i, 1);
-    for (int i = 0; i < mainLayout->columnCount(); i++)
-        mainLayout->setColumnStretch(i, 1);
-}
-
-void DocumentPage::TranslateUI()
-{
-    document->setText(tr("<style>a {text-decoration: none; color: blue}</style>"
-                         "<h2>About</h2>"
-                         "<p>This software (PvZ Tools) is applicable to Plants vs. Zombies 1.0.0.1051 original English version only (which you can <a href=\"https://pvz.lmintlcx.com/download/\">download here</a>).</p>"
-                         "<p>Excessive modification or forced use of non-corresponding game versions can easily cause the game to crash, please back up data file before use. All effects caused by using this software are responsibility of user himself.</p>"
-                         "<p>Some behavior of trainer (finding game progress, modifying memory data, remote injection code, etc.) may be considered dangerous by anti-virus software. Please decide whether to trust this software yourself.</p>"
-                         "<p>Reasonable uses of trainer include, but not limited to, demonstrations, testing, research, and entertainment. Abuse of modifiers may reduce the fun of game seriously, please use it with caution, especially newbies.</p>"
-                         "<p>There may be some bugs with this software, users can summit feedback or feature request to the author. The beta version of this software has a time limit, please download latest version if it prompt expires.</p>"
-                         "<p>Configuration information is saved in \"HKEY_CURRENT_USER\\SOFTWARE\\Cube Studio\\PvZ Tools\\v2\", you can export this registry item for back up, or clean it after delete this software.<br>(Starting from version 2.5.0, these configurations are in the \"pvztools.ini\" file which located at the same directory as the main program.)</p>"
-                         "<p>Most important data (memory address) comes from existing public information and other open source modifiers. And source code is copy and paste from Stack Overflow.</p>"
-                         "<p>All source code is located at <a href=\"https://github.com/lmintlcx/pvztools/\">https://github.com/lmintlcx/pvztools/</a>.</p>"
-                         "<h2>Spawn</h2>"
-                         "<p>This feature is suitable for later period of survival endless. Size of zombie's spawning list is 1000, which is 20 waves per level and 50 zombies per wave.</p>"
-                         "<p>The spawn page has two modes: \"brief\" and \"detailed\".</p>"
-                         "<p>When switching between different pages, if the number of zombie types selected on target page is 0, selected zombie types on current page will be synchronized to target page (not one-to-one correspondence).</p>"
-                         "<p>In brief mode, you can switch layout of the option boxes, in order of zombies in almanac or in same position as the PVZombiesSeed.exe.</p>"
-                         "<p>In brief mode, Conehead Zombie and Newspaper Zombie are mutually exclusive if \"Limit Spawn Count\" is checked, and it will limit the number of selected zombie types, up to 10 types except Bungee Zombie and Zombie Yeti. (Note that this limitation is not same as the game itself.)</p>"
-                         "<p>The difference between different spawn mode:<br>Natural spawn changes the zombie types only and calls built-in function of game to generates zombies list.<br>Extreme spawn is to evenly populate the zombies list with seleted zombie types.<br>Simulate natural spawn is randomly fill the zombies list with seleted zombie types according to certern ratio, meanwhile decrease the probability of GigaGargantuar in non flag wave.</p>"
-                         "<p>Special deal with some zombies:<br>When limit Flag Zombie, Flag Zombie will only appear in each flag wave (huge wave).<br>When limit Zombie Yeti, there will be only one Zombie Yeti.<br>When limit Bungee Zombie, Bungee Zombie will only appear in flag wave (huge wave).<br>When limit GigaGargantuar, GigaGargantuar will only appear in selected wave(s) (20 waves total).</p>"
-                         "<p>When using natural spawn in brief mode, there must be Zombie.</p>"
-                         "<p>When using extreme spawn in brief mode, there must be Zombie and Flag Zombie. Flag Zombie, Zombie Yeti and Bungee Zombie is limited, and GigaGargantuar has no limit.</p>"
-                         "<p>When using simulate natural spawn in detailed mode, there must be Zombie and Flag Zombie. Flag Zombie, Zombie Yeti and Bungee Zombie is limited.</p>"
-                         "<h2>Lineup</h2>"
-                         "<p>Checking \"Quick Lineup Mode\" will enable these features: Auto Collect, Cob Cannon No CD, Plant Invincible, Stop Spawning, Ignore Sun, Slots No CD, Purple Seed Unlimited, No Fog.</p>"
-                         "<p>Clicking \"Quick Pass\" will end current level directly, kill all zombies on the field, set the number of sunshine to 8000, and set the number of levels to 1009 (2020 flags completed). You can modify sunshine and level in corresponding page by pause the game immediately after clicking it.</p>"
-                         "<p>Format of lineup string is compatible with <a href=\"https://pvz.lmintlcx.com/lineup/\">Array Design</a>.</p>"
-                         "<p>The built-in lineup string includes some well-known build in <a href=\"https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good\">good tab</a> at Baidu Tieba. Players can adjust lineup as needed, don't have to follow the original array completely.</p>"
-                         "<p>Clicking \"Update\" will update built-in array list via Internet. Which is collected by me and will be update if I'm happy.</p>"
-                         "<p>Modifying game scene may cause some unknown problems, therefore the \"Allow Switch Scene\" option is not checked by default. It is recommended to enter the hidden scene in a <a href=\"https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/\">more conventional way</a> and then mix to \"Survival Endless\" mode.</p>"
-                         "<p>When \"Keep HP Status\" is checked, appearance status of some plants (Wall-nut, Tall-nut, Pumpkin, Garlic, Spikerock) will be preserved when importing or exporting lineup strings.</p>"
-                         "<h2>Others</h2>"
-                         "<p>The \"Open Data Dir\" feature is temporarily unavailable on XP systems (the data file is located in the \"userdata\" folder in game directory). For Vista and above, it's located in \"C:\\ProgramData\\PopCap Games\\PlantsVsZombies\\userdata\\\" folder.</p>"
-                         "<p>The unpacked file is located in the specified folder. But the packaged file will be named with \"main_&lt;number&gt;.pak\", please rename it to \"main.pak\" and replace the original game file (remember to backup first).</p>"));
-
-    setWindowTitle(tr("Document"));
-}
-
-// <style>a {text-decoration: none; color: blue}</style>
-// <h2>关于</h2>
-// <p>本软件（PvZ Tools）仅适用于植物大战僵尸 1.0.0.1051 英文原版（可从 <a href="https://pvz.lmintlcx.com/download/">这里下载</a>）。</p>
-// <p>过度修改或者强行使用不对应的游戏版本很容易造成游戏崩溃，使用前请及时备份存档。对于使用本软件造成的所有影响由用户自己负责。</p>
-// <p>修改器的部分行为（查找游戏进程，修改内存数据，远程注入代码等）可能会被杀毒软件视为危险行为，请自行决定是否信任本软件。</p>
-// <p>修改器的合理用途包括但不限于演示、测试、研究和娱乐。滥用修改器会严重降低游戏乐趣，新手请慎重使用。</p>
-// <p>本软件可能存在一些问题，用户可以向作者提供问题反馈或者功能需求。测试版有使用期限限制，如果提示过期请下载最新版本。</p>
-// <p>配置信息保存在“HKEY_CURRENT_USER\SOFTWARE\Cube Studio\PvZ Tools\v2”，你可以导出这个注册表项目来备份，或者在删除本软件后清理它。<br>从 2.5.0 版本开始，这些配置位于主程序同目录下的 “pvztools.ini” 文件中。）</p>
-// <p>大部分核心数据（内存基址）来自于已有公开资料和其他开源修改器。而源代码是从栈溢出（Stack Overflow）复制粘贴的。</p>
-// <p>所有源代码位于 <a href="https://github.com/lmintlcx/pvztools/">https://github.com/lmintlcx/pvztools/</a> 。</p>
-// <h2>出怪</h2>
-// <p>此功能适用于无尽后期调节出怪。出怪列表共用到 1000 只僵尸，其中每一次选卡 20 波，每波 50 只。</p>
-// <p>出怪页面有两种模式：“简略” 和 “详细”。</p>
-// <p>切换不同出怪页面时，如果目标页面所选的僵尸种类数量为 0，则会将当前页面已选的僵尸种类同步到另一页面上（并不是一一对应的）。</p>
-// <p>简略模式下可以切换选项框的排列布局，按僵尸在图鉴的顺序或者和小王子出怪修改器一样的位置。</p>
-// <p>在简略模式下勾选“限制出怪种类数”后路障和读报互斥，并且限制能够选择的出怪种类数量为除蹦极和雪人外最多 10 种。（注意这个限制和游戏本身的出怪情况并不相同）。</p>
-// <p>不同出怪模式的区别：<br>自然出怪只改变出怪种类，再由游戏内置的函数生成出怪列表。<br>极限出怪是把所选僵尸种类按顺序均匀地填充到出怪列表。<br>模拟自然出怪则是按一定的比例随机填充出怪列表，在非旗帜波会降低红眼的出现概率。</p>
-// <p>一些僵尸的特殊处理：<br>限制旗帜后，旗帜只在每个旗帜波（大波）出现一只。<br>限制雪人后，雪人只出现一只。<br>限制蹦极后，蹦极只在旗帜波（大波）出现。<br>限制红眼后，红眼只在所选的波次出现（总共 20 波）。</p>
-// <p>简略模式下使用自然出怪，普僵必出。</p>
-// <p>简略模式下使用极限出怪，普僵旗帜必出，限制旗帜雪人蹦极，不限制红眼。</p>
-// <p>详细模式下使用模拟自然出怪，普僵旗帜必出，限制旗帜雪人蹦极。</p>
-// <h2>布阵</h2>
-// <p>勾选“快捷布阵模式”会开启这些功能：自动收集、玉米炮无冷却、植物无敌、暂停出怪、无视阳光、卡片无冷却、紫卡无限制、浓雾透视。</p>
-// <p>点击“快速过关”后会直接结束本关卡，秒杀所有场上僵尸，并将阳光数设置为 8000，关卡数设置为 1009（已完成 2020 面旗帜数）。可以在点击后立即暂停游戏并去对应的页面修改阳光和关卡数。</p>
-// <p>布阵字符串格式和 <a href="https://pvz.lmintlcx.com/lineup/">网页布阵器</a> 互通。</p>
-// <p>内置布阵字符串包括一些贴吧 <a href="https://tieba.baidu.com/f?kw=植物大战僵尸&ie=utf-8&tab=good">精品区</a> 知名阵型。玩家可根据需要调整阵型，不需要完全遵循原阵。</p>
-// <p>点击“更新”后会联网更新内置的阵型列表。个人整理，随缘更新。</p>
-// <p>修改游戏场地可能会造成一些不为人知的问题，因此“允许切换场景”选项默认不勾选。建议用 <a href="https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/">更加常规的方法</a> 进入隐藏场地再混乱到“生存无尽”模式。</p>
-// <p>勾选“保持血量状态”后，导入或导出字符串时部分植物（坚果、高坚果、南瓜头、大蒜、地刺王）的残血状态会得到保留。</p>
-// <h2>其他</h2>
-// <p>“打开存档目录”功能在 XP 系统上暂时不可用（存档文件位于游戏目录内的“userdata”文件夹）。对于 Vista 以及更高版本的系统，存档文件位于“C:\ProgramData\PopCap Games\PlantsVsZombies\userdata\”文件夹。</p>
-// <p>解包文件位于指定的文件夹内。而打包文件会以“main_&lt;数字&gt;.pak”的格式命名，请将其改名为“main.pak”并且替换掉原来的游戏文件（记得先备份）。</p>
 
 } // namespace Pt
