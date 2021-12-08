@@ -13,17 +13,17 @@ Plants vs. Zombies 1.0.0.1051 Toolset.
 
 [Download](https://pvz.lmintlcx.com/tools/)
 
-Supported operating systems: (x86/x64)
+Supported operating systems:
 
-- Windows 7 / 8.x / 10
+- Windows 7 / 8.x / 10 / 11  (x86 / WoW64)
 
-Supported game version: (PC)
+Supported game version:
 
-- [1.0.0.1051](https://pvz.lmintlcx.com/download/)
+- [PC 1.0.0.1051](https://pvz.lmintlcx.com/download/)
 
 ## Build
 
-You need a C++17 compiler and Qt 5 libraries to build it.
+You need a C++20 compiler and Qt 5 libraries to build it.
 
 Qt must be linked with OpenSSL or Schannel, zlib is also required.
 
@@ -31,7 +31,7 @@ Already tested and confirmed works with:
 
 | Qt      | OpenSSL | zlib      | Compiler  |
 | ------- | ------- | --------- | --------- |
-| 5.15.\* | 1.1.1\* | 1.2.11.\* | MSVC 2017 |
+| 5.15.\* | 1.1.1\* | 1.2.11.\* | MSVC 2019 |
 
 ## Credit
 

@@ -7,7 +7,7 @@ QT += core gui widgets network
 
 DEFINES += UNICODE _UNICODE
 
-win32-msvc*:QMAKE_CXXFLAGS += /std:c++17 /MP /utf-8
+win32-msvc*:QMAKE_CXXFLAGS += /std:c++20 /MP /utf-8
 
 DEFINES += _WIN32_WINNT=0x0601
 
@@ -22,11 +22,11 @@ INCLUDEPATH += .
 
 # zlib
 contains(CONFIG, static) {
-  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.11\msvc2017_x86\static\include)
-  LIBS += -L$$quote(C:\Dev\zlib_1.2.11\msvc2017_x86\static\lib) -lzlib
+  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.11\msvc2019_x86\static\include)
+  LIBS += -L$$quote(C:\Dev\zlib_1.2.11\msvc2019_x86\static\lib) -lzlib
 } else {
-  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.11\msvc2017_x86\shared\include)
-  LIBS += -L$$quote(C:\Dev\zlib_1.2.11\msvc2017_x86\shared\lib) -lzdll
+  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.11\msvc2019_x86\shared\include)
+  LIBS += -L$$quote(C:\Dev\zlib_1.2.11\msvc2019_x86\shared\lib) -lzdll
 }
 
 win32-msvc*:PRECOMPILED_HEADER = src/stable.h

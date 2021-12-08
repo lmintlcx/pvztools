@@ -119,27 +119,27 @@ LevelPage::LevelPage(QWidget *parent)
 
     showHiddenGamesCheckBox->setChecked(true);
 
-    levelLineEdit->setText("1009");
+    levelLineEdit->setText("1010");
 
     mainLayout = new QGridLayout(this);
-    mainLayout->addWidget(getGoldSunflowerTrophyButton, 0, 0, 1, 1);
-    mainLayout->addWidget(getAllShopItemsButton, 0, 1, 1, 1);
-    mainLayout->addWidget(unlockAllModeCheckBox, 0, 2, 1, 2);
-    mainLayout->addWidget(directWinButton, 0, 4, 1, 1);
-    mainLayout->addWidget(adventureRadioButton, 1, 0, 1, 1);
-    mainLayout->addWidget(miniGamesRadioButton, 2, 0, 1, 1);
-    mainLayout->addWidget(puzzleRadioButton, 3, 0, 1, 1);
-    mainLayout->addWidget(survivalRadioButton, 4, 0, 1, 1);
-    mainLayout->addWidget(adventureCombo, 1, 1, 1, 1);
-    mainLayout->addWidget(miniGamesCombo, 2, 1, 1, 2);
-    mainLayout->addWidget(puzzleCombo, 3, 1, 1, 2);
-    mainLayout->addWidget(survivalCombo, 4, 1, 1, 2);
-    mainLayout->addWidget(mixmodeButton, 1, 4, 1, 1);
-    mainLayout->addWidget(showHiddenGamesCheckBox, 2, 3, 1, 2);
-    mainLayout->addWidget(izeArrayCombo, 3, 3, 1, 1);
-    mainLayout->addWidget(lockIzeArrayCheckBox, 3, 4, 1, 1);
-    mainLayout->addWidget(levelLineEdit, 4, 3, 1, 1);
-    mainLayout->addWidget(jumpLevelButton, 4, 4, 1, 1);
+    mainLayout->addWidget(getGoldSunflowerTrophyButton, 0, 0, 1, 3);
+    mainLayout->addWidget(getAllShopItemsButton, 0, 3, 1, 2);
+    mainLayout->addWidget(unlockAllModeCheckBox, 0, 5, 1, 3);
+    mainLayout->addWidget(directWinButton, 0, 8, 1, 2);
+    mainLayout->addWidget(adventureRadioButton, 1, 0, 1, 2);
+    mainLayout->addWidget(miniGamesRadioButton, 2, 0, 1, 2);
+    mainLayout->addWidget(puzzleRadioButton, 3, 0, 1, 2);
+    mainLayout->addWidget(survivalRadioButton, 4, 0, 1, 2);
+    mainLayout->addWidget(adventureCombo, 1, 2, 1, 2);
+    mainLayout->addWidget(miniGamesCombo, 2, 2, 1, 4);
+    mainLayout->addWidget(puzzleCombo, 3, 2, 1, 4);
+    mainLayout->addWidget(survivalCombo, 4, 2, 1, 4);
+    mainLayout->addWidget(mixmodeButton, 1, 8, 1, 2);
+    mainLayout->addWidget(showHiddenGamesCheckBox, 2, 6, 1, 4);
+    mainLayout->addWidget(izeArrayCombo, 3, 6, 1, 2);
+    mainLayout->addWidget(lockIzeArrayCheckBox, 3, 8, 1, 2);
+    mainLayout->addWidget(levelLineEdit, 4, 6, 1, 2);
+    mainLayout->addWidget(jumpLevelButton, 4, 8, 1, 2);
 
     for (int i = 0; i < mainLayout->rowCount(); i++)
         mainLayout->setRowStretch(i, 1);
@@ -2618,7 +2618,7 @@ void ScenePage::TranslateUI()
     putCoinButton->setText(tr("Coin"));
     putLadderButton->setText(tr("Ladder"));
     autoLadderButton->setText(tr("Ladder Pumpkin"));
-    imitaterPumpkinCheckBox->setText(tr("Imitater Pumpkin Only"));
+    imitaterPumpkinCheckBox->setText(tr("Imitater Only"));
 
     blockTypeLabel->setText(tr("Block Type"));
     // SET_COMBO_TEXT(blockTypeCombo, List::Get().blockTypeList, 3);
@@ -2958,7 +2958,7 @@ void LineupPage::TranslateUI()
     quickLineupModeCheckBox->setText(tr("Quick Lineup Mode"));
     quickPassButton->setText(tr("Quick Pass"));
     mixModeToSurvivalEndlessButton->setText(tr("Mix Mode To Survival Endless"));
-    hiddenSceneLabel->setText(tr("<style>a {text-decoration: none}</style><a href='https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/'>Hidden Scene</a>"));
+    hiddenSceneLabel->setText(tr("<style>a {text-decoration: none}</style><a href='https://pvz.lmintlcx.com/goto/hiddenscene/'>Hidden Scene</a>"));
 
     quickLineupModeCheckBox->setStatusTip(tr("Turn on a series of features that are convenient for manual lineup."));
     quickPassButton->setStatusTip(tr("Kill all zombies and end current level directly with 8000 sunshine and 2020 flags."));
@@ -3409,7 +3409,7 @@ void LineupPage::UpdateLineupString()
 
     QNetworkAccessManager manager;
     QNetworkRequest request;
-    request.setUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/lineup_string.json"));
+    request.setUrl(QUrl("https://pvz.lmintlcx.com/files/lineup_string.json"));
     request.setRawHeader("User-Agent", PRODUCT_NAME "/" VERSION_NAME " "
                                                     "(" COMPANY_NAME ")");
     request.setRawHeader("Accept-Encoding", "gzip");

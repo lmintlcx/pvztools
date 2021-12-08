@@ -39,15 +39,15 @@
 // 以及 Visual Studio 不支持 x64 内联汇编
 static_assert(sizeof(void *) == 4);
 
-// 要求编译器支持 C++17
+// 要求编译器支持 C++20
 #ifdef _MSC_VER
-static_assert(_MSC_VER >= 1914);
+static_assert(_MSC_VER >= 1929);
 #endif
 #ifdef __MINGW32__
-static_assert(__GNUC__ >= 7);
+static_assert(__GNUC__ >= 11);
 #endif
 #ifdef __clang__
-static_assert(__clang_major__ >= 6);
+static_assert(__clang_major__ >= 13);
 #endif
 
 using Pt::Application;

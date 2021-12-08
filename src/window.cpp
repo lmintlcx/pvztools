@@ -500,7 +500,7 @@ void MainWindow::CreateActions()
 
     connect(videoDemoAction, &QAction::triggered,
             this, [=]()
-            { QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/pvztoolsdemo/")); });
+            { QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/goto/pvztoolsdemo/")); });
 
     connect(visitWebsiteAction, &QAction::triggered,
             this, [=]()
@@ -508,14 +508,14 @@ void MainWindow::CreateActions()
 
     connect(changeLogAction, &QAction::triggered,
             this, [=]()
-            { QDesktopServices::openUrl(QUrl("https://github.com/lmintlcx/PvZTools/blob/master/CHANGELOG.md")); });
+            { QDesktopServices::openUrl(QUrl("https://github.com/lmintlcx/pvztools/blob/master/CHANGELOG.md")); });
 
     connect(checkUpdateAction, &QAction::triggered,
             this, [=]()
             {
                 QNetworkAccessManager manager;
                 QNetworkRequest request;
-                request.setUrl(QUrl("https://pvz.lmintlcx.com/getpvztools/version.txt"));
+                request.setUrl(QUrl("https://pvz.lmintlcx.com/files/pvztools_version.txt"));
                 request.setRawHeader("User-Agent", PRODUCT_NAME "/" VERSION_NAME " "
                                                                 "(" COMPANY_NAME ")");
                 // request.setRawHeader("Accept-Encoding", "deflate"); // no gzip

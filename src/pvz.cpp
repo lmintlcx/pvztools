@@ -282,10 +282,10 @@ void PvZ::GetGoldSunflowerTrophy()
         if (adventure_playthrough == 0 && GameUI() == 1)
         {
             asm_init();
-            asm_mov_exx_dword_ptr(Reg::ESI, 0x6a9ec0);
-            asm_call(0x0044faf0);
+            asm_push(1); // 显示 Loading
             asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
-            asm_call(0x0044f8e0);
+            asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x770);
+            asm_call(0x0044a320);
             asm_ret();
             asm_code_inject();
         }
@@ -316,7 +316,6 @@ void PvZ::GetAllShopItems()
         WriteMemory<int>(4, 0x6a9ec0, 0x82c, 0x214); // 10 seed slots
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x218); // Pool Cleaner
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x21c); // Roof Cleaner
-        WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x220); // Garden Rake (left)
 
         WriteMemory<int>(0, 0x6a9ec0, 0x82c, 0x1e8);        // Marigold Sprout #1
         WriteMemory<int>(0, 0x6a9ec0, 0x82c, 0x1ec);        // Marigold Sprout #2
@@ -333,11 +332,11 @@ void PvZ::GetAllShopItems()
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x224);        // Aquarium Garden
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x22c);        // Tree of Wisdom
         if (ReadMemory<int>(0x6a9ec0, 0x82c, 0x230) == 0)   //
-            WriteMemory<int>(1020, 0x6a9ec0, 0x82c, 0x230); // Tree Food 20->1020
+            WriteMemory<int>(1010, 0x6a9ec0, 0x82c, 0x230); // Tree Food 10->1010
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x20c);        // Wheel Barrow
         WriteMemory<int>(1, 0x6a9ec0, 0x82c, 0x210);        // Snail
         if (ReadMemory<int>(0x6a9ec0, 0x82c, 0x228) == 0)   //
-            WriteMemory<int>(1020, 0x6a9ec0, 0x82c, 0x228); // Chocolate 20->1020
+            WriteMemory<int>(1010, 0x6a9ec0, 0x82c, 0x228); // Chocolate 10->1010
 
         emit ShowMessageStatusBar(tr("Already get all shop items."));
     }
@@ -386,10 +385,10 @@ void PvZ::UnlockAllMode(bool on)
         if (GameUI() == 1)
         {
             asm_init();
-            asm_mov_exx_dword_ptr(Reg::ESI, 0x6a9ec0);
-            asm_call(0x0044faf0);
+            asm_push(1); // 显示 Loading
             asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
-            asm_call(0x0044f8e0);
+            asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x770);
+            asm_call(0x0044a320);
             asm_ret();
             asm_code_inject();
         }
@@ -1660,7 +1659,7 @@ void PvZ::TopSlots(bool on)
     if (!GameOn())
         return;
 
-    WriteMemory<int>(on ? 500001 : 100001, 0x416dbe);
+    WriteMemory<int>(on ? 699999 : 100001, 0x416dbe);
 }
 
 void PvZ::HideSlots(bool on)
@@ -1962,8 +1961,15 @@ int PvZ::GetScene()
 
 void PvZ::SetScene(int scene)
 {
+    if (scene < 0 || scene > 9)
+        return;
+
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
+        auto has_lawn_mower = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x110) > 0;
+        if (has_lawn_mower)
+            ClearLawnMowers();
+
         asm_init();
         asm_mov_exx_dword_ptr(Reg::ESI, 0x6a9ec0);
         asm_mov_exx_dword_ptr_exx_add(Reg::ESI, 0x768);
@@ -2030,33 +2036,52 @@ void PvZ::SetScene(int scene)
             break;
         }
 
+        if (has_lawn_mower)
+            ResetLawnMowers();
+
         // 泳池和雾夜仍然保留水波光
-        if (scene == 2 || scene == 3)
-            return;
-
-        asm_init();
-        auto particle_system_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x0);
-        auto particle_system_count_max = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x4);
-        for (size_t i = 0; i < particle_system_count_max; i++)
+        if (scene != 2 && scene != 3)
         {
-            auto particle_system_type = ReadMemory<int>(particle_system_offset + 0x00 + 0x2c * i);
-            auto particle_system_dead = ReadMemory<bool>(particle_system_offset + 0x1c + 0x2c * i);
-            if (!particle_system_dead && particle_system_type == 34)
+            asm_init();
+            auto particle_system_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x0);
+            auto particle_system_count_max = ReadMemory<uintptr_t>(0x6a9ec0, 0x820, 0x0, 0x4);
+            for (size_t i = 0; i < particle_system_count_max; i++)
             {
-                uintptr_t addr = particle_system_offset + 0x2c * i;
-                asm_push(addr);
-                asm_call(0x005160c0);
+                auto particle_system_type = ReadMemory<int>(particle_system_offset + 0x00 + 0x2c * i);
+                auto particle_system_dead = ReadMemory<bool>(particle_system_offset + 0x1c + 0x2c * i);
+                if (!particle_system_dead && particle_system_type == 34)
+                {
+                    uintptr_t addr = particle_system_offset + 0x2c * i;
+                    asm_push(addr);
+                    asm_call(0x005160c0);
+                }
             }
-        }
-        asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
-        asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
-        asm_add_list({0xc7, 0x80}); // mov [eax+00005620],00000000
-        asm_add_dword(0x5620);      //
-        asm_add_dword(0);           //
-        asm_ret();
-        asm_code_inject();
+            asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
+            asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
+            asm_add_list({0xc7, 0x80}); // mov [eax+00005620],00000000
+            asm_add_dword(0x5620);      //
+            asm_add_dword(0);           //
+            asm_ret();
+            asm_code_inject();
 
-        assert(ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x5620) == 0);
+            assert(ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x5620) == 0);
+        }
+
+        int music_id = scene + 1;
+        if (music_id == 6)
+            music_id = 2;
+        else if (music_id > 6)
+            music_id = 8;
+        SetMusic(music_id);
+
+        // asm_init();
+        // asm_mov_exx_dword_ptr(Reg::EDI, 0x6a9ec0);
+        // asm_mov_exx_dword_ptr_exx_add(Reg::EDI, 0x768);
+        // asm_mov_exx_dword_ptr_exx_add(Reg::EDI, 0x160);
+        // asm_add_list({0xff, 0x8f, 0x6c, 0x00, 0x00, 0x00}); // dec [edi+0000006c]
+        // asm_call(0x00429e50);
+        // asm_ret();
+        // asm_code_inject();
 
 #ifdef _DEBUG
         auto row_type = ReadMemory<int, 6>(0x6a9ec0, 0x768, 0x5d8);
@@ -2680,7 +2705,7 @@ void PvZ::QuickPass()
 
     Sleep(frame_time * 10);
     WriteMemory<int>(8000, 0x6a9ec0, 0x768, 0x5560);
-    WriteMemory<int>(1009, 0x6a9ec0, 0x768, 0x160, 0x6c);
+    WriteMemory<int>(1010, 0x6a9ec0, 0x768, 0x160, 0x6c);
 }
 
 void PvZ::ClearAllGraves()
@@ -2885,19 +2910,11 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
             break;
         }
 
-        ClearItems({1, 3, 11}); // Grave Ladder Rake
+        ClearItems({1, 2, 3, 11});
         ClearAllPlants();
-        auto has_lawn_mower = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x110) > 0;
-        if (has_lawn_mower)
-            ClearLawnMowers();
 
-        SetScene(game_scene);
-        int music_id = game_scene + 1;
-        if (music_id == 6)
-            music_id = 2;
-        SetMusic(music_id);
-        if (has_lawn_mower)
-            ResetLawnMowers();
+        if (GetScene() != game_scene)
+            SetScene(game_scene);
 
         for (size_t i = 0; i < count; i++)
         {
@@ -2980,7 +2997,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                             0xc1, 0xe3, 0x05,                   // shl ebx,05
                             0x03, 0x1a                          // add ebx,[edx]
                         );
-                        if (item_state_col == 1) // damage piont 1 : 300
+                        if (item_state_col == 1 || item_state_col == 2) // damage piont 1 : 300
                         {
                             asm_add_list(0xa1, 0x6b, 0xec, 0x45, 0x00); // mov eax,[0045EC6B]
                             asm_add_list(0x89, 0x46, 0x40);             // mov [esi+40],eax
@@ -2988,7 +3005,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                             asm_push(0x00668ce0);                       // push 00668CE0
                             asm_call(0x004739e0);                       // call 004739E0
                         }
-                        else // if (item_state_col == 2) // damage piont 2 : 150
+                        if (item_state_col == 2) // damage piont 2 : 150
                         {
                             asm_add_list(0xa1, 0x80, 0xec, 0x45, 0x00); // mov eax,[0045EC80]
                             asm_add_list(0x89, 0x46, 0x40);             // mov [esi+40],eax
@@ -3099,6 +3116,7 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
 
     if (!GameOn())
         return;
+
     int ui = GameUI();
     if (ui != 2 && ui != 3)
         return;
@@ -3118,19 +3136,11 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
         return;
     }
 
-    ClearItems({1, 3, 11});
+    ClearItems({1, 2, 3, 11});
     ClearAllPlants();
-    auto has_lawn_mower = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x110) > 0;
-    if (has_lawn_mower)
-        ClearLawnMowers();
 
-    SetScene(scene);
-    int music_id = scene + 1;
-    if (music_id == 6)
-        music_id = 2;
-    SetMusic(music_id);
-    if (has_lawn_mower)
-        ResetLawnMowers();
+    if (GetScene() != scene)
+        SetScene(scene);
 
     if (rake_row != 0)
     {
@@ -3496,7 +3506,7 @@ void PvZ::ChocolateUnlimited(bool on)
         {
             WriteMemory<byte>(0x00, 0x0051ec38);
             WriteMemory<byte>(0x00, 0x0051ecb8);
-            WriteMemory<int>(1020, 0x6a9ec0, 0x82c, 0x228);
+            WriteMemory<int>(1010, 0x6a9ec0, 0x82c, 0x228);
         }
         else
         {
@@ -3513,7 +3523,7 @@ void PvZ::TreeFoodUnlimited(bool on)
         if (on)
         {
             WriteMemory<byte>(0x00, 0x0042d463);
-            WriteMemory<int>(1020, 0x6a9ec0, 0x82c, 0x230);
+            WriteMemory<int>(1010, 0x6a9ec0, 0x82c, 0x230);
         }
         else
             WriteMemory<byte>(0xff, 0x0042d463);
@@ -3981,9 +3991,9 @@ void PvZ::DisableSaveData(bool on)
     if (GameOn())
     {
         if (on)
-            WriteMemory<byte>(0x70, 0x0054b267);
+            WriteMemory<byte>(0x2e, 0x00482149);
         else
-            WriteMemory<byte>(0x74, 0x0054b267);
+            WriteMemory<byte>(0x13, 0x00482149);
     }
 }
 
@@ -3992,9 +4002,9 @@ void PvZ::DisableDeleteData(bool on)
     if (GameOn())
     {
         if (on)
-            WriteMemory<byte>(0x2e, 0x00482149);
+            WriteMemory<byte>(0x70, 0x0054b267);
         else
-            WriteMemory<byte>(0x13, 0x00482149);
+            WriteMemory<byte>(0x74, 0x0054b267);
     }
 }
 

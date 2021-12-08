@@ -23,7 +23,7 @@ void Bot::OpenProcess()
     if (hwnd == nullptr)
     {
         if (!OpenByWindow(L"MainWindow", L"Plants vs. Zombies"))
-            OpenByWindow(L"MainWindow", L"植物大战僵尸汉化版");
+            OpenByWindow(L"MainWindow", nullptr);
     }
     else
     {

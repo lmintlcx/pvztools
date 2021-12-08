@@ -203,7 +203,7 @@
     <message>
         <location filename="../src/pages.cpp" line="225"/>
         <source>Get Gold Sunflower Trophy</source>
-        <translation>解锁金向日葵</translation>
+        <translation>解锁黄金向日葵奖杯</translation>
     </message>
     <message>
         <location filename="../src/pages.cpp" line="226"/>
@@ -306,8 +306,8 @@
     </message>
     <message>
         <location filename="../src/pages.cpp" line="2961"/>
-        <source>&lt;style&gt;a {text-decoration: none}&lt;/style&gt;&lt;a href=&apos;https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/&apos;&gt;Hidden Scene&lt;/a&gt;</source>
-        <translation>&lt;style&gt;a {text-decoration: none}&lt;/style&gt;&lt;a href=&apos;https://pvz.lmintlcx.com/pvztoolsdemo/hiddenscene/&apos;&gt;隐藏场地&lt;/a&gt;</translation>
+        <source>&lt;style&gt;a {text-decoration: none}&lt;/style&gt;&lt;a href=&apos;https://pvz.lmintlcx.com/goto/hiddenscene/&apos;&gt;Hidden Scene&lt;/a&gt;</source>
+        <translation>&lt;style&gt;a {text-decoration: none}&lt;/style&gt;&lt;a href=&apos;https://pvz.lmintlcx.com/goto/hiddenscene/&apos;&gt;隐藏场地&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/pages.cpp" line="2963"/>
@@ -2181,7 +2181,7 @@
 <context>
     <name>Pt::MainWindow</name>
     <message>
-        <location filename="../src/window.cpp" line="1531"/>
+        <location filename="../src/window.cpp" line="1539"/>
         <source>Plants vs. Zombies 1.0.0.1051 Toolset</source>
         <translation>植物大战僵尸 1.0.0.1051 辅助工具</translation>
     </message>
@@ -2195,13 +2195,13 @@
     </message>
     <message>
         <location filename="../src/window.cpp" line="210"/>
-        <location filename="../src/window.cpp" line="1698"/>
+        <location filename="../src/window.cpp" line="1706"/>
         <source>Better Choice</source>
         <translation>更好的选择</translation>
     </message>
     <message>
         <location filename="../src/window.cpp" line="211"/>
-        <location filename="../src/window.cpp" line="1699"/>
+        <location filename="../src/window.cpp" line="1707"/>
         <source>PvZ Tools only supports version 1.0.0.1051,
 yet PvZ Toolkit supports a dozen versions.
 
@@ -2267,187 +2267,187 @@ Do you want to download PvZ Toolkit now?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1611"/>
+        <location filename="../src/window.cpp" line="1619"/>
         <source>Open File</source>
         <translation>打开文件</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1612"/>
+        <location filename="../src/window.cpp" line="1620"/>
         <source>Open Folder</source>
         <translation>打开目录</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1613"/>
+        <location filename="../src/window.cpp" line="1621"/>
         <source>Restart</source>
         <translation>重启</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1614"/>
+        <location filename="../src/window.cpp" line="1622"/>
         <source>Exit</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1616"/>
+        <location filename="../src/window.cpp" line="1624"/>
         <source>Find Game Again</source>
         <translation>重新查找游戏</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1617"/>
+        <location filename="../src/window.cpp" line="1625"/>
         <source>Game Window Top Most</source>
         <translation>游戏窗口置顶</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1618"/>
+        <location filename="../src/window.cpp" line="1626"/>
         <source>Keep Selected Features</source>
         <translation>维持已选功能</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1633"/>
+        <location filename="../src/window.cpp" line="1641"/>
         <source>Spawning Counting</source>
         <translation>出怪数量统计</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1634"/>
+        <location filename="../src/window.cpp" line="1642"/>
         <source>Target Map Modify</source>
         <translation>目标地图修改</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1635"/>
+        <location filename="../src/window.cpp" line="1643"/>
         <source>Cannon Launcher</source>
         <translation>加农炮发射器</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1636"/>
+        <location filename="../src/window.cpp" line="1644"/>
         <source>Custom Portal</source>
         <translation>自定义传送门</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1637"/>
+        <location filename="../src/window.cpp" line="1645"/>
         <source>I, Zombie Endless</source>
         <translation>我是僵尸无尽</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1639"/>
+        <location filename="../src/window.cpp" line="1647"/>
         <source>Switch Spawn Layout</source>
         <translation>小王子出怪器布局</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1640"/>
+        <location filename="../src/window.cpp" line="1648"/>
         <source>Limit Spawn Species</source>
         <translation>限制出怪种类数</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1641"/>
+        <location filename="../src/window.cpp" line="1649"/>
         <source>Save Selected Species</source>
         <translation>保存已选出怪</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1642"/>
+        <location filename="../src/window.cpp" line="1650"/>
         <source>Mute</source>
         <translation>静音</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1643"/>
+        <location filename="../src/window.cpp" line="1651"/>
         <source>Font</source>
         <translation>字体</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1644"/>
+        <location filename="../src/window.cpp" line="1652"/>
         <source>Restore Default Setting</source>
         <translation>恢复默认设置</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1653"/>
+        <location filename="../src/window.cpp" line="1661"/>
         <source>Video Demo</source>
         <translation>视频演示</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1654"/>
+        <location filename="../src/window.cpp" line="1662"/>
         <source>Visit Website</source>
         <translation>访问网站</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1655"/>
+        <location filename="../src/window.cpp" line="1663"/>
         <source>Change Log</source>
         <translation>更新日志</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1656"/>
+        <location filename="../src/window.cpp" line="1664"/>
         <source>Check Update</source>
         <translation>检查更新</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1657"/>
+        <location filename="../src/window.cpp" line="1665"/>
         <source>About PvZ Tools</source>
         <translation>关于 PvZ Tools</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1658"/>
+        <location filename="../src/window.cpp" line="1666"/>
         <source>About Qt</source>
         <translation>关于 Qt</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1660"/>
+        <location filename="../src/window.cpp" line="1668"/>
         <source>&amp;File</source>
         <translation>文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1661"/>
+        <location filename="../src/window.cpp" line="1669"/>
         <source>&amp;Game</source>
         <translation>游戏(&amp;G)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1662"/>
+        <location filename="../src/window.cpp" line="1670"/>
         <source>&amp;Page</source>
         <translation>页面(&amp;P)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1663"/>
+        <location filename="../src/window.cpp" line="1671"/>
         <source>&amp;Setting</source>
         <translation>设置(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1664"/>
+        <location filename="../src/window.cpp" line="1672"/>
         <source>&amp;Language</source>
         <translation>语言(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1665"/>
+        <location filename="../src/window.cpp" line="1673"/>
         <source>&amp;Theme</source>
         <translation>主题(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1666"/>
+        <location filename="../src/window.cpp" line="1674"/>
         <source>&amp;Help</source>
         <translation>帮助(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1668"/>
+        <location filename="../src/window.cpp" line="1676"/>
         <source>Page</source>
         <translation>页面</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1675"/>
+        <location filename="../src/window.cpp" line="1683"/>
         <source>Game found successfully.</source>
         <translation>成功找到游戏。</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1695"/>
+        <location filename="../src/window.cpp" line="1703"/>
         <source>Unsupported game version. Try to use PvZ Toolkit instead.</source>
         <translation>不支持的游戏版本。试试使用 PvZ Toolkit 来代替。</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1708"/>
+        <location filename="../src/window.cpp" line="1716"/>
         <source>No game window was found. Run Plants vs. Zombies first.</source>
         <translation>未找到游戏窗口。先打开运行植物大战僵尸游戏。</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1713"/>
+        <location filename="../src/window.cpp" line="1721"/>
         <source>Error opening game process. Try run Pt as administrator.</source>
         <translation>打开游戏进程出错。建议用管理员权限运行修改器。</translation>
     </message>
     <message>
-        <location filename="../src/window.cpp" line="1789"/>
+        <location filename="../src/window.cpp" line="1797"/>
         <source>Message</source>
         <translation>信息</translation>
     </message>
@@ -2727,24 +2727,24 @@ Do you want to download PvZ Toolkit now?</source>
 <context>
     <name>Pt::PvZ</name>
     <message>
-        <location filename="../src/pvz.cpp" line="285"/>
+        <location filename="../src/pvz.cpp" line="293"/>
         <source>Already unlocked golden sunflower trophy.</source>
         <translation>已经解锁金向日葵奖杯。</translation>
     </message>
     <message>
-        <location filename="../src/pvz.cpp" line="334"/>
+        <location filename="../src/pvz.cpp" line="341"/>
         <source>Already get all shop items.</source>
         <translation>已经得到所有商店物品。</translation>
     </message>
     <message>
-        <location filename="../src/pvz.cpp" line="2834"/>
-        <location filename="../src/pvz.cpp" line="3103"/>
+        <location filename="../src/pvz.cpp" line="2867"/>
+        <location filename="../src/pvz.cpp" line="3129"/>
         <source>The current mode is not &apos;Survival: Endless&apos; or &apos;I, Zombie&apos;.</source>
         <translation>当前模式不是“生存无尽”或者“我是僵尸”。</translation>
     </message>
     <message>
-        <location filename="../src/pvz.cpp" line="2852"/>
-        <location filename="../src/pvz.cpp" line="3109"/>
+        <location filename="../src/pvz.cpp" line="2885"/>
+        <location filename="../src/pvz.cpp" line="3135"/>
         <source>The target lineup scene is inconsistent with the current scene.</source>
         <translation>目标阵型场地和当前场地不一致。</translation>
     </message>
@@ -2896,7 +2896,7 @@ Do you want to download PvZ Toolkit now?</source>
     </message>
     <message>
         <location filename="../src/pages.cpp" line="2621"/>
-        <source>Imitater Pumpkin Only</source>
+        <source>Imitater Only</source>
         <translation>仅白南瓜</translation>
     </message>
     <message>
