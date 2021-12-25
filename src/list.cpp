@@ -152,12 +152,12 @@ void List::Init()
         << tr("Dr. Zomboss's Revenge")      // 35
         << tr("Art Challenge Wall-nut")     // 36
         << tr("Sunny Day")                  // 37
-        << tr("Unsodded (FC)")              // 38
+        << tr("Unsodded")                   // 38
         << tr("Big Time")                   // 39
         << tr("Art Challenge Sunflower")    // 40
         << tr("Air Raid")                   // 41
         << tr("Ice Level")                  // 42
-        << tr("Zen Garden (FC)")            // 43
+        << tr("Zen Garden")                 // 43
         << tr("High Gravity")               // 44
         << tr("Grave Danger")               // 45
         << tr("Can You Dig It?")            // 46
@@ -478,11 +478,11 @@ void List::Init()
         << tr("Giant Wall-nut")
         << tr("Sprout")
         << tr("Reverse Repeater")
-        << tr("Nothing (FC)")       // 53
-        << tr("Shuffle plant (FC)") // 54
-        << tr("Refill crator (FC)") // 55
-        << tr("Sun (FC)")           // 56
-        << tr("Diamond (FC)")       // 57
+        << tr("Nothing")       // 53
+        << tr("Shuffle plant") // 54
+        << tr("Refill crator") // 55
+        << tr("Sun")           // 56
+        << tr("Diamond")       // 57
         << tr("Snorkel Zombie")
         << tr("Trophy")
         << tr("Zombie", "Zombie Zombie")
@@ -500,7 +500,7 @@ void List::Init()
         << tr("Dancing Zombie")
         << tr("Gargantuar")
         << tr("Imp")
-        << tr("<Missing> (FC)"); // 75
+        << tr("<Missing>"); // 75
 
     rowList
         << tr("All Rows")

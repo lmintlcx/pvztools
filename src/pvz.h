@@ -115,6 +115,8 @@ class PvZ : public QObject, public Process, public Code
     void UnlockAllMode(bool);
     void DirectWin();
     void MixMode(int, int);
+    void Capture();
+    void TodMode(bool);
     void ShowHiddenGames(bool);
     void LockIZE(bool, int);
     void JumpLevel(int);

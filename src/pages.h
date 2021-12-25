@@ -50,6 +50,8 @@ class LevelPage : public QWidget
     void UnlockAllMode(bool);
     void DirectWin();
     void MixMode(int, int);
+    void Capture();
+    void TodMode(bool);
     void ShowHiddenGames(bool);
     void LockIZE(bool, int);
     void JumpLevel(int);
@@ -71,6 +73,8 @@ class LevelPage : public QWidget
     QComboBox *puzzleCombo;
     QComboBox *survivalCombo;
     QPushButton *mixmodeButton;
+    QPushButton *captureButton;
+    QCheckBox *todModeCheckBox;
     QCheckBox *showHiddenGamesCheckBox;
     QComboBox *izeArrayCombo;
     QCheckBox *lockIzeArrayCheckBox;

@@ -504,11 +504,11 @@ void PAK::UnpackPAK(QString src, QString dst)
     int result = Unpack(src_file, dst_dir);
     if (result == UNPACK_SUCCESS)
     {
-        emit ShowMessageStatusBar(tr("Unpack pak Succeeded!"));
+        emit ShowMessageStatusBar(tr("Extract pak Succeeded!"));
     }
     else
     {
-        emit ShowMessageStatusBar(tr("Unpack pak Failed!"));
+        emit ShowMessageStatusBar(tr("Extract pak Failed!"));
     }
     emit UnpackFinished();
 }

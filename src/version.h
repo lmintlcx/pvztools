@@ -9,6 +9,8 @@
 #define TEST_VERSION       false
 // #define TEST_VERSION       true
 
+#define SIGNATURE_CHECK    false
+
 #define PRODUCT_ICON       "res\\logo.ico"
 // #define PRODUCT_ICON       "res\\logo_beta.ico"
 
@@ -22,9 +24,9 @@
 
 
 #define VERSION_MAJOR      2
-#define VERSION_MINOR      6
-#define VERSION_PATCH      1
-#define VERSION_BUILD      6837
+#define VERSION_MINOR      7
+#define VERSION_PATCH      0
+#define VERSION_BUILD      6954
 
 
 #define TOSTRING_(arg) #arg

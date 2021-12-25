@@ -1,7 +1,7 @@
 @echo off
 
 set QT_DIR=C:\Dev\Qt_5.15.2\msvc2019_x86\shared
-set OPENSSL_DIR=C:\Dev\OpenSSL_1.1.1l\msvc2019_x86\shared
+set OPENSSL_DIR=C:\Dev\OpenSSL_1.1.1m\msvc2019_x86\shared
 set ZLIB_DIR=C:\Dev\zlib_1.2.11\msvc2019_x86\shared
 
 set SRC_DIR=D:\repo\pvztools

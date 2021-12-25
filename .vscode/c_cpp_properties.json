@@ -10,7 +10,7 @@
                 "C:/Dev/Qt_5.15.2/msvc2019_x86/shared/include/QtGui",
                 "C:/Dev/Qt_5.15.2/msvc2019_x86/shared/include/QtWidgets",
                 "C:/Dev/Qt_5.15.2/msvc2019_x86/shared/include/QtNetwork",
-                "C:/Dev/OpenSSL_1.1.1l/msvc2019_x86/shared/include",
+                "C:/Dev/OpenSSL_1.1.1m/msvc2019_x86/shared/include",
                 "C:/Dev/zlib_1.2.11/msvc2019_x86/shared/include",
                 "${workspaceFolder}/**"
             ],

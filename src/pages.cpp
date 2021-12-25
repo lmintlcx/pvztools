@@ -95,6 +95,9 @@ LevelPage::LevelPage(QWidget *parent)
 
     mixmodeButton = new QPushButton(this);
 
+    captureButton = new QPushButton(this);
+
+    todModeCheckBox = new QCheckBox(this);
     showHiddenGamesCheckBox = new QCheckBox(this);
 
     izeArrayCombo = new QComboBox(this);
@@ -130,12 +133,14 @@ LevelPage::LevelPage(QWidget *parent)
     mainLayout->addWidget(miniGamesRadioButton, 2, 0, 1, 2);
     mainLayout->addWidget(puzzleRadioButton, 3, 0, 1, 2);
     mainLayout->addWidget(survivalRadioButton, 4, 0, 1, 2);
-    mainLayout->addWidget(adventureCombo, 1, 2, 1, 2);
+    mainLayout->addWidget(adventureCombo, 1, 2, 1, 4);
     mainLayout->addWidget(miniGamesCombo, 2, 2, 1, 4);
     mainLayout->addWidget(puzzleCombo, 3, 2, 1, 4);
     mainLayout->addWidget(survivalCombo, 4, 2, 1, 4);
     mainLayout->addWidget(mixmodeButton, 1, 8, 1, 2);
-    mainLayout->addWidget(showHiddenGamesCheckBox, 2, 6, 1, 4);
+    mainLayout->addWidget(captureButton, 2, 8, 1, 2);
+    mainLayout->addWidget(todModeCheckBox, 1, 6, 1, 2);
+    mainLayout->addWidget(showHiddenGamesCheckBox, 2, 6, 1, 2);
     mainLayout->addWidget(izeArrayCombo, 3, 6, 1, 2);
     mainLayout->addWidget(lockIzeArrayCheckBox, 3, 8, 1, 2);
     mainLayout->addWidget(levelLineEdit, 4, 6, 1, 2);
@@ -193,6 +198,12 @@ LevelPage::LevelPage(QWidget *parent)
                 emit MixMode(mode, level);
             });
 
+    connect(captureButton, &QPushButton::clicked,
+            this, &LevelPage::Capture);
+
+    connect(todModeCheckBox, &QCheckBox::clicked,
+            this, &LevelPage::TodMode);
+
     connect(showHiddenGamesCheckBox, &QCheckBox::clicked,
             this, &LevelPage::ShowHiddenGames);
 
@@ -225,7 +236,7 @@ void LevelPage::TranslateUI()
     getGoldSunflowerTrophyButton->setText(tr("Get Gold Sunflower Trophy"));
     getAllShopItemsButton->setText(tr("Get All Shop Items"));
     unlockAllModeCheckBox->setText(tr("Unlock All Mode Temporarily"));
-    directWinButton->setText(tr("Direct Win"));
+    directWinButton->setText(tr("Level Complete"));
 
     adventureRadioButton->setText(tr("Adventure"));
     miniGamesRadioButton->setText(tr("Mini-Games"));
@@ -239,10 +250,10 @@ void LevelPage::TranslateUI()
 
     if (adventureCombo->count() == 0)
         for (size_t i = 0; i < 50; i++)
-            adventureCombo->addItem(QString("[0]") + " " + List::Get().adventureList[i]);
+            adventureCombo->addItem(QString("[0]") + " " + tr("Adventure") + " " + List::Get().adventureList[i]);
     else
         for (size_t i = 0; i < 50; i++)
-            adventureCombo->setItemText(i, QString("[0]") + " " + List::Get().adventureList[i]);
+            adventureCombo->setItemText(i, QString("[0]") + " " + tr("Adventure") + " " + List::Get().adventureList[i]);
 
     if (miniGamesCombo->count() == 0)
         for (size_t i = 0; i < 35; i++)
@@ -265,14 +276,17 @@ void LevelPage::TranslateUI()
         for (size_t i = 0; i < 15; i++)
             survivalCombo->setItemText(i, QString("[") + QString::number(i + 1) + "]" + " " + List::Get().survivalList[i]);
 
-    mixmodeButton->setText(tr("Mix Mode"));
+    mixmodeButton->setText(tr("Modify Mode"));
 
-    showHiddenGamesCheckBox->setText(tr("Show Hidden Games"));
+    captureButton->setText(tr("Window Screenshot"));
+
+    todModeCheckBox->setText(tr("Tod Mode"));
+    showHiddenGamesCheckBox->setText(tr("Show Limbo Page"));
 
     SET_COMBO_TEXT(izeArrayCombo, List::Get().izeArrayList, 8);
     lockIzeArrayCheckBox->setText(tr("Lock IZE Array"));
 
-    jumpLevelButton->setText(tr("Jump Level"));
+    jumpLevelButton->setText(tr("Endless Rounds"));
 }
 
 void LevelPage::KeepSelectedFeatures()
@@ -600,10 +614,10 @@ void ResourcePage::TranslateUI()
 
     manyFallingSunCheckBox->setText(tr("Many Falling Sun"));
     noFallingSunCheckBox->setText(tr("No Falling Sun"));
-    autoCollectCheckBox->setText(tr("Auto Collect"));
-    zombieNoFallingCheckBox->setText(tr("Zombie No Falling"));
+    autoCollectCheckBox->setText(tr("Automatic Collected"));
+    zombieNoFallingCheckBox->setText(tr("Not Drop Loot"));
 
-    manyFallingSunCheckBox->setStatusTip(tr("This feature is available when \"Auto Collect\" is turned on."));
+    manyFallingSunCheckBox->setStatusTip(tr("This feature is available when \"Automatic Collected\" is turned on."));
 
     valueLabel->setText(tr("Value") + " x10");
     SET_COMBO_TEXT(valueCombo, List::Get().coinList, 6);
@@ -884,11 +898,11 @@ void PlantsPage::TranslateUI()
 
     plantInvincibleCheckBox->setText(tr("Plant Invincible"));
     plantWeakCheckBox->setText(tr("Plant Weak"));
-    lockKernelCheckBox->setText(tr("Lock Kernel"));
-    lockButterCheckBox->setText(tr("Lock Butter"));
+    lockKernelCheckBox->setText(tr("Always Kernel"));
+    lockButterCheckBox->setText(tr("Always Butter"));
 
     noCraterCheckBox->setText(tr("No Crater"));
-    mushroomsAwakeCheckBox->setText(tr("Mushrooms Awake"));
+    mushroomsAwakeCheckBox->setText(tr("Mushroom Awake"));
     strongBloverCheckBox->setText(tr("Strong Blover"));
     strongPeasCheckBox->setText(tr("Strong Peas"));
 
@@ -1224,8 +1238,8 @@ void ZombiesPage::TranslateUI()
     zombieInvincibleCheckBox->setText(tr("Zombie Invincible"));
     zombieWeakCheckBox->setText(tr("Zombie Weak"));
 
-    stopSpawningCheckBox->setText(tr("Stop Spawning"));
-    zombiesNoMoveCheckBox->setText(tr("Zombies No Move"));
+    stopSpawningCheckBox->setText(tr("Spawning Paused"));
+    zombiesNoMoveCheckBox->setText(tr("Stay In Place"));
 
     noIceSlowDownCheckBox->setText(tr("No Ice Slow Down"));
     noButterImmobilizeCheckBox->setText(tr("No Butter Immobilize"));
@@ -2201,7 +2215,7 @@ void SlotsPage::TranslateUI()
     topSlotsCheckBox->setText(tr("Top Slots"));
     hideSlotsCheckBox->setText(tr("Hide Slots"));
     showShovelCheckBox->setText(tr("Show Shovel"));
-    lockShovelCheckBox->setText(tr("Lock Shovel"));
+    lockShovelCheckBox->setText(tr("Shovel Continuously"));
 
     SET_COMBO_TEXT(slotsSlotCombo, List::Get().slotsIndexList, 10);
     // SET_COMBO_TEXT(slotsSeedCombo, List::Get().seedList, 76);
@@ -2218,10 +2232,10 @@ void SlotsPage::TranslateUI()
     hideSlotsSeedCheckBox->setText(tr("Hide"));
 
     ignoreSunCheckBox->setText(tr("Ignore Sun"));
-    slotsNoCdCheckBox->setText(tr("Seed No Cool Down"));
+    slotsNoCdCheckBox->setText(tr("Cancel Cool Down"));
     purpleSeedUnlimitedCheckBox->setText(tr("Purple Seed Unlimited"));
-    plantingFreelyCheckBox->setText(tr("Planting Freely"));
-    beltNoDelayCheckBox->setText(tr("Belt No Delay"));
+    plantingFreelyCheckBox->setText(tr("Placed Anywhere"));
+    beltNoDelayCheckBox->setText(tr("Seamless Conveyor Belt"));
     hideMenuButtonCheckBox->setText(tr("Hide Menu Button"));
 
     seedLabel->setText(tr("Seed"));
@@ -2425,8 +2439,8 @@ ScenePage::ScenePage(QWidget *parent)
     mainLayout->addWidget(clearLawnMowersButton, 4, 8, 1, 2);
     mainLayout->addWidget(resetLawnMowersButton, 4, 10, 1, 2);
     mainLayout->addWidget(musicLabel, 5, 0, 1, 2);
-    mainLayout->addWidget(musicCombo, 5, 2, 1, 3);
-    mainLayout->addWidget(musicButton, 5, 5, 1, 2);
+    mainLayout->addWidget(musicCombo, 5, 2, 1, 4);
+    mainLayout->addWidget(musicButton, 5, 6, 1, 2);
     mainLayout->addWidget(itemCombo, 5, 8, 1, 2);
     mainLayout->addWidget(clearItemButton, 5, 10, 1, 2);
 
@@ -2657,7 +2671,15 @@ void ScenePage::TranslateUI()
     resetLawnMowersButton->setText(tr("Reset Lawn Mowers"));
 
     musicLabel->setText(tr("Background Music"));
-    SET_COMBO_TEXT(musicCombo, List::Get().musicList, 12);
+
+    // SET_COMBO_TEXT(musicCombo, List::Get().musicList, 12);
+    if (musicCombo->count() == 0)
+        for (size_t i = 0; i < 12; i++)
+            musicCombo->addItem(QString("[") + QString::number(i + 1) + "]" + " " + List::Get().musicList[i]);
+    else
+        for (size_t i = 0; i < 12; i++)
+            musicCombo->setItemText(i, QString("[") + QString::number(i + 1) + "]" + " " + List::Get().musicList[i]);
+
     musicButton->setText(tr("Set"));
 
     SET_COMBO_TEXT(itemCombo, List::Get().itemList, 11);
@@ -2890,7 +2912,6 @@ LineupPage::LineupPage(QWidget *parent)
                 else
                 {
                     // 一边说着不要一边试着当成新字符串去布阵
-                    emit ShowMessageStatusBar(tr("Wrong string format!"));
                     std::string str = string.toStdString();
                     bool switch_scene = allowSwitchSceneCheckBox->isChecked();
 #ifdef _DEBUG
@@ -2955,9 +2976,9 @@ LineupPage::LineupPage(QWidget *parent)
 
 void LineupPage::TranslateUI()
 {
-    quickLineupModeCheckBox->setText(tr("Quick Lineup Mode"));
+    quickLineupModeCheckBox->setText(tr("Lineup Mode Shortcut"));
     quickPassButton->setText(tr("Quick Pass"));
-    mixModeToSurvivalEndlessButton->setText(tr("Mix Mode To Survival Endless"));
+    mixModeToSurvivalEndlessButton->setText(tr("Modify Mode To Survival Endless"));
     hiddenSceneLabel->setText(tr("<style>a {text-decoration: none}</style><a href='https://pvz.lmintlcx.com/goto/hiddenscene/'>Hidden Scene</a>"));
 
     quickLineupModeCheckBox->setStatusTip(tr("Turn on a series of features that are convenient for manual lineup."));
@@ -3260,13 +3281,6 @@ void LineupPage::RefreshLineupString()
     {
         auto GetWeight = [&](const QString &s)
         {
-            //    场地 1000000000000
-            // 2F 春哥 10000000000
-            // 2A 曾哥 100000000
-            // 1E 南瓜 1000000
-            // 10 睡莲 10000
-            // 21 花盆 100
-            // 30 梯子 1
             long long w = 0;
             QStringList items = s.split("|")[3].split(",");
             for (int i = 0; i < items.size(); i++)
@@ -3277,22 +3291,22 @@ void LineupPage::RefreshLineupString()
                     switch (scene)
                     {
                     case 0: // pool
-                        w += 2 * 1000000000000;
+                        w += 2 * 10000000000000000;
                         break;
                     case 1: // fog
-                        w += 3 * 1000000000000;
+                        w += 3 * 10000000000000000;
                         break;
                     case 2: // day
-                        w += 0 * 1000000000000;
+                        w += 0 * 10000000000000000;
                         break;
                     case 3: // night
-                        w += 1 * 1000000000000;
+                        w += 1 * 10000000000000000;
                         break;
                     case 4: // roof
-                        w += 4 * 1000000000000;
+                        w += 4 * 10000000000000000;
                         break;
                     case 5: // moon
-                        w += 5 * 1000000000000;
+                        w += 5 * 10000000000000000;
                         break;
                     default:
                         break;
@@ -3301,18 +3315,22 @@ void LineupPage::RefreshLineupString()
                 else
                 {
                     QString plant = items[i].split(" ")[0];
-                    if (plant == "2F") // Cob Cannon
-                        w += 10000000000;
-                    else if (plant == "2A") // Gloom-shroom
-                        w += 100000000;
+                    if (plant == "2F")
+                        w += 100000000000000; // 春哥
+                    else if (plant == "2A")
+                        w += 1000000000000; // 曾哥
+                    else if (plant == "29")
+                        w += 10000000000; // 双子
+                    else if (plant == "2C")
+                        w += 100000000; // 冰瓜
                     else if (plant == "1E")
-                        w += 1000000;
+                        w += 1000000; // 南瓜
                     else if (plant == "10")
-                        w += 10000;
+                        w += 10000; // 睡莲
                     else if (plant == "21")
-                        w += 100;
+                        w += 100; // 花盆
                     else if (plant == "30")
-                        w += 1;
+                        w += 1; // 梯子
                 }
             }
             return w;
@@ -3346,7 +3364,7 @@ void LineupPage::RefreshLineupString()
     endlessBuildCombo->blockSignals(false); // hack
 
     if (lastSelectedBuildName.isEmpty())
-        lastSelectedBuildName = QString("[PE].经典八炮");
+        lastSelectedBuildName = QString("[PE] 经典八炮");
     int index = endlessBuildNameList.indexOf(lastSelectedBuildName);
     // qDebug() << index << lastSelectedBuildName;
     if (index != -1)
@@ -3514,22 +3532,22 @@ void LineupPage::SaveLineupString()
     switch (scene)
     {
     case 0: // pool
-        name_header = "[PE].";
+        name_header = "[PE] ";
         break;
     case 1: // fog
-        name_header = "[FE].";
+        name_header = "[FE] ";
         break;
     case 2: // day
-        name_header = "[DE].";
+        name_header = "[DE] ";
         break;
     case 3: // night
-        name_header = "[NE].";
+        name_header = "[NE] ";
         break;
     case 4: // roof
-        name_header = "[RE].";
+        name_header = "[RE] ";
         break;
     case 5: // moon
-        name_header = "[ME].";
+        name_header = "[ME] ";
         break;
     default:
         break;
@@ -3835,7 +3853,7 @@ void GardenPage::TranslateUI()
     chocolateUnlimitedCheckBox->setText(tr("Chocolate Unlimited"));
     treeFoodUnlimitedCheckBox->setText(tr("Tree Food Unlimited"));
 
-    treeHeightLabel->setText(tr("Tree Height"));
+    treeHeightLabel->setText(tr("Wisdom Tree Height"));
     treeHeightButton->setText(tr("Set"));
 
     clearButton->setText(tr("Clear"));
@@ -4500,9 +4518,9 @@ void EffectPage::TranslateUI()
     SET_COMBO_TEXT(iceTrailCombo, List::Get().rowList, 7);
     iceTrailButton->setText(tr("Set"));
 
-    fullFogCheckBox->setText(tr("Full Fog"));
-    noFogCheckBox->setText(tr("No Fog"));
-    seeVaseCheckBox->setText(tr("See Vase"));
+    fullFogCheckBox->setText(tr("Fullscreen Fog"));
+    noFogCheckBox->setText(tr("Clear Fog"));
+    seeVaseCheckBox->setText(tr("Transparent Vase"));
     ignoreSlopeCheckBox->setText(tr("Ignore Slope"));
 }
 
@@ -4723,13 +4741,13 @@ OthersPage::OthersPage(QWidget *parent)
 
 void OthersPage::TranslateUI()
 {
-    disableSaveDataCheckBox->setText(tr("Disable Save Data"));
-    disableDeleteDataCheckBox->setText(tr("Disable Delete Data"));
+    disableSaveDataCheckBox->setText(tr("Disable Save Userdata"));
+    disableDeleteDataCheckBox->setText(tr("Disable Delete Userdata"));
 
-    runningInBackgroundCheckBox->setText(tr("Running In Background"));
+    runningInBackgroundCheckBox->setText(tr("Background Running"));
     disablePauseCheckBox->setText(tr("Disable Pause"));
 
-    openDataDirButton->setText(tr("Open Data Dir"));
+    openDataDirButton->setText(tr("Open Userdata Folder"));
 
     debugModeLabel->setText(tr("Debug Mode"));
     SET_COMBO_TEXT(debugModeCombo, List::Get().debugModeList, 5);
@@ -4738,10 +4756,10 @@ void OthersPage::TranslateUI()
     frameDurationLabel->setText(tr("Frame Duration") + " (ms)");
     frameDurationButton->setText(tr("Set"));
 
-    openPakFileButton->setText(tr("Open File"));
-    unpackPakButton->setText(tr("Unpack"));
+    openPakFileButton->setText(tr("Choose File"));
+    unpackPakButton->setText(tr("Extract"));
 
-    openPakFolderButton->setText(tr("Open Folder"));
+    openPakFolderButton->setText(tr("Choose Folder"));
     packPakButton->setText(tr("Pack"));
 
     targetMapButton->setText(tr("Target Map Modify"));
@@ -4754,7 +4772,7 @@ void OthersPage::GetFileName()
 {
     QString file_name = QFileDialog::getOpenFileName(
         this,
-        tr("Open File"),
+        tr("Choose File"),
         ".",
         tr("PAK files (*.pak) ;; All files (*.*)"));
     if (!file_name.isNull())
@@ -4768,7 +4786,7 @@ void OthersPage::GetFolderName()
 {
     QString dir_name = QFileDialog::getExistingDirectory(
         this,
-        tr("Open Folder"),
+        tr("Choose Folder"),
         ".");
     if (!dir_name.isNull())
         pakPathLineEdit->setText(dir_name);

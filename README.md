@@ -7,7 +7,7 @@ Plants vs. Zombies 1.0.0.1051 Toolset.
 
 ## Screenshots
 
-![](https://github.com/lmintlcx/pvztools/raw/master/screenshots/pvztools_preview.webp)
+![](https://github.com/lmintlcx/pvztools/raw/master/screenshots/pvztools_preview.gif)
 
 ## Download
 
@@ -15,7 +15,7 @@ Plants vs. Zombies 1.0.0.1051 Toolset.
 
 Supported operating systems:
 
-- Windows 7 / 8.x / 10 / 11  (x86 / WoW64)
+- Windows 7 SP1 +  (x86 / WoW64)
 
 Supported game version:
 

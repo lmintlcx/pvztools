@@ -139,15 +139,7 @@ void PvZ::FindPvZ()
                 result = Result::WrongVersion;
         else
             result = Result::OpenError;
-    else if (OpenByWindow(L"MainWindow", L"植物大战僵尸中文版")                       //
-             || OpenByWindow(L"MainWindow", L"植物大战僵尸汉化版")                    //
-             || OpenByWindow(L"MainWindow", L"Plants vs. Zombies 1.2.0.1073")         //
-             || OpenByWindow(L"MainWindow", L"Plants vs. Zombies 1.2.0.1073 RELEASE") //
-             || OpenByWindow(L"MainWindow", L"Plants vs. Zombies GOTY")               //
-             || OpenByWindow(L"MainWindow", L"Pflanzen gegen Zombies 1.2.0.1093")     //
-             || OpenByWindow(L"MainWindow", L"Plantas contra Zombis 1.2.0.1093")      //
-             || OpenByWindow(L"MainWindow", L"Plantes contre Zombies 1.2.0.1093")     //
-             || OpenByWindow(L"MainWindow", L"Piante contro zombi 1.2.0.1093"))       //
+    else if (OpenByWindow(L"MainWindow", nullptr))
         if (IsValid())
             if (ReadMemory<unsigned int>(0x004140c5) == 0x0019b337)
                 result = Result::OK;
@@ -161,7 +153,7 @@ void PvZ::FindPvZ()
     if (result == Result::OK)
     {
         if (extra_code_addr != nullptr && ReadMemory<byte>((unsigned int)extra_code_addr) == 0xcc)
-            VirtualFreeEx(handle, extra_code_addr, 0, MEM_RELEASE);
+            VirtualFreeEx(handle, extra_code_addr, 4096, MEM_RELEASE);
 
         void *thread_addr = VirtualAllocEx(handle, nullptr, 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
         if (thread_addr != nullptr)
@@ -174,10 +166,9 @@ void PvZ::FindPvZ()
                 0xc7, 0x40, 0x10, 0x02, 0x00, 0x00, 0x00, // mov [eax+10],00000002
                 0xc7, 0x40, 0x14, 0x04, 0x00, 0x00, 0x00, // mov [eax+14],00000004
                 0xe9, 0x00, 0x00, 0x00, 0x00,             // jmp xxxxxxxx
-                0xcc,                                     // int 3
             };
-            (unsigned int &)extra_code[16] = 0x0042706f - ((unsigned int)thread_addr + 15) - 5;
-            WriteProcessMemory(handle, thread_addr, extra_code, 21, nullptr);
+            (int &)extra_code[16] = (0x00427065 + 10) - ((int)thread_addr + 16 + 4);
+            WriteProcessMemory(handle, thread_addr, extra_code, sizeof(extra_code), nullptr);
 
             byte portal_fix_code[] = {
                 // 0xc7, 0x40, 0x10, 0x02, 0x00, 0x00, 0x00, // mov [eax+10],00000002
@@ -185,8 +176,8 @@ void PvZ::FindPvZ()
                 0xe9, 0x00, 0x00, 0x00, 0x00, // jmp xxxxxxxx
                 0x90, 0x90, 0x90, 0x90, 0x90, //
             };
-            (unsigned int &)portal_fix_code[1] = ((unsigned int)thread_addr + 1) - 0x00427065 - 5;
-            WriteProcessMemory(handle, (void *)0x00427065, portal_fix_code, 10, nullptr);
+            (int &)portal_fix_code[1] = ((int)thread_addr + 1) - (0x00427065 + 1 + 4);
+            WriteProcessMemory(handle, (void *)0x00427065, portal_fix_code, sizeof(portal_fix_code), nullptr);
         }
     }
     else
@@ -282,7 +273,7 @@ void PvZ::GetGoldSunflowerTrophy()
         if (adventure_playthrough == 0 && GameUI() == 1)
         {
             asm_init();
-            asm_push(1); // 显示 Loading
+            asm_push_byte(1); // 显示 Loading
             asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
             asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x770);
             asm_call(0x0044a320);
@@ -385,7 +376,7 @@ void PvZ::UnlockAllMode(bool on)
         if (GameUI() == 1)
         {
             asm_init();
-            asm_push(1); // 显示 Loading
+            asm_push_byte(1); // 显示 Loading
             asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
             asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x770);
             asm_call(0x0044a320);
@@ -418,6 +409,61 @@ void PvZ::MixMode(int mode, int level)
             WriteMemory<int>(level, 0x6a9ec0, 0x768, 0x5550);
         }
         WriteMemory<int>(mode, 0x6a9ec0, 0x7f8);
+    }
+}
+
+void PvZ::Capture()
+{
+    if (!GameOn())
+        return;
+
+    RECT rcClient = {0, 0, 800, 600};
+    // if (GetClientRect(this->hwnd, &rcClient) == 0)
+    //     return;
+    int cx = rcClient.right - rcClient.left;
+    int cy = rcClient.bottom - rcClient.top;
+    // if (cx == 0 || cy == 0)
+    //     return;
+
+    HDC hdcWindow = nullptr;
+    HDC hdcMemDC = nullptr;
+    HBITMAP hbmScreen = nullptr;
+
+    hdcWindow = GetDC(this->hwnd);
+    if (!hdcWindow)
+        goto done;
+    hdcMemDC = CreateCompatibleDC(hdcWindow);
+    if (!hdcMemDC)
+        goto done;
+    hbmScreen = CreateCompatibleBitmap(hdcWindow, cx, cy);
+    if (!hbmScreen)
+        goto done;
+
+    SelectObject(hdcMemDC, hbmScreen);
+    if (BitBlt(hdcMemDC, 0, 0, cx, cy, hdcWindow, 0, 0, SRCCOPY) == 0)
+        goto done;
+
+    // 保存到剪贴板
+    if (OpenClipboard(nullptr) != 0)
+    {
+        EmptyClipboard();
+        SetClipboardData(CF_BITMAP, hbmScreen);
+        CloseClipboard();
+
+        emit ShowMessageStatusBar(tr("Screenshot has been copied to clipboard successfully."));
+    }
+
+done:
+    DeleteObject(hbmScreen);
+    DeleteObject(hdcMemDC);
+    ReleaseDC(this->hwnd, hdcWindow);
+}
+
+void PvZ::TodMode(bool on)
+{
+    if (GameOn())
+    {
+        WriteMemory<bool>(on, 0x6a9ec0, 0x7f5);
     }
 }
 
@@ -532,11 +578,11 @@ void PvZ::ZombieNoFalling(bool on)
     {
         if (on)
         {
-            WriteMemory(std::array<byte, 2>{0x90, 0xe9}, 0x0041d025);
+            WriteMemory<byte>(0x66, 0x00530276);
         }
         else
         {
-            WriteMemory(std::array<byte, 2>{0x0f, 0x8f}, 0x0041d025);
+            WriteMemory<byte>(0x5b, 0x00530276);
         }
     }
 }
@@ -784,7 +830,7 @@ void PvZ::MushroomsAwake(bool on)
                 {
                     uint32_t addr = plant_offset + 0x14c * i;
                     asm_mov_exx(Reg::EAX, addr);
-                    asm_push(0);
+                    asm_push_byte(0);
                     asm_call(0x0045e860);
                 }
             }
@@ -2052,7 +2098,7 @@ void PvZ::SetScene(int scene)
                 if (!particle_system_dead && particle_system_type == 34)
                 {
                     uintptr_t addr = particle_system_offset + 0x2c * i;
-                    asm_push(addr);
+                    asm_push_dword(addr);
                     asm_call(0x005160c0);
                 }
             }
@@ -2116,16 +2162,16 @@ void PvZ::asm_plant(int row, int col, int type, bool imitater, bool iz_style)
 {
     if (imitater)
     {
-        asm_push(type);
-        asm_push(48);
+        asm_push_dword(type);
+        asm_push_dword(48);
     }
     else
     {
-        asm_push(-1);
-        asm_push(type);
+        asm_push_dword(-1);
+        asm_push_dword(type);
     }
     asm_mov_exx(Reg::EAX, row);
-    asm_push(col);
+    asm_push_dword(col);
     asm_mov_exx_dword_ptr(Reg::EBP, 0x6a9ec0);
     asm_mov_exx_dword_ptr_exx_add(Reg::EBP, 0x768);
     asm_push_exx(Reg::EBP);
@@ -2142,21 +2188,21 @@ void PvZ::asm_plant(int row, int col, int type, bool imitater, bool iz_style)
         asm_add_list(0x69, 0xdb, 0x4c, 0x01, 0x00, 0x00); // imul ebx,ebx,0000014C
         asm_add_list(0x01, 0xd9);                         // add ecx,ebx
         asm_push_exx(Reg::ECX);
-        asm_add_list(0x8b, 0xf0); // mov esi,eax
+        asm_mov_exx_exx(Reg::ESI, Reg::EAX);
         asm_call(0x00466b80);
         asm_pop_exx(Reg::ECX);
-        asm_add_list(0x8b, 0xc1); // mov eax,ecx
+        asm_mov_exx_exx(Reg::EAX, Reg::ECX);
     }
 
     if (iz_style)
     {
-        asm_add_list(0x8b, 0xf0); // mov esi,eax
+        asm_mov_exx_exx(Reg::ESI, Reg::EAX);
         asm_push_exx(Reg::EAX);
         asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
         asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
         asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x160);
         asm_call(0x0042a530);
-        asm_add_list(0x8b, 0xc6); // mov eax,esi
+        asm_mov_exx_exx(Reg::EAX, Reg::ESI);
     }
 }
 
@@ -2189,8 +2235,8 @@ void PvZ::Plant(int row, int col, int type, bool imitater)
 
 void PvZ::asm_put_zombie(int row, int col, int type)
 {
-    asm_push(col);
-    asm_push(type);
+    asm_push_dword(col);
+    asm_push_dword(type);
     asm_mov_exx(Reg::EAX, row);
     asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
     asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x768);
@@ -2207,8 +2253,8 @@ void PvZ::PutZombie(int row, int col, int type)
             asm_init();
             asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
             asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
-            asm_push(0);
-            asm_push(25);
+            asm_push_dword(0);
+            asm_push_dword(25);
             asm_call(0x0040ddc0);
             asm_ret();
             asm_code_inject();
@@ -2348,10 +2394,10 @@ void PvZ::asm_put_coin(int row, int col, int type, int scene)
     }
     y -= 40;
 
-    asm_push(2); // 0 ~ 5
-    asm_push(type);
-    asm_push(y);
-    asm_push(x);
+    asm_push_dword(2); // 0 ~ 5
+    asm_push_dword(type);
+    asm_push_dword(y);
+    asm_push_dword(x);
     asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
     asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x768);
     asm_call(0x0040cb10);
@@ -2385,7 +2431,7 @@ void PvZ::PutCoin(int row, int col, int type)
 void PvZ::asm_put_ladder(int row, int col)
 {
     asm_mov_exx(Reg::EDI, row);
-    asm_push(col);
+    asm_push_dword(col);
     asm_mov_exx_dword_ptr(Reg::EAX, 0x6a9ec0);
     asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0x768);
     asm_call(0x00408f40);
@@ -2813,7 +2859,7 @@ void PvZ::ClearAllPlants()
             if (!plant_disappeared)
             {
                 uint32_t addr = plant_offset + 0x14c * i;
-                asm_push(addr);
+                asm_push_dword(addr);
                 asm_call(0x004679b0);
             }
         }
@@ -2949,7 +2995,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                     && may_sleep[item_type] && item_state_row == 1)
                 {
                     asm_push_exx(Reg::EAX);
-                    asm_push(0);
+                    asm_push_byte(0);
                     asm_call(0x0045e860);
                     asm_pop_exx(Reg::EAX);
                 }
@@ -3002,7 +3048,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                             asm_add_list(0xa1, 0x6b, 0xec, 0x45, 0x00); // mov eax,[0045EC6B]
                             asm_add_list(0x89, 0x46, 0x40);             // mov [esi+40],eax
                             asm_add_list(0x6a, 0xff);                   // push -01
-                            asm_push(0x00668ce0);                       // push 00668CE0
+                            asm_push_dword(0x00668ce0);                 // push 00668CE0
                             asm_call(0x004739e0);                       // call 004739E0
                         }
                         if (item_state_col == 2) // damage piont 2 : 150
@@ -3010,7 +3056,7 @@ void PvZ::SetLineup(std::string str, bool enable_switch_scene, bool keep_hp_stat
                             asm_add_list(0xa1, 0x80, 0xec, 0x45, 0x00); // mov eax,[0045EC80]
                             asm_add_list(0x89, 0x46, 0x40);             // mov [esi+40],eax
                             asm_add_list(0x6a, 0xff);                   // push -01
-                            asm_push(0x00668cec);                       // push 00668CEC
+                            asm_push_dword(0x00668cec);                 // push 00668CEC
                             asm_call(0x004739e0);                       // call 004739E0
                         }
                     }
@@ -3048,12 +3094,18 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
                               false, false, false, false, false, false, false, false,
                               false, false, true, false, false, false, false, false};
 
+#define ERR_FMT_RET                                            \
+    {                                                          \
+        emit ShowMessageStatusBar(tr("Wrong string format!")); \
+        return;                                                \
+    }
+
     if (!std::regex_match(lineup, std::regex("[a-zA-Z0-9+/=]{18,164}")))
-        return;
+        ERR_FMT_RET
     if (lineup.size() % 4 != 0)
-        return;
+        ERR_FMT_RET
     if (std::count(lineup.begin(), lineup.end(), '=') > 2)
-        return;
+        ERR_FMT_RET
 
     uint16_t items[6 * 9] = {0};
     uint8_t rake_row = 0, scene = 2;
@@ -3062,7 +3114,7 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
     unsigned char lineup_bin[128] = {0};
     BOOL ret_decode = CryptStringToBinaryA(lineup.c_str(), 0, CRYPT_STRING_BASE64, lineup_bin, &size, nullptr, nullptr);
     if (ret_decode == FALSE)
-        return;
+        ERR_FMT_RET
 
     for (size_t i = 0; i < size; i++)
         lineup_bin[i] = lineup_bin[i] ^ (unsigned char)0x54;
@@ -3070,18 +3122,18 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
     rake_row = lineup_bin[size - 1] >> 4;
     scene = lineup_bin[size - 1] & 0b00001111;
     if (scene >= 6)
-        return;
+        ERR_FMT_RET
     if (rake_row != 0 && rake_row > ((scene == 2 || scene == 3) ? 6 : 5))
-        return;
+        ERR_FMT_RET
     if ((scene == 2 || scene == 3) && (rake_row == 3 || rake_row == 4))
-        return;
+        ERR_FMT_RET
 
     unsigned long cut_size = 6 * 9 * sizeof(uint16_t);
     int ret_decomp = uncompress((unsigned char *)items, &cut_size, lineup_bin, size - 1);
     if (ret_decomp != Z_OK)
-        return;
+        ERR_FMT_RET
     if (cut_size != ((scene == 2 || scene == 3) ? 6 : 5) * 9 * sizeof(uint16_t))
-        return;
+        ERR_FMT_RET
 
     uint16_t plant[6 * 9] = {0};
     uint16_t plant_im[6 * 9] = {0};
@@ -3185,7 +3237,7 @@ void PvZ::SetLineup2(std::string lineup, bool enable_switch_scene)
                 && may_sleep[plant_type] && !plant_asleep)
             {
                 asm_push_exx(Reg::EAX);
-                asm_push(0);
+                asm_push_byte(0);
                 asm_call(0x0045e860);
                 asm_pop_exx(Reg::EAX);
             }
@@ -3605,10 +3657,30 @@ void PvZ::SetGardenPlants(std::vector<GardenPlant> plants)
         if (ReadMemory<uint32_t>(0x6a9ec0, 0x82c, 0x350) != count)
             WriteMemory<uint32_t>(count, 0x6a9ec0, 0x82c, 0x350);
 
-        Bot bot(this->hwnd);
-        if (GameUI() == 3)
-            for (size_t i = 0; i < 4; i++)
-                bot.Click(600, 30);
+        if (GameUI() == 3 && ReadMemory<uintptr_t>(0x6a9ec0, 0x320, 0x88, 0xc) == 0)
+        {
+            while (GameMode() == 43)
+            {
+                asm_init();
+                asm_mov_exx_dword_ptr(Reg::EDX, 0x6a9ec0);
+                asm_mov_exx_dword_ptr_exx_add(Reg::EDX, 0x81c);
+                asm_push_exx(Reg::EDX);
+                asm_call(0x00520d30);
+                asm_ret();
+                asm_code_inject();
+            }
+
+            if (GameMode() == 50)
+            {
+                asm_init();
+                asm_mov_exx_dword_ptr(Reg::ECX, 0x6a9ec0);
+                asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x768);
+                asm_mov_exx_dword_ptr_exx_add(Reg::ECX, 0x160);
+                asm_call(0x0042d830);
+                asm_ret();
+                asm_code_inject();
+            }
+        }
     }
 }
 
@@ -4159,8 +4231,8 @@ void PvZ::asm_launch_cannon(int index, int x, int y)
     asm_mov_exx_dword_ptr_exx_add(Reg::EAX, 0xac);
     asm_add_byte(0x05); // add eax,
     asm_add_dword(0x14c * index);
-    asm_push(y);
-    asm_push(x);
+    asm_push_dword(y);
+    asm_push_dword(x);
     asm_call(0x00466d50);
 }
 

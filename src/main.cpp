@@ -21,6 +21,7 @@
 #pragma comment(lib, "psapi.lib")
 #pragma comment(lib, "shlwapi.lib")
 #pragma comment(lib, "crypt32.lib")
+#pragma comment(lib, "wintrust.lib")
 
 #include <QSplashScreen>
 #include <QSettings>
@@ -84,6 +85,10 @@ int main(int argc, char *argv[])
     QString splash_filename = ":/res/logo.ico";
     if (QFileInfo::QFileInfo("splash.jpg").isFile())
         splash_filename = "splash.jpg";
+    else if (QFileInfo::QFileInfo("splash.png").isFile())
+        splash_filename = "splash.png";
+    else if (QFileInfo::QFileInfo("splash.bmp").isFile())
+        splash_filename = "splash.bmp";
     QImage image = QImage(splash_filename);
     if (TEST_VERSION)
         image = image.convertToFormat(QImage::Format_Grayscale8);

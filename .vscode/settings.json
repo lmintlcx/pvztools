@@ -143,6 +143,12 @@
         "qjsonarray": "cpp",
         "qtplugin": "cpp",
         "qregularexpression": "cpp",
-        "qstylefactory": "cpp"
+        "qstylefactory": "cpp",
+        "bit": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "coroutine": "cpp",
+        "format": "cpp",
+        "stop_token": "cpp"
     }
 }

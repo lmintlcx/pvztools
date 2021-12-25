@@ -739,6 +739,12 @@ void MainWindow::ConnectPages()
     connect(levelPage, &LevelPage::MixMode,
             pvz, &PvZ::MixMode);
 
+    connect(levelPage, &LevelPage::Capture,
+            pvz, &PvZ::Capture);
+
+    connect(levelPage, &LevelPage::TodMode,
+            pvz, &PvZ::TodMode);
+
     connect(levelPage, &LevelPage::ShowHiddenGames,
             pvz, &PvZ::ShowHiddenGames);
 
@@ -1616,8 +1622,8 @@ void MainWindow::SetScreenSize()
 
 void MainWindow::TranslateUI()
 {
-    openFileAction->setText(tr("Open File"));
-    openFolderAction->setText(tr("Open Folder"));
+    openFileAction->setText(tr("Choose File"));
+    openFolderAction->setText(tr("Choose Folder"));
     restartAction->setText(tr("Restart"));
     exitAction->setText(tr("Exit"));
 
