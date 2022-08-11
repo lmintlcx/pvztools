@@ -15,7 +15,7 @@ Plants vs. Zombies 1.0.0.1051 Toolset.
 
 Supported operating systems:
 
-- Windows 7 SP1 +  (x86 / WoW64)
+- Windows 7 SP1 + (x86 / WoW64)
 
 Supported game version:
 
@@ -31,7 +31,7 @@ Already tested and confirmed works with:
 
 | Qt      | OpenSSL | zlib      | Compiler  |
 | ------- | ------- | --------- | --------- |
-| 5.15.\* | 1.1.1\* | 1.2.11.\* | MSVC 2019 |
+| 5.15.\* | 1.1.1\* | 1.2.12.\* | MSVC 2019 |
 
 ## Credit
 

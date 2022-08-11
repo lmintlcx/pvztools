@@ -322,12 +322,12 @@ class SpawnDetailedPage : public QWidget
 
   signals:
     void SwitchToBriefPage();
-    void SetRandomSeed(int);
+    void SetRandomSeed(unsigned int);
     void InternalSpawn(std::array<bool, 33>, bool);
     void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>, int);
 
   public slots:
-    void ShowRandomSeed(int);
+    void ShowRandomSeed(unsigned int);
     void ShowGigaWaves(std::array<uint32_t, 1000>);
 
   private:
@@ -380,10 +380,10 @@ class SpawnPage : public QStackedWidget
     void InternalSpawn(std::array<bool, 33>, bool);
     void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>, int);
     void GetRandomSeed();
-    void SetRandomSeed(int);
+    void SetRandomSeed(unsigned int);
 
   public slots:
-    void ShowRandomSeed(int);
+    void ShowRandomSeed(unsigned int);
     void ShowGigaWaves(std::array<uint32_t, 1000>);
     void SwitchLayout(bool);
     void LimitSpawnCount(bool);

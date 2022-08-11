@@ -153,7 +153,7 @@ void PvZ::FindPvZ()
     if (result == Result::OK)
     {
         if (extra_code_addr != nullptr && ReadMemory<byte>((unsigned int)extra_code_addr) == 0xcc)
-            VirtualFreeEx(handle, extra_code_addr, 4096, MEM_RELEASE);
+            VirtualFreeEx(handle, extra_code_addr, 0, MEM_RELEASE);
 
         void *thread_addr = VirtualAllocEx(handle, nullptr, 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
         if (thread_addr != nullptr)
@@ -1662,23 +1662,23 @@ void PvZ::CustomizeSpawn(std::array<bool, 33> zombies, bool simulate, bool limit
 #endif
 }
 
-int PvZ::GetRandomSeed()
+unsigned int PvZ::GetRandomSeed()
 {
-    int random_seed = 0;
+    unsigned int random_seed = 0;
 
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
     {
-        random_seed = ReadMemory<int>(0x6a9ec0, 0x768, 0x561c);
+        random_seed = ReadMemory<unsigned int>(0x6a9ec0, 0x768, 0x561c);
         emit RandomSeed(random_seed);
     }
 
     return random_seed;
 }
 
-void PvZ::SetRandomSeed(int seed)
+void PvZ::SetRandomSeed(unsigned int seed)
 {
     if (GameOn() && (GameUI() == 2 || GameUI() == 3))
-        WriteMemory<int>(seed, 0x6a9ec0, 0x768, 0x561c);
+        WriteMemory<unsigned int>(seed, 0x6a9ec0, 0x768, 0x561c);
 }
 
 // Slots

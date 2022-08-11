@@ -1746,7 +1746,7 @@ SpawnDetailedPage::SpawnDetailedPage(QWidget *parent)
             this, [=]()
             {
                 bool ok;
-                int random_seed = randomSeedLineEdit->text().toInt(&ok, 16);
+                unsigned int random_seed = randomSeedLineEdit->text().toUInt(&ok, 16);
                 if (ok)
                 {
                     emit SetRandomSeed(random_seed);
@@ -1880,7 +1880,7 @@ void SpawnDetailedPage::ShowGigaWaves(std::array<uint32_t, 1000> zombies_list)
         waveCheckBox[i]->setChecked(giga_waves[i]);
 }
 
-void SpawnDetailedPage::ShowRandomSeed(int random_seed)
+void SpawnDetailedPage::ShowRandomSeed(unsigned int random_seed)
 {
     QString seed_text = QString("%1").arg(random_seed, 8, 16, QLatin1Char('0')).toUpper();
     randomSeedLineEdit->setText(seed_text);
@@ -1981,7 +1981,7 @@ void SpawnPage::SetDetailedZombies(std::array<bool, 33> zombies)
     detailedPage->SetZombies(zombies);
 }
 
-void SpawnPage::ShowRandomSeed(int random_seed)
+void SpawnPage::ShowRandomSeed(unsigned int random_seed)
 {
     detailedPage->ShowRandomSeed(random_seed);
 }
@@ -3427,6 +3427,7 @@ void LineupPage::UpdateLineupString()
 
     QNetworkAccessManager manager;
     QNetworkRequest request;
+    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
     request.setUrl(QUrl("https://pvz.lmintlcx.com/files/lineup_string.json"));
     request.setRawHeader("User-Agent", PRODUCT_NAME "/" VERSION_NAME " "
                                                     "(" COMPANY_NAME ")");

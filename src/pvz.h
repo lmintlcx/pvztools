@@ -178,8 +178,8 @@ class PvZ : public QObject, public Process, public Code
     std::array<uint32_t, 1000> GetSpawnList();
     void InternalSpawn(std::array<bool, 33>, bool);
     void CustomizeSpawn(std::array<bool, 33>, bool, bool, bool, bool, bool, std::array<bool, 20>, int);
-    int GetRandomSeed();
-    void SetRandomSeed(int);
+    unsigned int GetRandomSeed();
+    void SetRandomSeed(unsigned int);
     // Slots
     void SetSlotsCount(int);
     void TopSlots(bool);
@@ -300,7 +300,7 @@ class PvZ : public QObject, public Process, public Code
     void Damage(int);
     void HP(int);
     void Time(int);
-    void RandomSeed(int);
+    void RandomSeed(unsigned int);
     void SpawnList(std::array<uint32_t, 1000>);
     void SeedType(int);
     void SeedImitater(bool);

@@ -22,11 +22,11 @@ INCLUDEPATH += .
 
 # zlib
 contains(CONFIG, static) {
-  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.11\msvc2019_x86\static\include)
-  LIBS += -L$$quote(C:\Dev\zlib_1.2.11\msvc2019_x86\static\lib) -lzlib
+  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.12\msvc2019_x86\static\include)
+  LIBS += -L$$quote(C:\Dev\zlib_1.2.12\msvc2019_x86\static\lib) -lzlib
 } else {
-  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.11\msvc2019_x86\shared\include)
-  LIBS += -L$$quote(C:\Dev\zlib_1.2.11\msvc2019_x86\shared\lib) -lzdll
+  INCLUDEPATH += $$quote(C:\Dev\zlib_1.2.12\msvc2019_x86\shared\include)
+  LIBS += -L$$quote(C:\Dev\zlib_1.2.12\msvc2019_x86\shared\lib) -lzdll
 }
 
 win32-msvc*:PRECOMPILED_HEADER = src/stable.h
