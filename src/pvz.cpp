@@ -2632,7 +2632,7 @@ void PvZ::ClearItems(std::vector<int> indexs)
 
 void PvZ::StartLawnMowers()
 {
-    if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    if (GameOn() && GameUI() == 3)
     {
         auto lawn_mower_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x104);
         auto lawn_mower_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x100);
@@ -2654,7 +2654,7 @@ void PvZ::StartLawnMowers()
 
 void PvZ::ClearLawnMowers()
 {
-    if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    if (GameOn() && GameUI() == 3)
     {
         auto lawn_mower_count_max = ReadMemory<uint32_t>(0x6a9ec0, 0x768, 0x104);
         auto lawn_mower_offset = ReadMemory<uintptr_t>(0x6a9ec0, 0x768, 0x100);
@@ -2676,7 +2676,7 @@ void PvZ::ClearLawnMowers()
 
 void PvZ::ResetLawnMowers()
 {
-    if (GameOn() && (GameUI() == 2 || GameUI() == 3))
+    if (GameOn() && GameUI() == 3)
     {
         ClearLawnMowers();
 

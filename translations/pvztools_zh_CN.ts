@@ -4,65 +4,65 @@
 <context>
     <name>Pt::CannonLauncherPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="5390"/>
+        <location filename="../src/pages.cpp" line="5391"/>
         <source>Index</source>
         <translation>序号</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5391"/>
-        <location filename="../src/pages.cpp" line="5417"/>
+        <location filename="../src/pages.cpp" line="5392"/>
+        <location filename="../src/pages.cpp" line="5418"/>
         <source>Not Found</source>
         <translation>未找到</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5393"/>
+        <location filename="../src/pages.cpp" line="5394"/>
         <source>Grid</source>
         <translation>格子</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5394"/>
-        <location filename="../src/pages.cpp" line="5410"/>
+        <location filename="../src/pages.cpp" line="5395"/>
+        <location filename="../src/pages.cpp" line="5411"/>
         <source>Row</source>
         <translation>行</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5395"/>
-        <location filename="../src/pages.cpp" line="5411"/>
+        <location filename="../src/pages.cpp" line="5396"/>
+        <location filename="../src/pages.cpp" line="5412"/>
         <source>Column</source>
         <translation>列</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5397"/>
+        <location filename="../src/pages.cpp" line="5398"/>
         <source>Coordinate</source>
         <translation>坐标</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5398"/>
+        <location filename="../src/pages.cpp" line="5399"/>
         <source>Random Fall</source>
         <translation>随机落点</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5399"/>
+        <location filename="../src/pages.cpp" line="5400"/>
         <source>Launch All</source>
         <translation>发射全部</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5400"/>
+        <location filename="../src/pages.cpp" line="5401"/>
         <source>Launch</source>
         <translation>发射</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5402"/>
+        <location filename="../src/pages.cpp" line="5403"/>
         <source>Cannon Launcher</source>
         <translation>加农炮发射器</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5409"/>
+        <location filename="../src/pages.cpp" line="5410"/>
         <source>Cob Cannon</source>
         <translation>玉米加农炮</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5409"/>
+        <location filename="../src/pages.cpp" line="5410"/>
         <source>in</source>
         <translation>位于</translation>
     </message>
@@ -70,32 +70,32 @@
 <context>
     <name>Pt::EffectPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="4517"/>
+        <location filename="../src/pages.cpp" line="4518"/>
         <source>Ice Trail Coordinate</source>
         <translation>冰道坐标</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4519"/>
+        <location filename="../src/pages.cpp" line="4520"/>
         <source>Set</source>
         <translation>修改</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4521"/>
+        <location filename="../src/pages.cpp" line="4522"/>
         <source>Fullscreen Fog</source>
         <translation>全屏浓雾</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4522"/>
+        <location filename="../src/pages.cpp" line="4523"/>
         <source>Clear Fog</source>
         <translation>清除浓雾</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4523"/>
+        <location filename="../src/pages.cpp" line="4524"/>
         <source>Transparent Vase</source>
         <translation>罐子透视</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4524"/>
+        <location filename="../src/pages.cpp" line="4525"/>
         <source>Ignore Slope</source>
         <translation>无视斜坡</translation>
     </message>
@@ -103,68 +103,68 @@
 <context>
     <name>Pt::GardenPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="3851"/>
+        <location filename="../src/pages.cpp" line="3852"/>
         <source>Fertilizer Unlimited</source>
         <translation>花肥无限</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3852"/>
+        <location filename="../src/pages.cpp" line="3853"/>
         <source>Bug Spray Unlimited</source>
         <translation>杀虫剂无限</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3853"/>
+        <location filename="../src/pages.cpp" line="3854"/>
         <source>Chocolate Unlimited</source>
         <translation>巧克力无限</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3854"/>
+        <location filename="../src/pages.cpp" line="3855"/>
         <source>Tree Food Unlimited</source>
         <translation>树肥无限</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3856"/>
+        <location filename="../src/pages.cpp" line="3857"/>
         <source>Wisdom Tree Height</source>
         <translation>智慧树高度</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3857"/>
-        <location filename="../src/pages.cpp" line="3861"/>
+        <location filename="../src/pages.cpp" line="3858"/>
+        <location filename="../src/pages.cpp" line="3862"/>
         <source>Set</source>
         <translation>修改</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3859"/>
+        <location filename="../src/pages.cpp" line="3860"/>
         <source>Clear</source>
         <translation>清空</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3860"/>
+        <location filename="../src/pages.cpp" line="3861"/>
         <source>Load</source>
         <translation>加载</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3863"/>
+        <location filename="../src/pages.cpp" line="3864"/>
         <source>Scene</source>
         <translation>场地</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3864"/>
+        <location filename="../src/pages.cpp" line="3865"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3865"/>
+        <location filename="../src/pages.cpp" line="3866"/>
         <source>Direction</source>
         <translation>方向</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3866"/>
+        <location filename="../src/pages.cpp" line="3867"/>
         <source>Color</source>
         <translation>颜色</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3867"/>
+        <location filename="../src/pages.cpp" line="3868"/>
         <source>Status</source>
         <translation>状态</translation>
     </message>
@@ -172,28 +172,28 @@
 <context>
     <name>Pt::IzeLineupPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="5661"/>
-        <location filename="../src/pages.cpp" line="5667"/>
+        <location filename="../src/pages.cpp" line="5662"/>
+        <location filename="../src/pages.cpp" line="5668"/>
         <source>Empty</source>
         <translation>空</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5674"/>
+        <location filename="../src/pages.cpp" line="5675"/>
         <source>Load</source>
         <translation>加载</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5675"/>
+        <location filename="../src/pages.cpp" line="5676"/>
         <source>Clear</source>
         <translation>清空</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5676"/>
+        <location filename="../src/pages.cpp" line="5677"/>
         <source>Set</source>
         <translation>修改</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5678"/>
+        <location filename="../src/pages.cpp" line="5679"/>
         <source>I, Zombie Endless Lineup</source>
         <translation>我是僵尸无尽布阵</translation>
     </message>
@@ -276,12 +276,12 @@
 <context>
     <name>Pt::LineupPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="3591"/>
+        <location filename="../src/pages.cpp" line="3592"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3526"/>
+        <location filename="../src/pages.cpp" line="3527"/>
         <source>Wrong string format!</source>
         <translation>字符串格式错误！</translation>
     </message>
@@ -351,57 +351,57 @@
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3452"/>
+        <location filename="../src/pages.cpp" line="3453"/>
         <source>Unable to connect to network.</source>
         <translation>无法连接到网络。</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3476"/>
+        <location filename="../src/pages.cpp" line="3477"/>
         <source>Update failed, lineup string database parsing error.</source>
         <translation>更新失败，布阵字符串数据库解析出错。</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3495"/>
+        <location filename="../src/pages.cpp" line="3496"/>
         <source>Lineup string updated, version %1, total %2.</source>
         <translation>阵型字符串已更新，版本 %1，数量 %2。</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3499"/>
+        <location filename="../src/pages.cpp" line="3500"/>
         <source>Lineup already up to date, version %1, total %2.</source>
         <translation>阵型已是最新，版本 %1，数量 %2。</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3511"/>
+        <location filename="../src/pages.cpp" line="3512"/>
         <source>Error while connecting to update server.</source>
         <translation>连接到更新服务器时出错。</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3558"/>
+        <location filename="../src/pages.cpp" line="3559"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3559"/>
+        <location filename="../src/pages.cpp" line="3560"/>
         <source>Please input lineup name:</source>
         <translation>请输入阵型名称：</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3569"/>
+        <location filename="../src/pages.cpp" line="3570"/>
         <source>Save failed, name cannot contain character &quot;|&quot;.</source>
         <translation>保存失败，名称中不能包含“|”字符。</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3580"/>
+        <location filename="../src/pages.cpp" line="3581"/>
         <source>Lineup %1 already saved.</source>
         <translation>阵型 %1 已保存。</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3592"/>
+        <location filename="../src/pages.cpp" line="3593"/>
         <source>Are you sure you want to delete lineup %1?</source>
         <translation>确定要删除阵型 %1 吗？</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="3614"/>
+        <location filename="../src/pages.cpp" line="3615"/>
         <source>Lineup %1 already deleted.</source>
         <translation>阵型 %1 已删除。</translation>
     </message>
@@ -2206,7 +2206,7 @@ yet PvZ Toolkit supports a dozen versions.
 
 Do you want to download PvZ Toolkit now?</source>
         <translation>PvZ Tools 仅支持 1.0.0.1051。
-而 PvZ Toolkit 支持数十个版本。
+而 PvZ Toolkit 支持十多个版本。
 
 要现在下载 PvZ Toolkit 吗？</translation>
     </message>
@@ -2454,90 +2454,90 @@ Do you want to download PvZ Toolkit now?</source>
 <context>
     <name>Pt::OthersPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="4744"/>
+        <location filename="../src/pages.cpp" line="4745"/>
         <source>Disable Save Userdata</source>
         <translation>禁止存档</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4745"/>
+        <location filename="../src/pages.cpp" line="4746"/>
         <source>Disable Delete Userdata</source>
         <translation>禁止删档</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4747"/>
+        <location filename="../src/pages.cpp" line="4748"/>
         <source>Background Running</source>
         <translation>后台运行</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4748"/>
+        <location filename="../src/pages.cpp" line="4749"/>
         <source>Disable Pause</source>
         <translation>禁用暂停</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4750"/>
+        <location filename="../src/pages.cpp" line="4751"/>
         <source>Open Userdata Folder</source>
         <translation>打开存档目录</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4752"/>
+        <location filename="../src/pages.cpp" line="4753"/>
         <source>Debug Mode</source>
         <translation>调试模式</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4754"/>
-        <location filename="../src/pages.cpp" line="4757"/>
+        <location filename="../src/pages.cpp" line="4755"/>
+        <location filename="../src/pages.cpp" line="4758"/>
         <source>Set</source>
         <translation>修改</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4756"/>
+        <location filename="../src/pages.cpp" line="4757"/>
         <source>Frame Duration</source>
         <translation>帧间隔</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4759"/>
-        <location filename="../src/pages.cpp" line="4775"/>
+        <location filename="../src/pages.cpp" line="4760"/>
+        <location filename="../src/pages.cpp" line="4776"/>
         <source>Choose File</source>
         <translation>选择文件</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4760"/>
+        <location filename="../src/pages.cpp" line="4761"/>
         <source>Extract</source>
         <translation>解包</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4762"/>
-        <location filename="../src/pages.cpp" line="4789"/>
+        <location filename="../src/pages.cpp" line="4763"/>
+        <location filename="../src/pages.cpp" line="4790"/>
         <source>Choose Folder</source>
         <translation>选择目录</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4763"/>
+        <location filename="../src/pages.cpp" line="4764"/>
         <source>Pack</source>
         <translation>打包</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4765"/>
+        <location filename="../src/pages.cpp" line="4766"/>
         <source>Target Map Modify</source>
         <translation>目标地图修改</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4766"/>
+        <location filename="../src/pages.cpp" line="4767"/>
         <source>Cannon Launcher</source>
         <translation>加农炮发射器</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4767"/>
+        <location filename="../src/pages.cpp" line="4768"/>
         <source>Custom Portal</source>
         <translation>自定义传送门</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4768"/>
+        <location filename="../src/pages.cpp" line="4769"/>
         <source>I, Zombie Endless</source>
         <translation>我是僵尸无尽</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4777"/>
+        <location filename="../src/pages.cpp" line="4778"/>
         <source>PAK files (*.pak) ;; All files (*.*)</source>
         <translation>PAK 文件 (*.pak) ;; 所有文件 (*.*)</translation>
     </message>
@@ -2671,54 +2671,54 @@ Do you want to download PvZ Toolkit now?</source>
 <context>
     <name>Pt::PortalPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="5553"/>
-        <location filename="../src/pages.cpp" line="5555"/>
+        <location filename="../src/pages.cpp" line="5554"/>
+        <location filename="../src/pages.cpp" line="5556"/>
         <source>Row</source>
         <translation>行</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5554"/>
-        <location filename="../src/pages.cpp" line="5556"/>
+        <location filename="../src/pages.cpp" line="5555"/>
+        <location filename="../src/pages.cpp" line="5557"/>
         <source>Column</source>
         <translation>列</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5557"/>
+        <location filename="../src/pages.cpp" line="5558"/>
         <source>Black1</source>
         <translation>黑1</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5558"/>
+        <location filename="../src/pages.cpp" line="5559"/>
         <source>Black2</source>
         <translation>黑2</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5559"/>
+        <location filename="../src/pages.cpp" line="5560"/>
         <source>White1</source>
         <translation>白1</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5560"/>
+        <location filename="../src/pages.cpp" line="5561"/>
         <source>White2</source>
         <translation>白2</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5562"/>
+        <location filename="../src/pages.cpp" line="5563"/>
         <source>Start</source>
         <translation>启动</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5563"/>
+        <location filename="../src/pages.cpp" line="5564"/>
         <source>Lock</source>
         <translation>锁定</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5564"/>
+        <location filename="../src/pages.cpp" line="5565"/>
         <source>Set Portal</source>
         <translation>设置传送门</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5566"/>
+        <location filename="../src/pages.cpp" line="5567"/>
         <source>Portal</source>
         <translation>传送门</translation>
     </message>
@@ -3075,7 +3075,7 @@ Do you want to download PvZ Toolkit now?</source>
 <context>
     <name>Pt::SpawnCountPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="5092"/>
+        <location filename="../src/pages.cpp" line="5093"/>
         <source>Spawning Counting</source>
         <translation>出怪数量统计</translation>
     </message>
@@ -3201,72 +3201,72 @@ Do you want to download PvZ Toolkit now?</source>
 <context>
     <name>Pt::StatusPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="4970"/>
+        <location filename="../src/pages.cpp" line="4971"/>
         <source>Auto Refresh</source>
         <translation>自动刷新</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4972"/>
+        <location filename="../src/pages.cpp" line="4973"/>
         <source>Game Mode</source>
         <translation>游戏模式</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4973"/>
+        <location filename="../src/pages.cpp" line="4974"/>
         <source>Game UI</source>
         <translation>游戏界面</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4974"/>
+        <location filename="../src/pages.cpp" line="4975"/>
         <source>Running Time</source>
         <translation>进行时间</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4975"/>
+        <location filename="../src/pages.cpp" line="4976"/>
         <source>Level Completed</source>
         <translation>完成轮数</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4976"/>
+        <location filename="../src/pages.cpp" line="4977"/>
         <source>Total Waves</source>
         <translation>本轮总波数</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4977"/>
+        <location filename="../src/pages.cpp" line="4978"/>
         <source>Past Waves</source>
         <translation>已刷新波数</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4978"/>
+        <location filename="../src/pages.cpp" line="4979"/>
         <source>Total HP</source>
         <translation>本波总血量</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4979"/>
+        <location filename="../src/pages.cpp" line="4980"/>
         <source>Trigger HP</source>
         <translation>刷新触发血量</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4980"/>
+        <location filename="../src/pages.cpp" line="4981"/>
         <source>Count Down</source>
         <translation>刷新倒计时</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4981"/>
+        <location filename="../src/pages.cpp" line="4982"/>
         <source>Huge Wave Count Down</source>
         <translation>大波刷新倒计时</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4982"/>
+        <location filename="../src/pages.cpp" line="4983"/>
         <source>Plant Count</source>
         <translation>植物数量</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4983"/>
+        <location filename="../src/pages.cpp" line="4984"/>
         <source>Zombie Count</source>
         <translation>僵尸数量</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4994"/>
+        <location filename="../src/pages.cpp" line="4995"/>
         <source>Adventure</source>
         <translation>冒险模式</translation>
     </message>
@@ -3274,28 +3274,28 @@ Do you want to download PvZ Toolkit now?</source>
 <context>
     <name>Pt::TargetMapPage</name>
     <message>
-        <location filename="../src/pages.cpp" line="5258"/>
-        <location filename="../src/pages.cpp" line="5264"/>
+        <location filename="../src/pages.cpp" line="5259"/>
+        <location filename="../src/pages.cpp" line="5265"/>
         <source>Empty</source>
         <translation>空</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5275"/>
+        <location filename="../src/pages.cpp" line="5276"/>
         <source>Load</source>
         <translation>加载</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5276"/>
+        <location filename="../src/pages.cpp" line="5277"/>
         <source>Clear</source>
         <translation>清空</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5277"/>
+        <location filename="../src/pages.cpp" line="5278"/>
         <source>Set</source>
         <translation>修改</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="5282"/>
+        <location filename="../src/pages.cpp" line="5283"/>
         <source>Target Map Modify</source>
         <translation>目标地图修改</translation>
     </message>
@@ -3303,65 +3303,65 @@ Do you want to download PvZ Toolkit now?</source>
 <context>
     <name>Pt::VasePage</name>
     <message>
-        <location filename="../src/pages.cpp" line="4061"/>
-        <location filename="../src/pages.cpp" line="4194"/>
-        <location filename="../src/pages.cpp" line="4237"/>
+        <location filename="../src/pages.cpp" line="4062"/>
+        <location filename="../src/pages.cpp" line="4195"/>
+        <location filename="../src/pages.cpp" line="4238"/>
         <source>Vase Count</source>
         <translation>花瓶数量</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4195"/>
+        <location filename="../src/pages.cpp" line="4196"/>
         <source>Clear</source>
         <translation>清空</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4196"/>
+        <location filename="../src/pages.cpp" line="4197"/>
         <source>Load</source>
         <translation>加载</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4197"/>
+        <location filename="../src/pages.cpp" line="4198"/>
         <source>Set</source>
         <translation>修改</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4199"/>
+        <location filename="../src/pages.cpp" line="4200"/>
         <source>Row</source>
         <translation>行</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4200"/>
+        <location filename="../src/pages.cpp" line="4201"/>
         <source>Column</source>
         <translation>列</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4201"/>
+        <location filename="../src/pages.cpp" line="4202"/>
         <source>Skin</source>
         <translation>皮肤</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4202"/>
+        <location filename="../src/pages.cpp" line="4203"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4203"/>
+        <location filename="../src/pages.cpp" line="4204"/>
         <source>Plant</source>
         <translation>植物</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4204"/>
+        <location filename="../src/pages.cpp" line="4205"/>
         <source>Zombie</source>
         <translation>僵尸</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4205"/>
+        <location filename="../src/pages.cpp" line="4206"/>
         <source>Sun</source>
         <translation>阳光</translation>
     </message>
     <message>
-        <location filename="../src/pages.cpp" line="4258"/>
-        <location filename="../src/pages.cpp" line="4292"/>
+        <location filename="../src/pages.cpp" line="4259"/>
+        <location filename="../src/pages.cpp" line="4293"/>
         <source>Empty</source>
         <translation>空</translation>
     </message>
