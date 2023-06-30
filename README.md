@@ -31,7 +31,7 @@ Already tested and confirmed works with:
 
 | Qt      | OpenSSL | zlib      | Compiler  |
 | ------- | ------- | --------- | --------- |
-| 5.15.7  | 1.1.1s  | 1.2.13    | MSVC 2019 |
+| 5.15.10 | 1.1.1u  | 1.2.13    | MSVC 2019 |
 
 ## Credit
 

@@ -3,7 +3,12 @@
 
 本项目的所有值得注意的更改都将记录于此文件中.
 
-PvZ Tools 已被废弃, 推荐使用 [PvZ Toolkit](https://pvz.lmintlcx.com/toolkit/) 代替.
+**PvZ Tools 已被废弃, 推荐使用 [PvZ Toolkit](https://pvz.lmintlcx.com/toolkit/) 代替.**
+
+
+## [2.7.4] - 2023/06/30
+
+- 更新了版本号.
 
 
 ## [2.7.3] - 2022/11/24

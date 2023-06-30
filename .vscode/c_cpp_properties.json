@@ -5,12 +5,12 @@
             "includePath": [
                 "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/include",
                 "C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/ucrt",
-                "C:/Dev/Qt_5.15.7/msvc2019_x86/shared/include",
-                "C:/Dev/Qt_5.15.7/msvc2019_x86/shared/include/QtCore",
-                "C:/Dev/Qt_5.15.7/msvc2019_x86/shared/include/QtGui",
-                "C:/Dev/Qt_5.15.7/msvc2019_x86/shared/include/QtWidgets",
-                "C:/Dev/Qt_5.15.7/msvc2019_x86/shared/include/QtNetwork",
-                "C:/Dev/OpenSSL_1.1.1s/msvc2019_x86/shared/include",
+                "C:/Dev/Qt_5.15.10/msvc2019_x86/shared/include",
+                "C:/Dev/Qt_5.15.10/msvc2019_x86/shared/include/QtCore",
+                "C:/Dev/Qt_5.15.10/msvc2019_x86/shared/include/QtGui",
+                "C:/Dev/Qt_5.15.10/msvc2019_x86/shared/include/QtWidgets",
+                "C:/Dev/Qt_5.15.10/msvc2019_x86/shared/include/QtNetwork",
+                "C:/Dev/OpenSSL_1.1.1u/msvc2019_x86/shared/include",
                 "C:/Dev/zlib_1.2.13/msvc2019_x86/shared/include",
                 "${workspaceFolder}/**"
             ],
