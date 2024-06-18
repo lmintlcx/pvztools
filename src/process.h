@@ -1,19 +1,19 @@
 /*
- * @Author: lmintlcx 
- * @Date: 2018-06-27 21:53:24 
+ * @Author: lmintlcx
+ * @Date: 2018-06-27 21:53:24
  * @Description: Read and write memory.
  */
 
 #pragma once
 
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <string>
-#include <functional>
-#include <initializer_list>
 #include <array>
 #include <cassert>
+#include <functional>
+#include <initializer_list>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 #include <Windows.h>
 

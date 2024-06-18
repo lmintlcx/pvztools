@@ -1,6 +1,6 @@
 /*
- * @Author: lmintlcx 
- * @Date: 2018-06-29 19:17:18 
+ * @Author: lmintlcx
+ * @Date: 2018-06-29 19:17:18
  * @Description: Pack and unpack ".pak" file.
  */
 
@@ -50,19 +50,19 @@ class PAK : public QObject
     bool create_path(const std::wstring &);
 
     // 递归地查找所有文件
-    void find_files(const std::wstring,
+    void find_files(const std::wstring &,
                     std::vector<std::wstring> &, //
                     std::vector<int> &,          //
                     std::vector<FILETIME> &);
 
   public:
     // 解包, 参数分别为源文件名和解包文件夹
-    int Unpack(std::wstring, std::wstring);
-    int Unpack(std::string, std::string);
+    int Unpack(const std::wstring &, const std::wstring &);
+    int Unpack(const std::string &, const std::string &);
 
     // 打包, 参数分别为源文件夹和打包文件名
-    int Pack(std::wstring, std::wstring);
-    int Pack(std::string, std::string);
+    int Pack(const std::wstring &, const std::wstring &);
+    int Pack(const std::string &, const std::string &);
 
     void UnpackPAK(QString, QString);
     void PackPAK(QString);

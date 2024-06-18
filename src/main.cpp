@@ -23,15 +23,16 @@
 #pragma comment(lib, "crypt32.lib")
 #pragma comment(lib, "wintrust.lib")
 
-#include <QSplashScreen>
-#include <QSettings>
 #include <QFileInfo>
+#include <QSettings>
+#include <QSplashScreen>
 
 #include <ctime>
 #include <random>
 
 #include "src/application.h"
 #include "src/window.h"
+
 #include "src/version.h"
 
 // 编译器目标平台限制为 x86
@@ -40,15 +41,9 @@
 // 以及 Visual Studio 不支持 x64 内联汇编
 static_assert(sizeof(void *) == 4);
 
-// 要求编译器支持 C++20
+// 要求编译器支持 C++17
 #ifdef _MSC_VER
-static_assert(_MSC_VER >= 1929);
-#endif
-#ifdef __MINGW32__
-static_assert(__GNUC__ >= 11);
-#endif
-#ifdef __clang__
-static_assert(__clang_major__ >= 13);
+static_assert(_MSC_VER >= 1916);
 #endif
 
 using Pt::Application;
@@ -74,15 +69,16 @@ int main(int argc, char *argv[])
     // 开启高 DPI 缩放支持
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-
+#endif
     QGuiApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
 
     Application app(argc, argv);
     if (app.isRunning())
         return -1;
 
-    QString splash_filename = ":/res/logo.ico";
+    QString splash_filename = ":/resources/logo.ico";
     if (QFileInfo::QFileInfo("splash.jpg").isFile())
         splash_filename = "splash.jpg";
     else if (QFileInfo::QFileInfo("splash.png").isFile())

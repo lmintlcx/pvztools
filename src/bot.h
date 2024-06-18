@@ -1,6 +1,6 @@
 /*
- * @Author: lmintlcx 
- * @Date: 2018-06-28 13:30:04 
+ * @Author: lmintlcx
+ * @Date: 2018-06-28 13:30:04
  * @Description: Simulate mouse and keyboard operation.
  */
 

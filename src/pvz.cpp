@@ -1,19 +1,19 @@
 
-#include <QString>
 #include <QMetaType>
+#include <QString>
 
-#include <iostream>
-#include <iomanip>
-#include <random>
+#include <algorithm>
 #include <array>
+#include <cassert>
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <random>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <chrono>
-#include <cassert>
 
-#include "src/pvz.h"
 #include "src/bot.h"
+#include "src/pvz.h"
 
 namespace Pt
 {
@@ -1230,11 +1230,11 @@ void PvZ::AllZombiesXXX(int zombie_status)
                     break;
                 case 2: // Freeze
                     WriteMemory<int>(600, zombie_offset + 0xb4 + i * 0x15c);
-                    WriteMemory<int>(20000, zombie_offset + 0xac + i * 0x15c);
+                    WriteMemory<int>(2000, zombie_offset + 0xac + i * 0x15c);
                     break;
                 case 3: // Decelerate
                     WriteMemory<int>(1, zombie_offset + 0xb4 + i * 0x15c);
-                    WriteMemory<int>(20000, zombie_offset + 0xac + i * 0x15c);
+                    WriteMemory<int>(2000, zombie_offset + 0xac + i * 0x15c);
                     break;
                 case 4: // Immobilize
                     WriteMemory<int>(500, zombie_offset + 0xb0 + i * 0x15c);
@@ -1407,10 +1407,10 @@ void PvZ::InternalSpawn(std::array<bool, 33> zombies, bool original)
             // change replace zombie back after the zombies list was generated
             if (!has_normal_zombie)
             {
-                auto zombies_list = ReadMemory<uint32_t, 1000>(zombies_list_offset);
+                auto internal_zombies_list = ReadMemory<uint32_t, 1000>(zombies_list_offset);
                 for (size_t i = 0; i < 1000; i++)
                 {
-                    if (zombies_list[i] == 26)
+                    if (internal_zombies_list[i] == 26)
                         WriteMemory<uint32_t>(replace_zombie, zombies_list_offset + i * sizeof(uint32_t));
                 }
             }

@@ -1,6 +1,6 @@
 /*
- * @Author: lmintlcx 
- * @Date: 2018-07-02 17:55:52 
+ * @Author: lmintlcx
+ * @Date: 2018-07-02 17:55:52
  * @Description: Main Window.
  */
 
@@ -8,9 +8,9 @@
 
 #include <QMainWindow>
 
-#include "src/pvz.h"
-#include "src/pak.h"
 #include "src/pages.h"
+#include "src/pak.h"
+#include "src/pvz.h"
 
 class QAction;
 class QActionGroup;
@@ -55,6 +55,7 @@ class MainWindow : public QMainWindow
     void ShowCannonLauncherPage();
     void ShowPortalPage();
     void ShowIzeLineupPage();
+    void ShowDocumentPage();
 
   private:
     QAction *openFileAction;
@@ -102,6 +103,7 @@ class MainWindow : public QMainWindow
     QAction *themeFusionAction;
     QActionGroup *themeGroup;
 
+    QAction *helpDocumentAction;
     QAction *videoDemoAction;
     QAction *visitWebsiteAction;
     QAction *changeLogAction;
@@ -151,6 +153,7 @@ class MainWindow : public QMainWindow
     CannonLauncherPage *cannonLauncherPage;
     PortalPage *portalPage;
     IzeLineupPage *izeLineupPage;
+    DocumentPage *documentPage;
 
     QHBoxLayout *mainLayout;
 

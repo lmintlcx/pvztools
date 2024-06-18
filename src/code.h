@@ -1,6 +1,6 @@
 /*
- * @Author: lmintlcx 
- * @Date: 2018-06-28 13:30:04 
+ * @Author: lmintlcx
+ * @Date: 2018-06-28 13:30:04
  * @Description: Inject assembly language.
  */
 
@@ -29,6 +29,9 @@ class Code
   public:
     Code();
     ~Code();
+
+    Code(const Code &) = delete;
+    Code &operator=(const Code &) = delete;
 
     void asm_init();
 

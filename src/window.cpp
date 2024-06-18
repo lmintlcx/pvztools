@@ -1,51 +1,52 @@
 
-#include <QWidget>
-#include <QMainWindow>
-#include <QStackedWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QLineEdit>
-#include <QSpinBox>
-#include <QComboBox>
-#include <QPlainTextEdit>
-#include <QTimer>
-#include <QLayout>
-#include <QThread>
-#include <QDebug>
 #include <QAction>
 #include <QActionGroup>
-#include <QMenu>
-#include <QMenuBar>
-#include <QToolBar>
-#include <QStatusBar>
-#include <QSettings>
-#include <QFontDialog>
 #include <QApplication>
-#include <QDesktopServices>
-#include <QMessageBox>
-#include <QLocale>
+#include <QCheckBox>
+#include <QComboBox>
 #include <QDateTime>
-#include <QPixmap>
-#include <QProcess>
-#include <QTranslator>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QFile>
+#include <QFontDialog>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
-#include <QFile>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
+#include <QLocale>
+#include <QMainWindow>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QPixmap>
+#include <QPlainTextEdit>
+#include <QProcess>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QSettings>
+#include <QSpinBox>
+#include <QStackedWidget>
+#include <QStatusBar>
 #include <QStyleFactory>
+#include <QThread>
+#include <QTimer>
+#include <QToolBar>
+#include <QTranslator>
+#include <QWidget>
 
-#include <string>
 #include <array>
+#include <string>
 
-#include "src/pvz.h"
 #include "src/list.h"
 #include "src/pages.h"
-#include "src/version.h"
+#include "src/pvz.h"
 #include "src/window.h"
+
+#include "src/version.h"
 
 namespace Pt
 {
@@ -84,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent)
     cannonLauncherPage = new CannonLauncherPage;
     portalPage = new PortalPage;
     izeLineupPage = new IzeLineupPage;
+    documentPage = new DocumentPage;
 
     stackedWidget->addWidget(levelPage);
     stackedWidget->addWidget(resourcePage);
@@ -311,7 +313,9 @@ void MainWindow::CreateActions()
 
     connect(exitAction, &QAction::triggered,
             this, [=]()
-            { qApp->quit(); });
+            {
+                qApp->quit();
+            });
 
     findGameAction = new QAction(this);
     gameTopMostAction = new QAction(this);
@@ -491,6 +495,7 @@ void MainWindow::CreateActions()
     connect(themeFusionAction, &QAction::triggered,
             this, &MainWindow::SetTheme);
 
+    helpDocumentAction = new QAction(this);
     videoDemoAction = new QAction(this);
     visitWebsiteAction = new QAction(this);
     changeLogAction = new QAction(this);
@@ -498,17 +503,26 @@ void MainWindow::CreateActions()
     aboutAction = new QAction(this);
     aboutQtAction = new QAction(this);
 
+    connect(helpDocumentAction, &QAction::triggered,
+            this, &MainWindow::ShowDocumentPage);
+
     connect(videoDemoAction, &QAction::triggered,
             this, [=]()
-            { QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/goto/pvztoolsdemo/")); });
+            {
+                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/goto/pvztoolsdemo/"));
+            });
 
     connect(visitWebsiteAction, &QAction::triggered,
             this, [=]()
-            { QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/tools/")); });
+            {
+                QDesktopServices::openUrl(QUrl("https://pvz.lmintlcx.com/tools/"));
+            });
 
     connect(changeLogAction, &QAction::triggered,
             this, [=]()
-            { QDesktopServices::openUrl(QUrl("https://github.com/lmintlcx/pvztools/blob/master/CHANGELOG.md")); });
+            {
+                QDesktopServices::openUrl(QUrl("https://github.com/lmintlcx/pvztools/blob/master/CHANGELOG.md"));
+            });
 
     connect(checkUpdateAction, &QAction::triggered,
             this, [=]()
@@ -601,20 +615,20 @@ void MainWindow::CreateActions()
 
                 QString copyright = QString("") + "©" + " " + (build_date.left(4) == QString("2018") ? QString("2018") : QString("2018") + "-" + build_date.left(4)) + " " + "lmintlcx";
 
-                QString info = QString("<p>")                                                                    //
-                               + tr("Version") + ":" + "  " + VERSION_NAME_FULL + "<br>"                         //
-                               + tr("Date") + ":" + "  " + build_date + "  " + build_time + "<br>"               //
-                               + tr("Toolchain") + ":" + "  " + compiler + "<br>"                                //
-                               + qt_version + " + " + ssl_version + "<br>"                                       //
-                               + tr("Copyright") + ":" + "  " + copyright + "<br>"                               //
-                               + tr("Credit") + ":" + "  " + "a418569882" + "  " + "kmtohoem" + "<br>" + "</p>"; //
+                QString info = QString("<p>")                                                                   //
+                               + tr("Version") + ":" + "  " + VERSION_NAME_FULL + "<br>"                        //
+                               + tr("Date") + ":" + "  " + build_date + "  " + build_time + "<br>"              //
+                               + tr("Toolchain") + ":" + "  " + compiler + "<br>"                               //
+                               + qt_version + " + " + ssl_version + "<br>"                                      //
+                               + tr("Copyright") + ":" + "  " + copyright + "<br>"                              //
+                               + tr("Credit") + ":" + "  " + "zhumxiang" + "  " + "kmtohoem" + "<br>" + "</p>"; //
 
                 QMessageBox msgBox;
                 msgBox.setWindowTitle(tr("About"));
                 if (TEST_VERSION)
-                    msgBox.setIconPixmap(QPixmap::fromImage(QImage(":/res/logo_about.png").convertToFormat(QImage::Format_Grayscale8)));
+                    msgBox.setIconPixmap(QPixmap::fromImage(QImage(":/resources/logo_about.png").convertToFormat(QImage::Format_Grayscale8)));
                 else
-                    msgBox.setIconPixmap(QPixmap::fromImage(QImage(":/res/logo_about.png")));
+                    msgBox.setIconPixmap(QPixmap::fromImage(QImage(":/resources/logo_about.png")));
                 msgBox.setText(tr("<h1>PvZ Tools</h1>"));
                 msgBox.setInformativeText(info);
                 msgBox.setStandardButtons(QMessageBox::Ok);
@@ -624,7 +638,9 @@ void MainWindow::CreateActions()
 
     connect(aboutQtAction, &QAction::triggered,
             this, [=]()
-            { QApplication::aboutQt(); });
+            {
+                QApplication::aboutQt();
+            });
 }
 
 void MainWindow::CreateMenus()
@@ -669,9 +685,10 @@ void MainWindow::CreateMenus()
     themeMenu->addActions(themeGroup->actions());
 
     helpMenu = new QMenu(this);
+    helpMenu->addAction(helpDocumentAction);
     helpMenu->addAction(videoDemoAction);
-    helpMenu->addAction(visitWebsiteAction);
     helpMenu->addSeparator();
+    helpMenu->addAction(visitWebsiteAction);
     helpMenu->addSeparator();
     helpMenu->addAction(changeLogAction);
     helpMenu->addAction(checkUpdateAction);
@@ -1533,6 +1550,7 @@ void MainWindow::SetLanguage()
     cannonLauncherPage->TranslateUI();
     portalPage->TranslateUI();
     izeLineupPage->TranslateUI();
+    documentPage->TranslateUI();
 
     // Hack 2/2
     spawnPage->SetDetailedZombies(zombie);
@@ -1595,6 +1613,9 @@ void MainWindow::SetScreenSize()
         x = 540 * scale_x * font_scale;
         y = 280 * scale_y * font_scale;
         izeLineupPage->setFixedSize(x, y);
+        x = 610 * scale_x * font_scale;
+        y = 420 * scale_y * font_scale;
+        documentPage->setFixedSize(x, y);
     }
     else if (languageEnglishAction->isChecked())
     {
@@ -1617,6 +1638,9 @@ void MainWindow::SetScreenSize()
         x = 690 * scale_x * font_scale;
         y = 280 * scale_y * font_scale;
         izeLineupPage->setFixedSize(x, y);
+        x = 720 * scale_x * font_scale;
+        y = 420 * scale_y * font_scale;
+        documentPage->setFixedSize(x, y);
     }
 }
 
@@ -1664,6 +1688,7 @@ void MainWindow::TranslateUI()
     themeWindowsVistaAction->setText("WindowsVista");
     themeFusionAction->setText("Fusion");
 
+    helpDocumentAction->setText(tr("Help Document"));
     videoDemoAction->setText(tr("Video Demo"));
     visitWebsiteAction->setText(tr("Visit Website"));
     changeLogAction->setText(tr("Change Log"));
@@ -1791,6 +1816,18 @@ void MainWindow::ShowIzeLineupPage()
     }
 }
 
+void MainWindow::ShowDocumentPage()
+{
+    if (documentPage->isVisible())
+    {
+        documentPage->hide();
+    }
+    else
+    {
+        documentPage->show();
+    }
+}
+
 void MainWindow::ActivateWindow()
 {
     showNormal();
@@ -1805,7 +1842,7 @@ void MainWindow::ShowMessageBox(QString msg)
 
 void MainWindow::ShowMessageStatusBar(QString msg)
 {
-    const int display_time = 0x1437;
+    const int display_time = 0x1435;
     statusBar()->showMessage(msg, display_time);
     if (!muteAction->isChecked())
         QApplication::beep();

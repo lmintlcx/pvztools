@@ -1,6 +1,6 @@
 /*
- * @Author: lmintlcx 
- * @Date: 2018-07-01 21:58:32 
+ * @Author: lmintlcx
+ * @Date: 2018-07-01 21:58:32
  * @Description: Strings.
  */
 

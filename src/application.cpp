@@ -1,16 +1,17 @@
 
 #include <QApplication>
-#include <QLocalSocket>
-#include <QLocalServer>
 #include <QDate>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QMessageBox>
 
 #include <Windows.h>
-#include <WinTrust.h>
-#include <SoftPub.h>
 
-#include "src/version.h"
+#include <SoftPub.h>
+#include <WinTrust.h>
+
 #include "src/application.h"
+#include "src/version.h"
 
 namespace Pt
 {
@@ -81,7 +82,7 @@ bool VerifySignature(LPCWSTR pwszSourceFile)
         for (DWORD i = 0; i < size; i++)
             snRead[i] = pCertContext->pCertInfo->SerialNumber.pbData[size - (i + 1)];
         snRead[size] = 0;
-        char snCheck[] = "\x21\x13\x67\x0f\x3b\x6c\x60\xaf\x42\x50\x7f\x07\xd3\x97\xbc\xd6";
+        const char snCheck[] = "\x21\x13\x67\x0f\x3b\x6c\x60\xaf\x42\x50\x7f\x07\xd3\x97\xbc\xd6";
         isGoodSignature = strcmp(snRead, snCheck) == 0;
     }
     else

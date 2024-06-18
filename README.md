@@ -23,7 +23,7 @@ Supported game version:
 
 ## Build
 
-You need a C++20 compiler and Qt 5 libraries to build it.
+You need a C++17 compiler and Qt 5 libraries to build it.
 
 Qt must be linked with OpenSSL or Schannel, zlib is also required.
 
@@ -31,7 +31,7 @@ Already tested and confirmed works with:
 
 | Qt      | OpenSSL | zlib      | Compiler  |
 | ------- | ------- | --------- | --------- |
-| 5.15.10 | 1.1.1u  | 1.2.13    | MSVC 2019 |
+| 5.15.14 | 1.1.1w  | 1.3.1     | MSVC 2017 |
 
 ## Credit
 

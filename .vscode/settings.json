@@ -149,6 +149,8 @@
         "concepts": "cpp",
         "coroutine": "cpp",
         "format": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "qlocalsocket": "cpp",
+        "qlocale": "cpp"
     }
 }

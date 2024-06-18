@@ -1,13 +1,13 @@
 /*
- * @Author: lmintlcx 
- * @Date: 2018-07-01 17:41:29 
+ * @Author: lmintlcx
+ * @Date: 2018-07-01 17:41:29
  * @Description: Pages.
  */
 
 #pragma once
 
-#include <QWidget>
 #include <QStackedWidget>
+#include <QWidget>
 
 #include "src/pvz.h"
 
@@ -1030,6 +1030,21 @@ class IzeLineupPage : public QWidget
     QPushButton *loadButton;
     QPushButton *clearButton;
     QPushButton *setButton;
+    QGridLayout *mainLayout;
+};
+
+// Document
+
+class DocumentPage : public QWidget
+{
+    Q_OBJECT
+
+  public:
+    DocumentPage(QWidget *parent = nullptr);
+    void TranslateUI();
+
+  private:
+    QTextBrowser *document;
     QGridLayout *mainLayout;
 };
 

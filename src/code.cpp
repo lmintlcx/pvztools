@@ -1,6 +1,6 @@
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include <Windows.h>
 

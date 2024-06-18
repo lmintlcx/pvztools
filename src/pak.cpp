@@ -1,9 +1,9 @@
 
-#include <string>
-#include <vector>
-#include <iostream>
 #include <cassert>
 #include <ctime>
+#include <iostream>
+#include <string>
+#include <vector>
 
 #include "src/pak.h"
 
@@ -64,7 +64,7 @@ bool PAK::create_path(const std::wstring &path)
     return CreateDirectoryW(path.c_str(), nullptr);
 }
 
-void PAK::find_files(const std::wstring find_path,
+void PAK::find_files(const std::wstring &find_path,
                      std::vector<std::wstring> &files_name,
                      std::vector<int> &files_size,
                      std::vector<FILETIME> &files_time)
@@ -107,7 +107,7 @@ void PAK::find_files(const std::wstring find_path,
     }
 }
 
-int PAK::Unpack(std::wstring src_file, std::wstring dst_dir)
+int PAK::Unpack(const std::wstring &src_file, const std::wstring &dst_dir)
 {
 #ifdef _DEBUG
     std::wcout << L"解包源文件: " << src_file << std::endl;
@@ -281,12 +281,12 @@ int PAK::Unpack(std::wstring src_file, std::wstring dst_dir)
     return UNPACK_SUCCESS;
 }
 
-int PAK::Unpack(std::string src_file, std::string dst_dir)
+int PAK::Unpack(const std::string &src_file, const std::string &dst_dir)
 {
     return Unpack(utf8_decode(src_file), utf8_decode(dst_dir));
 }
 
-int PAK::Pack(std::wstring src_dir, std::wstring dst_file)
+int PAK::Pack(const std::wstring &src_dir, const std::wstring &dst_file)
 {
 #ifdef _DEBUG
     std::wcout << L"打包源文件夹: " << src_dir << std::endl;
@@ -380,8 +380,8 @@ int PAK::Pack(std::wstring src_dir, std::wstring dst_file)
         unsigned int name_size = file_name_str.size();
         name_width = static_cast<unsigned char>(name_size);
 
-        for (size_t i = 0; i < name_size; i++)
-            file_name[i] = file_name_str.at(i);
+        for (size_t j = 0; j < name_size; j++)
+            file_name[j] = file_name_str.at(j);
         file_name[name_size] = 0;
 
         file_size = files_size.at(i);
@@ -473,11 +473,10 @@ int PAK::Pack(std::wstring src_dir, std::wstring dst_file)
         CloseHandle(hfr);
 
         // 加密
-        for (size_t i = 0; i < size; ++i)
-            buffer[i] = buffer[i] ^ 0xf7;
+        for (size_t j = 0; j < size; ++j)
+            buffer[j] = buffer[j] ^ 0xf7;
 
         // 写入
-        DWORD write_size = 0;
         WriteFile(hfw, buffer, size, &write_size, nullptr);
         if (write_size != size)
         {
@@ -492,7 +491,7 @@ int PAK::Pack(std::wstring src_dir, std::wstring dst_file)
     return PACK_SUCCESS;
 }
 
-int PAK::Pack(std::string src_file, std::string dst_dir)
+int PAK::Pack(const std::string &src_file, const std::string &dst_dir)
 {
     return Pack(utf8_decode(src_file), utf8_decode(dst_dir));
 }
